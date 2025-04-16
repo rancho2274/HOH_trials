@@ -1,0 +1,3265 @@
+[
+  {
+    "timestamp":"2025-03-20 23:28:46.254358",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":201,
+    "response_time":5.439,
+    "ip_address":"13.224.81.166",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36"
+    },
+    "request_body":{
+      "category":"electronics",
+      "price_range":"44-524"
+    },
+    "response_size":3897,
+    "error_message":null,
+    "correlation_id":"27bc278b-590e-409c-96fa-b3b8ef3e0e8c",
+    "is_anomalous":false,
+    "hour":23,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":52,
+    "num_headers":3,
+    "has_error":0,
+    "status_category":"success",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-12 12:37:03.307360",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":400,
+    "response_time":3.208,
+    "ip_address":"129.73.43.122",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 89a10e5397674e11b8cdab1fdef3f279"
+    },
+    "request_body":{
+      "params":{
+        "query":"Operation kid ability."
+      }
+    },
+    "response_size":302,
+    "error_message":"Validation failed for input data",
+    "correlation_id":"deab7931-e35e-497b-ac1e-f22afa2e1c9a",
+    "is_anomalous":true,
+    "hour":12,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":47,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-19 10:32:47.304360",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/payments",
+    "status_code":422,
+    "response_time":8.798,
+    "ip_address":"178.207.186.139",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+      "Authorization":"Bearer d139b3c6e4084793b0d69c9a11a6c1db"
+    },
+    "request_body":{
+      "order_id":"1811c7b5fc064bfd8d8754bcd1ab0853",
+      "payment_method":"paypal",
+      "amount":"not-a-number"
+    },
+    "response_size":179,
+    "error_message":"Data validation failed",
+    "correlation_id":"e50c2e41-4564-431d-970c-11e6d3a0343c",
+    "is_anomalous":true,
+    "hour":10,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":102,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-06 01:48:01.306358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/orders",
+    "status_code":503,
+    "response_time":1.756,
+    "ip_address":"231.36.177.25",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer be3b01257e2a41789e9b27563cc2cc85"
+    },
+    "request_body":{
+      "product_id":"invalid-id",
+      "quantity":-5,
+      "shipping_address":"626 Walker Point\nWest Michaelborough, WA 26756"
+    },
+    "response_size":745,
+    "error_message":"Service is down for maintenance",
+    "correlation_id":"735d5b11-79b6-44b1-91de-b5351985a79d",
+    "is_anomalous":true,
+    "hour":1,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":115,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-15 13:59:32.302358",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/users",
+    "status_code":429,
+    "response_time":2.375,
+    "ip_address":"202.240.114.38",
+    "user_agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer f27ffb46443c4667ade37eb5d4bb0aa3"
+    },
+    "request_body":{
+      "name":"Lori Goodwin",
+      "email":"invalid-email-format",
+      "role":"guest"
+    },
+    "response_size":466,
+    "error_message":"Please try again later",
+    "correlation_id":"4feabfcb-e6e4-4448-b398-188673e870da",
+    "is_anomalous":true,
+    "hour":13,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":74,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-27 13:31:17.034359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/shipping",
+    "status_code":502,
+    "response_time":8.098,
+    "ip_address":"31.153.124.128",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 3c5e1eaff2974bbbb8b5b0237f58d79e"
+    },
+    "request_body":{
+      "params":{
+        "query":"Receive financial method start."
+      }
+    },
+    "response_size":478,
+    "error_message":"Proxy error",
+    "correlation_id":"9bd871ae-993a-42b0-b9dc-e4ecffc467af",
+    "is_anomalous":true,
+    "hour":13,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":56,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-12 04:31:15.825359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":401,
+    "response_time":1.425,
+    "ip_address":"179.154.68.43",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15"
+    },
+    "request_body":"{'category': 'clothing', 'price_range': '31-936'",
+    "response_size":507,
+    "error_message":"Missing authentication token",
+    "correlation_id":"ee4ce072-c0f7-4521-86a4-fb8e07443a06",
+    "is_anomalous":true,
+    "hour":4,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":48,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-01 04:45:57.301358",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/settings",
+    "status_code":502,
+    "response_time":2.042,
+    "ip_address":"215.81.175.156",
+    "user_agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 75c8d97e8c93400dbaf66e8937acdb59"
+    },
+    "request_body":{
+      "params":{
+        "query":"While might course development move sit unit."
+      }
+    },
+    "response_size":870,
+    "error_message":"Proxy error",
+    "correlation_id":"51f0bf0c-7b1c-405c-9dd1-61e271c13fb7",
+    "is_anomalous":true,
+    "hour":4,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":70,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-13 19:01:07.307360",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/orders",
+    "status_code":502,
+    "response_time":1.908,
+    "ip_address":"142.140.113.216",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 4ce1ebf2b4ac4e2e8bfe52755a02163e"
+    },
+    "request_body":{
+      "product_id":"fcb946971f8a4411ad36b87c98262af3",
+      "quantity":7,
+      "shipping_address":"1399 Stevens Pines Suite 453\nSmithtown, AZ 72000"
+    },
+    "response_size":496,
+    "error_message":"Invalid response from upstream server",
+    "correlation_id":"c0ddc65d-23fd-46d2-ab0f-561c02bdb798",
+    "is_anomalous":true,
+    "hour":19,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":138,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-19 15:19:05.303359",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/logout",
+    "status_code":422,
+    "response_time":8.107,
+    "ip_address":"184.244.14.94",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+      "Authorization":"Bearer 7458ac0f0ef148179907b692d7d0292d"
+    },
+    "request_body":{
+      "params":{
+        "query":"Deep according whole old education off."
+      }
+    },
+    "response_size":409,
+    "error_message":"Data validation failed",
+    "correlation_id":"e273b938-e2cd-4958-9e2d-7ef10812d5f8",
+    "is_anomalous":true,
+    "hour":15,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":64,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-04 06:49:27.305359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/orders",
+    "status_code":500,
+    "response_time":7.623,
+    "ip_address":"213.1.106.218",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 647fa5361862424cb46a2133ddcfbf76"
+    },
+    "request_body":{
+      "product_id":"5551884c81c047f1b3ff200242adee4a",
+      "quantity":5,
+      "shipping_address":"USCGC Johnson\nFPO AE 48472"
+    },
+    "response_size":623,
+    "error_message":"Internal server error",
+    "correlation_id":"312a0319-bb16-40ac-af52-27da62fa30b1",
+    "is_anomalous":true,
+    "hour":6,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":116,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-01 20:17:19.308360",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/settings",
+    "status_code":502,
+    "response_time":7.277,
+    "ip_address":"198.128.162.229",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+      "Authorization":"Bearer b843f272fb6a4e30ad9947d2a0b1166c"
+    },
+    "request_body":{
+      "params":{
+        "query":"Well charge join set any stock."
+      }
+    },
+    "response_size":920,
+    "error_message":"Upstream server unavailable",
+    "correlation_id":"9bb2defd-96c1-400e-bb66-33cdeec18445",
+    "is_anomalous":true,
+    "hour":20,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":56,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-20 07:19:22.305359",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/orders",
+    "status_code":422,
+    "response_time":6.069,
+    "ip_address":"19.171.125.44",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 16ffe84a52304f3291cdaf887baeb75d"
+    },
+    "request_body":{
+      "product_id":"invalid-id",
+      "quantity":-5,
+      "shipping_address":"4271 Hunter Mews\nLake Crystal, MH 77434"
+    },
+    "response_size":130,
+    "error_message":"Data validation failed",
+    "correlation_id":"ac884142-fe03-48f6-a14c-ee91495af25b",
+    "is_anomalous":true,
+    "hour":7,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":108,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-05 02:52:29.304360",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/settings",
+    "status_code":400,
+    "response_time":7.858,
+    "ip_address":"34.214.240.162",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 16f2128fc0374bc2b408e5e3ad3f957f"
+    },
+    "request_body":{
+      "params":{
+        "query":"Ahead skin no sort make."
+      }
+    },
+    "response_size":222,
+    "error_message":"Malformed JSON in request body",
+    "correlation_id":"66acca95-4058-403f-9d2b-d5e7790bb3ad",
+    "is_anomalous":true,
+    "hour":2,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":49,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-09 21:17:23.304360",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/logout",
+    "status_code":404,
+    "response_time":4.765,
+    "ip_address":"67.5.74.49",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 36b5b1645d8f4ee2802df127c57c44ea"
+    },
+    "request_body":{
+      "params":{
+        "query":"Several organization look."
+      }
+    },
+    "response_size":202,
+    "error_message":"Resource not found",
+    "correlation_id":"783e57bc-8d3d-4142-a999-529d1255c41d",
+    "is_anomalous":true,
+    "hour":21,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":51,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-16 21:12:34.310393",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/orders",
+    "status_code":502,
+    "response_time":3.46,
+    "ip_address":"130.164.226.46",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer a499bd8733004156bc4c9e0a9bf574cd"
+    },
+    "request_body":{
+      "product_id":"2fd55a098b1e430ebda4511198bd52ac",
+      "quantity":5,
+      "shipping_address":"45547 Gutierrez Underpass Apt. 488\nNew Daniel, LA 44962"
+    },
+    "response_size":615,
+    "error_message":"Invalid response from upstream server",
+    "correlation_id":"bbc91088-8bca-4f82-ba71-094a26bb8c40",
+    "is_anomalous":true,
+    "hour":21,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":145,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-08 00:31:15.849359",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/settings",
+    "status_code":504,
+    "response_time":0.53,
+    "ip_address":"189.53.13.42",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer 55e441ef39ac418b8fbc6cdc654dbc8c"
+    },
+    "request_body":{
+      "params":{
+        "query":"Decision impact thousand various."
+      }
+    },
+    "response_size":973,
+    "error_message":"Connection timeout",
+    "correlation_id":"2580a34c-085a-4e42-9821-716b256e31a4",
+    "is_anomalous":true,
+    "hour":0,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":58,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-15 00:08:50.284358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/orders",
+    "status_code":503,
+    "response_time":5.141,
+    "ip_address":"25.202.156.27",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 7efb3e0b6fce44278f1dad03f051b4b5"
+    },
+    "request_body":{
+      "product_id":"8b1b4113637240d8b7e34a35e3b7fad7",
+      "quantity":1,
+      "shipping_address":"48315 Daniel Field Apt. 903\nToddland, KY 15355"
+    },
+    "response_size":268,
+    "error_message":"Server is overloaded",
+    "correlation_id":"4221fb4a-1aaf-4968-a71e-b2245ccd3919",
+    "is_anomalous":false,
+    "hour":0,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":136,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-31 09:26:26.311391",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":401,
+    "response_time":6.628,
+    "ip_address":"234.173.203.47",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 6cc401ffba0c4762948f2182e5878b2a"
+    },
+    "request_body":{
+      "params":{
+        "query":"Final role everyone grow difficult."
+      }
+    },
+    "response_size":171,
+    "error_message":"Missing authentication token",
+    "correlation_id":"cba2a994-4764-4eeb-8791-7f26218932aa",
+    "is_anomalous":true,
+    "hour":9,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":60,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-24 23:36:04.303359",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":502,
+    "response_time":3.411,
+    "ip_address":"51.93.171.70",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer a8bb3559d70a4be080feb8c47a3d3f6a"
+    },
+    "request_body":{
+      "params":{
+        "query":"Point body address many line chair want each."
+      }
+    },
+    "response_size":885,
+    "error_message":"Upstream server unavailable",
+    "correlation_id":"45b6296d-32f0-4efa-96c0-2243a0cfbb18",
+    "is_anomalous":true,
+    "hour":23,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":70,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-01 20:39:59.306358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/payments",
+    "status_code":401,
+    "response_time":7.723,
+    "ip_address":"3.103.238.44",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer e241ef8caae442358c29f80efa6739fb"
+    },
+    "request_body":"{'order_id': '3097ddecfca94e1290b979b28b69c2ec', 'payment_method': 'bank_transfer', 'amount': -100",
+    "response_size":330,
+    "error_message":"Missing authentication token",
+    "correlation_id":"a7563001-1870-46e5-8c3d-c770d9897bdb",
+    "is_anomalous":true,
+    "hour":20,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":98,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-20 08:34:42.311391",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/logout",
+    "status_code":400,
+    "response_time":9.928,
+    "ip_address":"226.18.247.225",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer f816ae95c9e94cf099b39f0a8804d56c"
+    },
+    "request_body":{
+      "params":{
+        "query":"Least already discuss church."
+      }
+    },
+    "response_size":400,
+    "error_message":"Validation failed for input data",
+    "correlation_id":"8f42d506-8a2b-4e29-aa14-dc149cdf9489",
+    "is_anomalous":true,
+    "hour":8,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":54,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-18 09:07:38.304360",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":403,
+    "response_time":8.843,
+    "ip_address":"182.157.47.72",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 9d71b5647eaf40d58651d2d2ecd1abab"
+    },
+    "request_body":{
+      "params":{
+        "query":"Property keep first last speak shoulder health."
+      }
+    },
+    "response_size":331,
+    "error_message":"Account suspended",
+    "correlation_id":"85c7ba37-677b-4f7e-acb2-c53ea077a1c1",
+    "is_anomalous":true,
+    "hour":9,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":72,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-01 01:34:51.305359",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":500,
+    "response_time":1.812,
+    "ip_address":"109.15.116.230",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer cf2d1c8a5b3e4dccb7860232ccfd09cd"
+    },
+    "request_body":{
+      "params":{
+        "query":"Actually response crime eight affect I support."
+      }
+    },
+    "response_size":633,
+    "error_message":"Unexpected condition encountered",
+    "correlation_id":"d3fea51f-e3e5-468c-8d0b-8f6bb8f259d3",
+    "is_anomalous":true,
+    "hour":1,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":72,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-14 03:31:15.830359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/users",
+    "status_code":503,
+    "response_time":0.167,
+    "ip_address":"235.42.224.139",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 87e7e25482f04c5998d84168a6aa6724"
+    },
+    "request_body":"{'name': 'Dr. Ronald Lane', 'email': 'invalid-email-format', 'role': 'user'",
+    "response_size":426,
+    "error_message":"Service temporarily unavailable",
+    "correlation_id":"f22a45d4-ba94-4cf1-a8d3-e43d0dc9867a",
+    "is_anomalous":true,
+    "hour":3,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":75,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-07 22:27:44.303359",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/settings",
+    "status_code":401,
+    "response_time":3.848,
+    "ip_address":"246.155.213.150",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 84b46d01c063439ebba63a75c582e727"
+    },
+    "request_body":{
+      "params":{
+        "query":"Figure politics by consider base record allow million."
+      }
+    },
+    "response_size":477,
+    "error_message":"Invalid authentication credentials",
+    "correlation_id":"f2b74500-f398-496e-8a0e-e989e40af58b",
+    "is_anomalous":true,
+    "hour":22,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":79,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-06 18:08:07.301358",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":429,
+    "response_time":2.55,
+    "ip_address":"56.236.113.170",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer 6148340869c24f26b379e6768a2ed0a4"
+    },
+    "request_body":{
+      "params":{
+        "query":"Particularly hold soon development quality."
+      }
+    },
+    "response_size":509,
+    "error_message":"Rate limit exceeded",
+    "correlation_id":"1caeb098-1431-4290-9c7f-495b4adf0ef7",
+    "is_anomalous":true,
+    "hour":18,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":68,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-27 07:10:39.304360",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":403,
+    "response_time":8.623,
+    "ip_address":"34.45.178.207",
+    "user_agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0"
+    },
+    "request_body":{
+      "category":"food",
+      "price_range":"36-862"
+    },
+    "response_size":359,
+    "error_message":"Rate limit exceeded",
+    "correlation_id":"75d1e7f4-3ece-4ec4-8d43-739843160210",
+    "is_anomalous":true,
+    "hour":7,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":45,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-11 18:16:56.301358",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/orders",
+    "status_code":401,
+    "response_time":4.823,
+    "ip_address":"50.68.15.7",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 5a06ddc2b2684c63815314a2ece79ed5"
+    },
+    "request_body":{
+      "product_id":"invalid-id",
+      "quantity":-5,
+      "shipping_address":"07722 Michael Road Apt. 921\nLake Manuelville, DE 88292"
+    },
+    "response_size":348,
+    "error_message":"Missing authentication token",
+    "correlation_id":"2b2b305a-0c6e-4c6b-a288-7e810a666277",
+    "is_anomalous":true,
+    "hour":18,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":123,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-26 00:59:43.302358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/logout",
+    "status_code":503,
+    "response_time":5.92,
+    "ip_address":"30.127.146.173",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 3adc8d4db63e42d384358f8d86d6ebb9"
+    },
+    "request_body":{
+      "params":{
+        "query":"Nature ask performance report energy become."
+      }
+    },
+    "response_size":288,
+    "error_message":"Please try again later",
+    "correlation_id":"6aed9650-b113-4782-a9e9-8f0ef4d4e504",
+    "is_anomalous":true,
+    "hour":0,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":69,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-21 17:54:32.308360",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/orders",
+    "status_code":404,
+    "response_time":1.947,
+    "ip_address":"25.21.187.28",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 779d0f6132e34a6eb0734f9034e35cdc"
+    },
+    "request_body":{
+      "product_id":"invalid-id",
+      "quantity":-5,
+      "shipping_address":"7438 Vanessa Crossing\nWrightview, KS 42497"
+    },
+    "response_size":312,
+    "error_message":"Product no longer available",
+    "correlation_id":"8837daf3-bc54-4b2d-beb0-b608ac21d314",
+    "is_anomalous":true,
+    "hour":17,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":111,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-16 18:37:20.254358",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":422,
+    "response_time":0.309,
+    "ip_address":"71.53.68.249",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 265a2b397e404a0cbb62aef443ae383d"
+    },
+    "request_body":{
+      "params":{
+        "query":"Wind her chance listen option myself."
+      }
+    },
+    "response_size":217,
+    "error_message":"Value out of allowed range",
+    "correlation_id":"cf825e8a-7c13-4461-aaef-6eddb9668f7b",
+    "is_anomalous":false,
+    "hour":18,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":62,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-25 12:31:15.809359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/orders",
+    "status_code":503,
+    "response_time":9.914,
+    "ip_address":"46.59.95.214",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 8b7fad0086b84cfb924329cf02137af4"
+    },
+    "request_body":"{'product_id': 'd81f50ebd6494c029d6b32d644ac707e', 'quantity': 4, 'shipping_address': '206 Gregory Unions\\nEast Mauriceland, RI 00785'",
+    "response_size":385,
+    "error_message":"Please try again later",
+    "correlation_id":"781d6c3e-aa42-4087-88e0-946fdeb72f26",
+    "is_anomalous":true,
+    "hour":12,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":134,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-27 00:17:25.310393",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/orders",
+    "status_code":403,
+    "response_time":8.038,
+    "ip_address":"10.178.226.202",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 54cfcab2f54545b08491f4767d72a7d1"
+    },
+    "request_body":{
+      "product_id":"a965efc0911b4d16b98166c6e04e93ac",
+      "quantity":9,
+      "shipping_address":"5029 Jennifer Flat\nValerieside, UT 93874"
+    },
+    "response_size":412,
+    "error_message":"Rate limit exceeded",
+    "correlation_id":"bb603d9c-b7fd-45fc-94f4-c33289963f10",
+    "is_anomalous":true,
+    "hour":0,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":130,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-09 17:42:33.294359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/settings",
+    "status_code":502,
+    "response_time":6.11,
+    "ip_address":"24.230.58.85",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer dcb8e07bc9754954a372a17551b7f7f6"
+    },
+    "request_body":{
+      "params":{
+        "query":"Population believe seat scientist detail wear necessary model."
+      }
+    },
+    "response_size":351,
+    "error_message":"Upstream server unavailable",
+    "correlation_id":"d8f62646-55af-4b01-bb1c-f0d4bd61a72c",
+    "is_anomalous":false,
+    "hour":17,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":87,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-04 16:31:16.088358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/settings",
+    "status_code":504,
+    "response_time":7.294,
+    "ip_address":"236.104.252.7",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer fe86319182004c958436b628d9f674b8"
+    },
+    "request_body":{
+      "params":{
+        "query":"Team subject point source."
+      }
+    },
+    "response_size":930,
+    "error_message":"Upstream server did not respond in time",
+    "correlation_id":"c2feaad8-97c4-43c0-8cdf-65971cc7561a",
+    "is_anomalous":true,
+    "hour":16,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":51,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-17 01:31:16.513358",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/shipping",
+    "status_code":400,
+    "response_time":0.13,
+    "ip_address":"50.26.146.64",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 1ea055375c4c4dbe87ace69ec5bb583d"
+    },
+    "request_body":{
+      "params":{
+        "query":"Same maybe suffer experience role perform project."
+      }
+    },
+    "response_size":454,
+    "error_message":"Missing required field",
+    "correlation_id":"76e2c5f9-a842-4b57-9ba2-63d342dcbf4b",
+    "is_anomalous":true,
+    "hour":1,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":75,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-02 20:31:15.719359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":422,
+    "response_time":0.278,
+    "ip_address":"240.159.229.171",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1"
+    },
+    "request_body":{
+      "category":"food",
+      "price_range":"23-878"
+    },
+    "response_size":494,
+    "error_message":"Invalid format for field 'email'",
+    "correlation_id":"9663a7a1-914a-42ed-953d-b0b61b4f8149",
+    "is_anomalous":true,
+    "hour":20,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":45,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-21 02:44:44.302358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/logout",
+    "status_code":504,
+    "response_time":6.343,
+    "ip_address":"91.41.49.122",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer edabdf4a94b243aa9de2f320f999b803"
+    },
+    "request_body":{
+      "params":{
+        "query":"High big case should."
+      }
+    },
+    "response_size":915,
+    "error_message":"Connection timeout",
+    "correlation_id":"c2af9711-607e-46a3-97cc-bb0bc45d0366",
+    "is_anomalous":true,
+    "hour":2,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":46,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-10 19:09:14.301358",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":422,
+    "response_time":9.539,
+    "ip_address":"17.126.137.78",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1"
+    },
+    "request_body":{
+      "category":"clothing",
+      "price_range":"32-215"
+    },
+    "response_size":501,
+    "error_message":"Data validation failed",
+    "correlation_id":"d85fd614-3269-4c24-9ae0-583cb0ba48c7",
+    "is_anomalous":true,
+    "hour":19,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":49,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-16 17:31:15.878358",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/users",
+    "status_code":401,
+    "response_time":8.95,
+    "ip_address":"101.247.109.6",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 394d0eeac23f43f2b0e44204adb2bc9b"
+    },
+    "request_body":{
+      "email":"clayjennifer@example.org",
+      "role":"guest"
+    },
+    "response_size":458,
+    "error_message":"Token expired",
+    "correlation_id":"8429c2ad-6fee-4f3d-9517-65344abf05a6",
+    "is_anomalous":true,
+    "hour":17,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":54,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-26 21:55:30.256360",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/payments",
+    "status_code":503,
+    "response_time":3.654,
+    "ip_address":"55.11.192.99",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 2860275a1ad5488fbf9c838eb85e674d"
+    },
+    "request_body":{
+      "order_id":"0b4b9e2db8ec45ce97d3b7662b39488e",
+      "payment_method":"bank_transfer",
+      "amount":609.37
+    },
+    "response_size":357,
+    "error_message":"Service temporarily unavailable",
+    "correlation_id":"5ae38a06-866b-45e8-b519-8f75e53c23fc",
+    "is_anomalous":false,
+    "hour":21,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":101,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-15 07:05:04.265358",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/orders",
+    "status_code":500,
+    "response_time":0.219,
+    "ip_address":"96.42.78.87",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer e278d6d29a544df997754bab01570793"
+    },
+    "request_body":{
+      "product_id":"4200eaad6480449bb7c633a6c8b6ba26",
+      "quantity":7,
+      "shipping_address":"115 Tracey Key\nKnoxborough, TX 87044"
+    },
+    "response_size":715,
+    "error_message":"Unhandled exception occurred",
+    "correlation_id":"3fe3a9f1-d9ac-4d33-a041-e68dc5682015",
+    "is_anomalous":false,
+    "hour":7,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":126,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-07 05:11:57.309395",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":403,
+    "response_time":8.054,
+    "ip_address":"55.48.88.190",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer f9e9120525ab493c9f83795aad7791da"
+    },
+    "request_body":{
+      "params":{
+        "query":"It employee professor."
+      }
+    },
+    "response_size":284,
+    "error_message":"IP address blocked",
+    "correlation_id":"831eea0c-32b1-4d3a-b613-903d6e57d9c6",
+    "is_anomalous":true,
+    "hour":5,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":47,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-25 19:26:08.302358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/orders",
+    "status_code":504,
+    "response_time":9.798,
+    "ip_address":"253.155.250.243",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 9dfb1f09a90647f09a4fde8bf62799a2"
+    },
+    "request_body":{
+      "product_id":"invalid-id",
+      "quantity":-5,
+      "shipping_address":"8233 James Shores Apt. 995\nAlvaradostad, KY 91931"
+    },
+    "response_size":602,
+    "error_message":"Request timed out",
+    "correlation_id":"1bd7cf7f-409e-47af-b25c-de3bbeef7827",
+    "is_anomalous":true,
+    "hour":19,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":118,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-04 12:35:58.311391",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":503,
+    "response_time":2.744,
+    "ip_address":"16.167.18.152",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer f9b2eff4feac4473b20f981cc9700316"
+    },
+    "request_body":{
+      "params":{
+        "query":"Modern determine thus south candidate read final."
+      }
+    },
+    "response_size":944,
+    "error_message":"Server is overloaded",
+    "correlation_id":"63921ae1-0258-4626-8267-a4a5a5606877",
+    "is_anomalous":true,
+    "hour":12,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":74,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-08 00:31:15.622359",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":404,
+    "response_time":0.225,
+    "ip_address":"68.173.36.132",
+    "user_agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer b84404fe58ef42fb8ded135e6873939a"
+    },
+    "request_body":{
+      "params":{
+        "query":"Try same song soldier."
+      }
+    },
+    "response_size":179,
+    "error_message":"Endpoint does not exist",
+    "correlation_id":"2580a34c-085a-4e42-9821-716b256e31a4",
+    "is_anomalous":true,
+    "hour":0,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":47,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-02 01:28:28.309395",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/orders",
+    "status_code":401,
+    "response_time":6.414,
+    "ip_address":"133.212.191.15",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 5db4ff55d1254847a266191c59a2f069"
+    },
+    "request_body":{
+      "product_id":"invalid-id",
+      "quantity":-5,
+      "shipping_address":"809 Danny Neck\nMaxwellhaven, NV 07344"
+    },
+    "response_size":276,
+    "error_message":"Missing authentication token",
+    "correlation_id":"c928cf35-be13-4849-8c39-77c06959f997",
+    "is_anomalous":true,
+    "hour":1,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":106,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-12 01:04:14.306358",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":502,
+    "response_time":9.675,
+    "ip_address":"100.72.163.213",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36"
+    },
+    "request_body":{
+      "category":"clothing",
+      "price_range":"11-931"
+    },
+    "response_size":504,
+    "error_message":"Invalid response from upstream server",
+    "correlation_id":"a9a855fa-ca5f-4db6-b6b6-5850b080037c",
+    "is_anomalous":true,
+    "hour":1,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":49,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-14 09:31:16.433359",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/shipping",
+    "status_code":401,
+    "response_time":2.951,
+    "ip_address":"44.171.185.173",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer fd2a56dfd82a4c888584704c721ca520"
+    },
+    "request_body":{
+      "params":{
+        "query":"Half fish yeah expect."
+      }
+    },
+    "response_size":381,
+    "error_message":"Invalid authentication credentials",
+    "correlation_id":"49c1282c-8ef7-4ec8-8435-7b4ad0bfd27f",
+    "is_anomalous":true,
+    "hour":9,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":47,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-25 02:04:08.305359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":503,
+    "response_time":5.367,
+    "ip_address":"31.167.205.223",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer f27d128d36ce47ca9d47e48223ac2a02"
+    },
+    "request_body":{
+      "params":{
+        "query":"Wide identify case contain."
+      }
+    },
+    "response_size":993,
+    "error_message":"Server is overloaded",
+    "correlation_id":"122a7fee-2f40-4871-baa7-714e41359c23",
+    "is_anomalous":true,
+    "hour":2,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":52,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-04 17:42:49.307360",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/payments",
+    "status_code":503,
+    "response_time":4.795,
+    "ip_address":"241.152.246.46",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer b207c2031c5b494883cb568521150740"
+    },
+    "request_body":{
+      "order_id":"eefbfcd0ca044a55a3c8dc4bef2d17f2",
+      "payment_method":"credit_card",
+      "amount":"not-a-number"
+    },
+    "response_size":784,
+    "error_message":"Service is down for maintenance",
+    "correlation_id":"dc4b542f-dd5b-4a79-9c32-e873e90ebb65",
+    "is_anomalous":true,
+    "hour":17,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":107,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-14 17:26:40.305359",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":422,
+    "response_time":2.602,
+    "ip_address":"53.78.21.236",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer c1cd3f1db53a42d193a74fb9be2d10a6"
+    },
+    "request_body":{
+      "params":{
+        "query":"Degree return nation style force begin cover model."
+      }
+    },
+    "response_size":332,
+    "error_message":"Unable to process request",
+    "correlation_id":"0f77513a-df1e-45a3-b15a-3b23ece017bd",
+    "is_anomalous":true,
+    "hour":17,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":76,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-30 10:31:15.605359",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":401,
+    "response_time":8.618,
+    "ip_address":"113.171.71.17",
+    "user_agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 3c33e7d3b49f4987b95c4e183ef59891"
+    },
+    "request_body":{
+      "params":{
+        "query":"Cold stock world feeling compare myself."
+      }
+    },
+    "response_size":323,
+    "error_message":"User not authenticated",
+    "correlation_id":"5af7adfd-0607-482a-b709-61cf8e3cc59d",
+    "is_anomalous":true,
+    "hour":10,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":65,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-27 23:31:16.469359",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/payments",
+    "status_code":503,
+    "response_time":8.605,
+    "ip_address":"252.36.161.89",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+      "Authorization":"Bearer 66032f4e176e4e729eee10afbb3608cc"
+    },
+    "request_body":{
+      "order_id":"0817b2c5988947e7bd9d6b747aec6de2",
+      "payment_method":"bank_transfer",
+      "amount":"not-a-number"
+    },
+    "response_size":852,
+    "error_message":"Please try again later",
+    "correlation_id":"e7704d14-b249-421c-9c8e-af80b33bd88d",
+    "is_anomalous":true,
+    "hour":23,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":109,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-17 19:11:17.294359",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/shipping",
+    "status_code":504,
+    "response_time":1.073,
+    "ip_address":"216.254.184.222",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 79c55064675e499c8fada6203f02783e"
+    },
+    "request_body":{
+      "params":{
+        "query":"List and color great maybe."
+      }
+    },
+    "response_size":778,
+    "error_message":"Connection timeout",
+    "correlation_id":"9da45fc7-7348-46d6-a663-a672d0363b7f",
+    "is_anomalous":false,
+    "hour":19,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":52,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-22 19:10:05.303359",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":500,
+    "response_time":2.816,
+    "ip_address":"73.144.34.88",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer e869e66e45834bcdb65a9c818950dbde"
+    },
+    "request_body":{
+      "params":{
+        "query":"Herself sign pattern bar both social good democratic."
+      }
+    },
+    "response_size":333,
+    "error_message":"Unexpected condition encountered",
+    "correlation_id":"257bb558-b96e-43cd-b43e-98e5251c4e83",
+    "is_anomalous":true,
+    "hour":19,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":78,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-13 19:38:56.303359",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/settings",
+    "status_code":503,
+    "response_time":3.82,
+    "ip_address":"140.45.14.39",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer 0efd4301b5994aca8dfe5d372bdb127f"
+    },
+    "request_body":{
+      "params":{
+        "query":"Tv effort role ball fact like."
+      }
+    },
+    "response_size":513,
+    "error_message":"Please try again later",
+    "correlation_id":"2185285e-c08e-453f-a7d3-92584e79aa1e",
+    "is_anomalous":true,
+    "hour":19,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":55,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-12 23:20:57.309395",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/orders",
+    "status_code":401,
+    "response_time":2.388,
+    "ip_address":"14.249.249.3",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+      "Authorization":"Bearer a12204fd23a745e4b92f095d08a6325a"
+    },
+    "request_body":"{'product_id': 'invalid-id', 'quantity': -5, 'shipping_address': '689 Taylor Port\\nEast Michael, MI 90894'",
+    "response_size":294,
+    "error_message":"Invalid authentication credentials",
+    "correlation_id":"5e091b9f-dbe4-4850-a45b-8f6e5b7563ed",
+    "is_anomalous":true,
+    "hour":23,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":106,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-21 22:51:31.301358",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/settings",
+    "status_code":401,
+    "response_time":4.756,
+    "ip_address":"236.100.148.224",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer ab358c79fdfe403a96d7b5b79b67fb7d"
+    },
+    "request_body":{
+      "params":{
+        "query":"Off example strategy book their movement probably."
+      }
+    },
+    "response_size":187,
+    "error_message":"Invalid authentication credentials",
+    "correlation_id":"1a3f8383-ce63-4ea4-b52f-bc4cdbe94ce7",
+    "is_anomalous":true,
+    "hour":22,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":75,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-21 18:34:42.307360",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/logout",
+    "status_code":503,
+    "response_time":8.862,
+    "ip_address":"235.162.166.124",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer d0ffa99ceb5044e4b5d1a67e7b407240"
+    },
+    "request_body":{
+      "params":{
+        "query":"Office room light soon you special."
+      }
+    },
+    "response_size":577,
+    "error_message":"Service is down for maintenance",
+    "correlation_id":"5b5a8d04-e916-4803-aad0-238939fc6ebb",
+    "is_anomalous":true,
+    "hour":18,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":60,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-14 00:30:08.306358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":500,
+    "response_time":1.407,
+    "ip_address":"185.94.68.227",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer 4046a69efddf40be9cdccadc21ea60bc"
+    },
+    "request_body":{
+      "params":{
+        "query":"Air account system pull hundred."
+      }
+    },
+    "response_size":977,
+    "error_message":"Database connection failed",
+    "correlation_id":"f783a9ab-d42d-4094-9e2c-1ee8ebffebed",
+    "is_anomalous":true,
+    "hour":0,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":57,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-29 16:10:51.303359",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":401,
+    "response_time":8.275,
+    "ip_address":"86.1.246.165",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer fd97a6ee5f204c45a4d6f9c6e9941ed9"
+    },
+    "request_body":"{'params': {'query': 'Recently class free without scientist through.'}",
+    "response_size":473,
+    "error_message":"Invalid authentication credentials",
+    "correlation_id":"1a35708d-84e0-48a9-889f-292e45ab7165",
+    "is_anomalous":true,
+    "hour":16,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":70,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-17 01:31:15.888358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/orders",
+    "status_code":401,
+    "response_time":6.954,
+    "ip_address":"225.121.47.205",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 73b1ec28c6f741f3bfa490ccc69ca3c1"
+    },
+    "request_body":{
+      "product_id":"e1ece4ea513d4bcd8d0e6db5c198434f",
+      "quantity":4,
+      "shipping_address":"1109 Bailey Dale Apt. 360\nWest Dorothy, VA 22357"
+    },
+    "response_size":503,
+    "error_message":"Invalid authentication credentials",
+    "correlation_id":"76e2c5f9-a842-4b57-9ba2-63d342dcbf4b",
+    "is_anomalous":true,
+    "hour":1,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":138,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-29 03:40:01.303359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":504,
+    "response_time":1.853,
+    "ip_address":"109.86.207.213",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 569fce7b923c496a86f8a9c9d249b569"
+    },
+    "request_body":{
+      "params":{
+        "query":"Bank compare must than trip perhaps."
+      }
+    },
+    "response_size":324,
+    "error_message":"Connection timeout",
+    "correlation_id":"497880d3-a0e0-4ff6-9035-b41c13e1ee9a",
+    "is_anomalous":true,
+    "hour":3,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":61,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-26 02:31:15.669358",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":504,
+    "response_time":6.843,
+    "ip_address":"108.193.218.77",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 886de69b7ff44cc8a7b226412fefde40"
+    },
+    "request_body":{
+      "params":{
+        "query":"Chair movie imagine practice."
+      }
+    },
+    "response_size":365,
+    "error_message":"Connection timeout",
+    "correlation_id":"3a6dc8e7-36d2-4e6a-b06b-aea7e26f186f",
+    "is_anomalous":true,
+    "hour":2,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":54,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-05 00:45:52.303359",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/logout",
+    "status_code":504,
+    "response_time":1.313,
+    "ip_address":"98.123.14.221",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer 72af8d9a513c4b1ebade0fc776868a44"
+    },
+    "request_body":{
+      "params":{
+        "query":"Recent director fact he television."
+      }
+    },
+    "response_size":311,
+    "error_message":"Request timed out",
+    "correlation_id":"1482a40a-8862-485b-9272-9b0e533e1731",
+    "is_anomalous":true,
+    "hour":0,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":60,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-10 10:31:16.124358",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/shipping",
+    "status_code":502,
+    "response_time":6.59,
+    "ip_address":"7.127.110.54",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 5de842a4c1c64949b0dc3381de790a8c"
+    },
+    "request_body":{
+      "params":{
+        "query":"Process ability above action then five drug."
+      }
+    },
+    "response_size":888,
+    "error_message":"Bad gateway",
+    "correlation_id":"c064f737-5b09-49b8-8591-f41a21204b32",
+    "is_anomalous":true,
+    "hour":10,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":69,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-31 20:49:53.307360",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":422,
+    "response_time":7.536,
+    "ip_address":"129.244.109.253",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer f485c0cb0c314225b9ea3b3bb4da41e2"
+    },
+    "request_body":{
+      "params":{
+        "query":"Everyone piece experience Mr people produce."
+      }
+    },
+    "response_size":352,
+    "error_message":"Data validation failed",
+    "correlation_id":"51147404-b202-449c-b086-43b66220bd3d",
+    "is_anomalous":true,
+    "hour":20,
+    "day_of_week":0,
+    "is_weekend":0,
+    "request_body_size":69,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-05 17:31:16.292359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/shipping",
+    "status_code":504,
+    "response_time":1.899,
+    "ip_address":"228.227.156.32",
+    "user_agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 25db7d17a51241d38b147a4650d30648"
+    },
+    "request_body":{
+      "params":{
+        "query":"Bad some really modern others."
+      }
+    },
+    "response_size":502,
+    "error_message":"Gateway timeout",
+    "correlation_id":"16e7eabf-3e19-45ba-be88-c6aacb4718d7",
+    "is_anomalous":true,
+    "hour":17,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":55,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-22 15:13:14.274360",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/payments",
+    "status_code":401,
+    "response_time":0.204,
+    "ip_address":"228.170.120.109",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+      "Authorization":"Bearer 90b336d97c854901b64023eced4188ff"
+    },
+    "request_body":{
+      "order_id":"30a1e95d9d974776b39669ec2e4a4821",
+      "payment_method":"paypal",
+      "amount":169.3
+    },
+    "response_size":166,
+    "error_message":"Missing authentication token",
+    "correlation_id":"d137c83b-2292-4a78-9a34-30312932f436",
+    "is_anomalous":false,
+    "hour":15,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":93,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-21 22:49:56.296359",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":502,
+    "response_time":9.699,
+    "ip_address":"86.219.99.138",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 4fe6d69440524a5fbd50db849ca61ec8"
+    },
+    "request_body":{
+      "params":{
+        "query":"Daughter never key carry throughout."
+      }
+    },
+    "response_size":272,
+    "error_message":"Bad gateway",
+    "correlation_id":"a87e39b5-4b1d-418f-9f4a-a825a73936b1",
+    "is_anomalous":false,
+    "hour":22,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":61,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-19 00:31:16.191360",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/settings",
+    "status_code":403,
+    "response_time":9.218,
+    "ip_address":"36.24.199.253",
+    "user_agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 2a271c4f0ffa4cc08a7e8c98c4e5badf"
+    },
+    "request_body":{
+      "params":{
+        "query":"Street mention fast what capital."
+      }
+    },
+    "response_size":246,
+    "error_message":"IP address blocked",
+    "correlation_id":"1473b051-e95c-43bc-ae07-534b7b92050d",
+    "is_anomalous":true,
+    "hour":0,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":58,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-08 22:26:10.248358",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":503,
+    "response_time":7.893,
+    "ip_address":"42.69.194.171",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 8df9b6884cb74743bd9404a6108e9448"
+    },
+    "request_body":{
+      "params":{
+        "query":"Organization manage major wear identify."
+      }
+    },
+    "response_size":387,
+    "error_message":"Please try again later",
+    "correlation_id":"de1291f6-ecb9-46b3-9983-fe264a05cb95",
+    "is_anomalous":false,
+    "hour":22,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":65,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-08 18:47:01.284358",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/payments",
+    "status_code":503,
+    "response_time":5.821,
+    "ip_address":"23.207.119.95",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer 59b44a08524240f3a5bb9c14d555b0c6"
+    },
+    "request_body":{
+      "order_id":"e50da335ab2c4aaa9f9ac96ac3685192",
+      "payment_method":"bank_transfer",
+      "amount":833.86
+    },
+    "response_size":510,
+    "error_message":"Service is down for maintenance",
+    "correlation_id":"fc1c606b-8bb5-4dd6-ae3b-4d7f175933b3",
+    "is_anomalous":false,
+    "hour":18,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":101,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-29 11:02:32.301358",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":500,
+    "response_time":4.817,
+    "ip_address":"119.69.85.96",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15"
+    },
+    "request_body":"{'category': 'food', 'price_range': '24-468'",
+    "response_size":577,
+    "error_message":"Internal server error",
+    "correlation_id":"10773be2-c6f2-4624-9b9d-74b1c379c6d5",
+    "is_anomalous":true,
+    "hour":11,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":44,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-30 00:31:15.710359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":404,
+    "response_time":8.354,
+    "ip_address":"155.5.10.108",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36"
+    },
+    "request_body":{
+      "category":"food",
+      "price_range":"25-846"
+    },
+    "response_size":473,
+    "error_message":"Endpoint does not exist",
+    "correlation_id":"25dd0663-a101-4b6e-a0bd-98e242d04fd3",
+    "is_anomalous":true,
+    "hour":0,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":45,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-26 02:21:20.309395",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/payments",
+    "status_code":504,
+    "response_time":4.687,
+    "ip_address":"165.90.201.47",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 29df894e6d9b4fed869c1b74d5181149"
+    },
+    "request_body":{
+      "order_id":"b4c080b123f5498f8328a152a1dc5531",
+      "payment_method":"credit_card",
+      "amount":-100
+    },
+    "response_size":709,
+    "error_message":"Upstream server did not respond in time",
+    "correlation_id":"88f9c7d7-7891-4519-b37d-5b85bc5428d3",
+    "is_anomalous":true,
+    "hour":2,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":97,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-15 02:14:53.269360",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":404,
+    "response_time":0.144,
+    "ip_address":"137.236.188.81",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0"
+    },
+    "request_body":{
+      "category":"food",
+      "price_range":"47-756"
+    },
+    "response_size":307,
+    "error_message":"Product no longer available",
+    "correlation_id":"f0308159-d632-485c-8a04-485e396cd1cf",
+    "is_anomalous":false,
+    "hour":2,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":45,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-28 01:30:18.310393",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/users",
+    "status_code":502,
+    "response_time":7.862,
+    "ip_address":"137.228.236.40",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 23e3373bc986482bb30d8ce8b09185db"
+    },
+    "request_body":{
+      "email":"rodriguezdavid@example.org",
+      "role":"guest"
+    },
+    "response_size":922,
+    "error_message":"Bad gateway",
+    "correlation_id":"d5a78544-4788-4468-8b95-5bdadff89fb1",
+    "is_anomalous":true,
+    "hour":1,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":56,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-01 22:31:15.590358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/login",
+    "status_code":404,
+    "response_time":3.141,
+    "ip_address":"165.113.245.66",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 268d14602246487fbced47e8e884e7b6"
+    },
+    "request_body":{
+      "username":"willismichael"
+    },
+    "response_size":471,
+    "error_message":"Resource not found",
+    "correlation_id":"887dc35e-883f-415b-bbe2-21293453f96a",
+    "is_anomalous":true,
+    "hour":22,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":29,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-01 18:05:20.306358",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/analytics",
+    "status_code":504,
+    "response_time":4.247,
+    "ip_address":"205.252.239.117",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer b995b597602b4d26924d0d135e2ca07c"
+    },
+    "request_body":{
+      "params":{
+        "query":"Finally nice enjoy property already should."
+      }
+    },
+    "response_size":962,
+    "error_message":"Connection timeout",
+    "correlation_id":"0e0fb264-04ea-46ac-98ff-ee9eabee5bb0",
+    "is_anomalous":true,
+    "hour":18,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":68,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-12 20:31:16.292359",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/settings",
+    "status_code":404,
+    "response_time":5.918,
+    "ip_address":"36.160.219.110",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 4741bddcfd3c471586f21bcd96a2d06c"
+    },
+    "request_body":"{'params': {'query': 'Claim responsibility road century.'}",
+    "response_size":346,
+    "error_message":"User ID not found",
+    "correlation_id":"39bffcbf-46f8-48de-9965-559eca443337",
+    "is_anomalous":true,
+    "hour":20,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":58,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-08 10:31:16.167359",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/payments",
+    "status_code":502,
+    "response_time":8.573,
+    "ip_address":"188.232.143.34",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 30deb2019e114cc0b39b699a98e44722"
+    },
+    "request_body":"{'order_id': 'afc3a9b805714b5a904a8c1e67a243ce', 'payment_method': 'credit_card', 'amount': 'not-a-number'",
+    "response_size":878,
+    "error_message":"Upstream server unavailable",
+    "correlation_id":"98627b39-288d-4e88-9c3d-4ac3a941aaf3",
+    "is_anomalous":true,
+    "hour":10,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":106,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-30 09:31:16.549360",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/settings",
+    "status_code":502,
+    "response_time":4.667,
+    "ip_address":"59.117.159.170",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 5a94b5824b784c2eb13bc3d7cf5863a2"
+    },
+    "request_body":{
+      "params":{
+        "query":"Lose parent discuss west enter."
+      }
+    },
+    "response_size":542,
+    "error_message":"Bad gateway",
+    "correlation_id":"f0ce7d97-8527-4406-8b99-5792933674a3",
+    "is_anomalous":true,
+    "hour":9,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":56,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-12 09:31:16.080359",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/orders",
+    "status_code":502,
+    "response_time":5.305,
+    "ip_address":"209.253.71.17",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 35ac9adcb84446dc800330c662e22e6e"
+    },
+    "request_body":{
+      "product_id":"11a236e440bf4508aadf72af8ceef3db",
+      "quantity":1,
+      "shipping_address":"56031 John Ferry\nWest Kathleen, CT 29386"
+    },
+    "response_size":751,
+    "error_message":"Invalid response from upstream server",
+    "correlation_id":"42e64c2c-aab6-46b5-8bd8-0b319174d6d8",
+    "is_anomalous":true,
+    "hour":9,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":130,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-27 20:11:24.311391",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/login",
+    "status_code":502,
+    "response_time":9.706,
+    "ip_address":"1.211.160.51",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer 2e83bba647f64625b6051bf6bda75bd4"
+    },
+    "request_body":{
+      "username":"msanchez",
+      "password":"wrong"
+    },
+    "response_size":976,
+    "error_message":"Invalid response from upstream server",
+    "correlation_id":"f3dedc4a-b54d-4bc5-9fa0-8c93b4a0feb5",
+    "is_anomalous":true,
+    "hour":20,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":45,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-20 19:00:08.304360",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/login",
+    "status_code":404,
+    "response_time":9.514,
+    "ip_address":"97.207.145.251",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer f2de34e6dedd479789dca57c66099e76"
+    },
+    "request_body":{
+      "username":"lisalarson"
+    },
+    "response_size":510,
+    "error_message":"Product no longer available",
+    "correlation_id":"82a83bd5-db32-4ce4-b3c6-04b06b4fe517",
+    "is_anomalous":true,
+    "hour":19,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":26,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-30 03:26:45.309395",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/users",
+    "status_code":400,
+    "response_time":3.422,
+    "ip_address":"104.32.128.37",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 242105b675274ceaa75d9eefbf71dffc"
+    },
+    "request_body":{
+      "name":"Cameron Sanders",
+      "email":"invalid-email-format",
+      "role":"guest"
+    },
+    "response_size":412,
+    "error_message":"Missing required field",
+    "correlation_id":"78c96938-e387-45e7-9272-917f6ab2b9d3",
+    "is_anomalous":true,
+    "hour":3,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":77,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-23 15:45:24.307360",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/settings",
+    "status_code":429,
+    "response_time":4.615,
+    "ip_address":"147.22.47.83",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer 350cfd46b87e42d495be57b44a0e8597"
+    },
+    "request_body":{
+      "params":{
+        "query":"Financial him fast I friend visit clearly space."
+      }
+    },
+    "response_size":350,
+    "error_message":"Rate limit exceeded",
+    "correlation_id":"94385f5e-43c1-47f8-839e-dd7fcf46073f",
+    "is_anomalous":true,
+    "hour":15,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":73,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-05 18:31:15.545359",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/users",
+    "status_code":422,
+    "response_time":6.321,
+    "ip_address":"32.84.116.250",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 9fc5dbd313ab49f9847d0b31d7943948"
+    },
+    "request_body":"{'email': 'spacheco@example.com', 'role': 'guest'",
+    "response_size":363,
+    "error_message":"Unable to process request",
+    "correlation_id":"00833ad6-d1be-411b-9db0-6cd0e2f6f299",
+    "is_anomalous":true,
+    "hour":18,
+    "day_of_week":5,
+    "is_weekend":1,
+    "request_body_size":49,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-27 07:42:30.310393",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":429,
+    "response_time":4.075,
+    "ip_address":"177.28.194.14",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+      "Authorization":"Bearer 0cd085cae2d24d62b2d245f217ec86dd"
+    },
+    "request_body":{
+      "params":{
+        "query":"Before movie remain however manager interview."
+      }
+    },
+    "response_size":434,
+    "error_message":"API quota exceeded",
+    "correlation_id":"921b9db3-890e-4686-8dc8-2f084e8b9498",
+    "is_anomalous":true,
+    "hour":7,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":71,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-23 21:15:11.304360",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":404,
+    "response_time":5.238,
+    "ip_address":"1.95.86.108",
+    "user_agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1"
+    },
+    "request_body":{
+      "category":"clothing",
+      "price_range":"48-737"
+    },
+    "response_size":434,
+    "error_message":"Resource not found",
+    "correlation_id":"03c102c0-25e5-42d4-8f43-9258d307f8b1",
+    "is_anomalous":true,
+    "hour":21,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":49,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-23 22:55:11.310393",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/auth\/logout",
+    "status_code":401,
+    "response_time":8.474,
+    "ip_address":"205.83.148.23",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+      "Authorization":"Bearer 9c12e6e65bc04a4a878f23ac0feccfa7"
+    },
+    "request_body":{
+      "params":{
+        "query":"Art also read difficult test major soon better."
+      }
+    },
+    "response_size":271,
+    "error_message":"User not authenticated",
+    "correlation_id":"dfbb0bb2-146d-4b5d-ab42-ad19441668dd",
+    "is_anomalous":true,
+    "hour":22,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":72,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-21 11:45:14.290360",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/payments",
+    "status_code":422,
+    "response_time":0.249,
+    "ip_address":"199.115.157.70",
+    "user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+      "Authorization":"Bearer 303c558318824a5c9a2bd0b3c7d04856"
+    },
+    "request_body":{
+      "order_id":"288fd38973684998a7d473e8492dadae",
+      "payment_method":"bank_transfer",
+      "amount":933.92
+    },
+    "response_size":268,
+    "error_message":"Data validation failed",
+    "correlation_id":"eb3f3c4d-1a4b-4a1a-a309-6f1a7043754c",
+    "is_anomalous":false,
+    "hour":11,
+    "day_of_week":4,
+    "is_weekend":0,
+    "request_body_size":101,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-06 12:04:18.309395",
+    "http_method":"PUT",
+    "endpoint_path":"\/api\/payments",
+    "status_code":401,
+    "response_time":1.467,
+    "ip_address":"68.240.7.23",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 84ac588010f241fe89a9823fc54c4120"
+    },
+    "request_body":{
+      "order_id":"53114beb2d4b4c2497208ab8ca3de8fe",
+      "payment_method":"credit_card",
+      "amount":-100
+    },
+    "response_size":325,
+    "error_message":"Missing authentication token",
+    "correlation_id":"b4510469-3834-4c29-8eec-5f2e4f88a28b",
+    "is_anomalous":true,
+    "hour":12,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":97,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-19 09:31:16.208359",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/settings",
+    "status_code":400,
+    "response_time":4.403,
+    "ip_address":"233.124.14.165",
+    "user_agent":"python-requests\/2.25.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+      "Authorization":"Bearer 90dc03465c00498f859247952bec4969"
+    },
+    "request_body":{
+      "params":{
+        "query":"Structure sound open him friend."
+      }
+    },
+    "response_size":168,
+    "error_message":"Missing required field",
+    "correlation_id":"8318294c-b0c8-4dd1-9f4a-c4f363de5b9b",
+    "is_anomalous":true,
+    "hour":9,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":57,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-06 18:31:15.452359",
+    "http_method":"GET",
+    "endpoint_path":"\/api\/products",
+    "status_code":400,
+    "response_time":4.398,
+    "ip_address":"92.2.241.218",
+    "user_agent":"PostmanRuntime\/7.28.0",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36"
+    },
+    "request_body":"{'category': 'electronics', 'price_range': '32-560'",
+    "response_size":423,
+    "error_message":"Malformed JSON in request body",
+    "correlation_id":"a74af5b4-ea63-452d-8e75-94077c0f9f6a",
+    "is_anomalous":true,
+    "hour":18,
+    "day_of_week":6,
+    "is_weekend":1,
+    "request_body_size":51,
+    "num_headers":3,
+    "has_error":1,
+    "status_category":"client_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-02 23:31:16.332359",
+    "http_method":"DELETE",
+    "endpoint_path":"\/api\/settings",
+    "status_code":504,
+    "response_time":0.115,
+    "ip_address":"232.95.218.85",
+    "user_agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.114 Safari\/537.36",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"python-requests\/2.25.1",
+      "Authorization":"Bearer 3a09d631b5e14533a6ab445f41fb4697"
+    },
+    "request_body":{
+      "params":{
+        "query":"North far financial best democratic morning cover."
+      }
+    },
+    "response_size":499,
+    "error_message":"Request timed out",
+    "correlation_id":"65604c20-674f-432a-b99a-2f713d521387",
+    "is_anomalous":true,
+    "hour":23,
+    "day_of_week":2,
+    "is_weekend":0,
+    "request_body_size":75,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-03-18 13:02:07.251358",
+    "http_method":"PATCH",
+    "endpoint_path":"\/api\/notifications",
+    "status_code":504,
+    "response_time":3.856,
+    "ip_address":"140.65.86.27",
+    "user_agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.1.1 Safari\/605.1.15",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"PostmanRuntime\/7.28.0",
+      "Authorization":"Bearer 7def035f2fd044559daef04e404fca6b"
+    },
+    "request_body":{
+      "params":{
+        "query":"Push bad result allow special."
+      }
+    },
+    "response_size":709,
+    "error_message":"Connection timeout",
+    "correlation_id":"8f0e121b-cf68-470a-9e55-09c09fad3ca3",
+    "is_anomalous":false,
+    "hour":13,
+    "day_of_week":1,
+    "is_weekend":0,
+    "request_body_size":55,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  },
+  {
+    "timestamp":"2025-04-10 10:31:15.611358",
+    "http_method":"POST",
+    "endpoint_path":"\/api\/orders",
+    "status_code":504,
+    "response_time":0.278,
+    "ip_address":"4.42.107.215",
+    "user_agent":"Mozilla\/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Version\/14.0 Mobile\/15E148 Safari\/604.1",
+    "request_headers":{
+      "Accept":"application\/json",
+      "Content-Type":"application\/json",
+      "User-Agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/91.0.4472.124 Safari\/537.36",
+      "Authorization":"Bearer e809155fb5af431c996541d150d798fc"
+    },
+    "request_body":{
+      "product_id":"546dfc3d364741338d241f6fa17ebd52",
+      "quantity":3,
+      "shipping_address":"7999 Aaron Forest Apt. 534\nWest Meganland, AK 55300"
+    },
+    "response_size":802,
+    "error_message":"Gateway timeout",
+    "correlation_id":"c064f737-5b09-49b8-8591-f41a21204b32",
+    "is_anomalous":true,
+    "hour":10,
+    "day_of_week":3,
+    "is_weekend":0,
+    "request_body_size":141,
+    "num_headers":4,
+    "has_error":1,
+    "status_category":"server_error",
+    "anomaly_score":-1,
+    "predicted_anomaly":1
+  }
+]
