@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hotels</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="header">
+        <h1 class="logo">TravelEase</h1>
+    </header>
+
+    <main class="hotel-listings">
+        <h2 class="section-title">Available Hotels in {{ destination }}</h2>
+        <div class="hotels-container">
+            {% for hotel in hotels %}
+            <div class="hotel-card">
+                <img src="{{ url_for('static', filename='images/' + hotel.image) }}" alt="Hotel Image">
+                <div class="hotel-info">
+                    <h3>{{ hotel.name }} <span class="stars">{{ hotel.stars }}</span></h3>
+                    <p class="description">{{ hotel.description }}</p>
+                    <p class="rating">{{ hotel.rating_label }} • {{ hotel.reviews }} reviews</p>
+                    <form method="post" action="{{ url_for('book') }}">
+                        <input type="hidden" name="hotel" value="{{ hotel.name }}">
+                        <button type="submit" class="book-btn">Book</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

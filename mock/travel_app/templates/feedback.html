@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>We Value Your Feedback!</h1>
+<form action="{{ url_for('thankyou') }}" method="post">
+    <textarea name="feedback" rows="5" placeholder="Write your feedback here..." required></textarea>
+    <button type="submit">Submit Feedback</button>
+</form>
+{% endblock %}
