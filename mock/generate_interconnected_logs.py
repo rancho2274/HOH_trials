@@ -25,7 +25,7 @@ try:
     from cdn_api_generator import generate_cdn_request_flow, save_cdn_logs, generate_interconnected_cdn_logs
     
     # Auth API generator
-    from auth_api_generator import generate_auth_logs, save_auth_logs, generate_interconnected_auth_logs, generate_auth_flow
+    from hackohire.HOH.mock2.auth_api_generator import generate_auth_logs, save_auth_logs, generate_interconnected_auth_logs, generate_auth_flow
     
     IMPORT_SUCCESS = True
 except ImportError as e:
