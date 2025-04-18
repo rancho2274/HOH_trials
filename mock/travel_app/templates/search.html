@@ -2,78 +2,195 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Select Destination</title>
+    <title>Choose Destination</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: #f0f4f8;
             margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
 
-        header {
-            background-color: #003366;
-            padding: 1rem 2rem;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 40px 20px;
         }
 
-        .section-title {
+        h1 {
             text-align: center;
-            margin: 2rem 0 1rem 0;
-            font-size: 1.8rem;
-            color: #003366;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            color: #00395D;
         }
 
-        .map-container {
-            position: relative;
-            max-width: 1000px;
-            margin: 0 auto;
-            height: auto;
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            justify-content: center;
         }
 
-        .map-container img {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        .search-bar select,
+        .search-bar input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
         }
 
-        .pin {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: #0072ce;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 30px;
+        .search-bar button {
+            background-color: #0072CE;
             color: white;
-            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
             font-size: 14px;
             cursor: pointer;
         }
 
-        .pin:hover {
-            background-color: #005baf;
+        .hotels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
         }
 
-        /* Example pin positions */
-        .paris { top: 40%; left: 52%; }
-        .newyork { top: 35%; left: 27%; }
-        .london { top: 38%; left: 49%; }
+        .hotel-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .hotel-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .hotel-card .info {
+            padding: 15px;
+        }
+
+        .hotel-card h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
+
+        .hotel-card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .hotel-card button {
+            margin-top: 10px;
+            background-color: #0072CE;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <header>TravelEase</header>
-    <h2 class="section-title">Select Your Destination</h2>
-    <div class="map-container">
-        <img src="{{ url_for('static', filename='images/world_map.png') }}" alt="World Map">
-
-        <!-- Clickable pins -->
-        <a href="{{ url_for('hotels_by_location', location='paris') }}"><div class="pin paris">FR</div></a>
-        <a href="{{ url_for('hotels_by_location', location='newyork') }}"><div class="pin newyork">US</div></a>
-        <a href="{{ url_for('hotels_by_location', location='london') }}"><div class="pin london">UK</div></a>
+<div class="container">
+    <h1>Choose your destination</h1>
+    {% if destination %}
+    <div style="text-align: center; margin-bottom: 20px;">
+        <strong>Destination:</strong> {{ destination }} |
+        <strong>Arrival:</strong> {{ checkin }} |
+        <strong>Departure:</strong> {{ checkout }} |
+        <strong>Guests:</strong> {{ guests }}
     </div>
+{% endif %}
+
+<form class="search-bar" onsubmit="redirectToHotels(event)">
+
+
+        <select name="destination" required>
+            <option value="">Destination</option>
+            <option value="New York">New York</option>
+            <option value="Paris">Paris</option>
+            <option value="London">London</option>
+            
+        </select>
+        <input type="date" name="checkin" required>
+        <input type="date" name="checkout" required>
+        <select name="guests" required>
+            <option value="">Guests</option>
+            <option value="1">1 Adult</option>
+            <option value="2">2 Adults</option>
+            <option value="3">3 Adults</option>
+        </select>
+        <button type="submit">Search</button>
+    </form>
+
+    <div class="hotels">
+        <div class="hotel-card">
+            <img src="{{ url_for('static', filename='images/london2.jpg') }}" alt="Bella Vista Resort">
+            <div class="info">
+                <h3>Bella Vista Resort</h3>
+                <p>London</p>
+                <p>₹4999 / night</p>
+                <button>View more</button>
+            </div>
+        </div>
+        <div class="hotel-card">
+            <img src="{{ url_for('static', filename='images/ny3.jpg') }}" alt="Island Palace Hotel">
+            <div class="info">
+                <h3>Island Palace Hotel</h3>
+                <p>New York</p>
+                <p>₹2999 / night</p>
+                <button>View more</button>
+            </div>
+        </div>
+        <div class="hotel-card">
+            <img src="{{ url_for('static', filename='images/paris1.jpg') }}" alt="Serenity Cove Hotel">
+            <div class="info">
+                <h3>Serenity Cove Hotel</h3>
+                <p>Paris</p>
+                <p>₹1500 / night</p>
+                <button>View more</button>
+            </div>
+        </div>
+        <div class="hotel-card">
+            <img src="{{ url_for('static', filename='images/paris3.jpg') }}" alt="White Sea Hotel">
+            <div class="info">
+                <h3>White Sea Hotel</h3>
+                <p>Paris</p>
+                <p>₹5490 / night</p>
+                <button>View more</button>
+            </div>
+        </div>
+        
+    </div>
+</div>
 </body>
 </html>
+
+<script>
+    function redirectToHotels(event) {
+        event.preventDefault();
+        const form = event.target;
+        const destination = form.destination.value.toLowerCase().replace(/\s+/g, '');
+        const checkin = form.checkin.value;
+        const checkout = form.checkout.value;
+        const guests = form.guests.value;
+    
+        const params = new URLSearchParams({
+            checkin,
+            checkout,
+            guests
+        });
+    
+        window.location.href = `/hotels/${destination}?${params.toString()}`;
+    }
+    </script>
+    
+  

@@ -11,7 +11,10 @@
     </header>
 
     <main class="hotel-listings">
-        <h2 class="section-title">Available Hotels in {{ destination }}</h2>
+        <h2 class="section-title">Available Hotels in {{ location }}</h2>
+        <p>
+            Check-in: {{ checkin }} | Check-out: {{ checkout }} | Guests: {{ guests }}
+        </p>
         <div class="hotels-container">
             {% for hotel in hotels %}
             <div class="hotel-card">
@@ -20,10 +23,15 @@
                     <h3>{{ hotel.name }} <span class="stars">{{ hotel.stars }}</span></h3>
                     <p class="description">{{ hotel.description }}</p>
                     <p class="rating">{{ hotel.rating_label }} • {{ hotel.reviews }} reviews</p>
-                    <form method="post" action="{{ url_for('book') }}">
+                    <form action="{{ url_for('book') }}" method="post">
                         <input type="hidden" name="hotel" value="{{ hotel.name }}">
-                        <button type="submit" class="book-btn">Book</button>
+                        <input type="hidden" name="destination" value="{{ location }}">
+                        <input type="hidden" name="checkin" value="{{ checkin }}">
+                        <input type="hidden" name="checkout" value="{{ checkout }}">
+                        <input type="hidden" name="guests" value="{{ guests }}">
+                        <button type="submit">Book</button>
                     </form>
+                    
                 </div>
             </div>
             {% endfor %}

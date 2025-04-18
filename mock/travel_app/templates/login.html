@@ -1,9 +1,119 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Welcome to TravelEase</h1>
-<form action="{{ url_for('search') }}" method="post">
-    <input type="text" name="loginid" placeholder="Login ID" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+    }
+
+    .login-wrapper {
+      display: flex;
+      height: 100vh;
+    }
+
+    .left-panel {
+      background: linear-gradient(to bottom right, #00395D, #005a8c);
+      color: white;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .left-panel h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .left-panel p {
+      font-size: 18px;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    .right-panel {
+      background: white;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #00395D;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .login-btn {
+      width: 100%;
+      background-color: #00395D;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 15px;
+    }
+
+    .login-btn:hover {
+      background-color: #005a8c;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+  <div class="left-panel">
+    <h1>Welcome to TravelEase</h1>
+    <p>Discover your next destination with ease and style</p>
+  </div>
+  <div class="right-panel">
+    <form class="login-box" action="{{ url_for('search') }}" method="post">
+      <h2>Login to Your Account</h2>
+      <div class="form-group">
+        <label for="username">Login ID</label>
+        <input type="text" name="loginid" id="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" required>
+      </div>
+      <button type="submit" class="login-btn">Login</button>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

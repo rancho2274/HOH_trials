@@ -1,6 +1,53 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Thank You!</h1>
-<p>Your booking and feedback has been received.</p>
-<p>We hope you enjoy your trip with TravelEase!</p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thank You</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f8fb;
+      margin: 0;
+      padding: 50px;
+      text-align: center;
+    }
+
+    .thankyou-container {
+      background-color: white;
+      max-width: 600px;
+      margin: auto;
+      padding: 50px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .brand-name {
+      font-size: 28px;
+      font-weight: bold;
+      color: #00395D;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #0072CE;
+      font-size: 26px;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="thankyou-container">
+    <div class="brand-name">TravelEase</div>
+    <h1>Thank You!</h1>
+    <p>Your booking and feedback has been received.</p>
+    <p>We hope you enjoy your trip with TravelEase!</p>
+  </div>
+</body>
+</html>

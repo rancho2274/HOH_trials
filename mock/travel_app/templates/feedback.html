@@ -1,8 +1,82 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>We Value Your Feedback!</h1>
-<form action="{{ url_for('thankyou') }}" method="post">
-    <textarea name="feedback" rows="5" placeholder="Write your feedback here..." required></textarea>
-    <button type="submit">Submit Feedback</button>
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Confirmed</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f8fb;
+      margin: 0;
+      padding: 50px;
+      text-align: center;
+    }
+
+    .feedback-container {
+      background-color: white;
+      max-width: 600px;
+      margin: auto;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .brand-name {
+      font-size: 28px;
+      font-weight: bold;
+      color: #00395D;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: #00395D;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      background-color: #0072CE;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+      background-color: #005a9e;
+    }
+  </style>
+</head>
+<body>
+  <div class="feedback-container">
+    <div class="brand-name">TravelEase</div>
+    <h1>Booking Confirmed!</h1>
+    <p>Thank you for booking with TravelEase. We'd love to hear your thoughts about your experience.</p>
+    <form action="{{ url_for('thankyou') }}" method="post">
+      <textarea name="feedback" placeholder="Leave your feedback here..."></textarea>
+      <br>
+      <button type="submit" class="submit-btn">Submit Feedback</button>
+    </form>
+  </div>
+</body>
+</html>

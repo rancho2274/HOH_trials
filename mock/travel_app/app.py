@@ -18,9 +18,13 @@ def search():
     return render_template('search.html')
 
 
+
 @app.route('/hotels', methods=['POST'])
 def hotels():
-    destination = request.form['destination']
+    destination = request.form.get('destination')
+    checkin = request.form.get('checkin')
+    checkout = request.form.get('checkout')
+    guests = request.form.get('guests')
     hotel_data = {
         "paris": [
             {"name": "Hotel Eiffel", "stars": "★★★", "rating_label": "Exceptional", "reviews": "128", "image": "paris1.jpg", "description": "Beachside hotel with pool and cozy rooms."},
@@ -41,10 +45,21 @@ def hotels():
     }
 
     hotels = hotel_data.get(destination, [])
-    return render_template('hotels.html', destination=destination, hotels=hotels)
+    return render_template(
+        'search.html',
+        destination=destination,
+        checkin=checkin,
+        checkout=checkout,
+        guests=guests
+    )
 
 @app.route('/hotels/<location>')
 def hotels_by_location(location):
+    
+
+    checkin = request.args.get('checkin')
+    checkout = request.args.get('checkout')
+    guests = request.args.get('guests')
     hotels_data = {
         "paris": [
             {"name": "Hotel Eiffel", "stars": "★★★", "rating_label": "Exceptional", "reviews": "128", "image": "paris1.jpg", "description": "Beachside hotel with pool and cozy rooms."},
@@ -63,15 +78,47 @@ def hotels_by_location(location):
             ],
     }
 
-    hotels = hotels_data.get(location.lower(), [])
-    return render_template('hotels.html', destination=location.capitalize(), hotels=hotels)
+    hotels = hotels_data.get(location, [])
+    return render_template("hotels.html", location = location.title(), hotels=hotels, checkin=checkin, checkout=checkout, guests=guests)
+       
 
 
+
+from datetime import datetime
 
 @app.route('/book', methods=['POST'])
 def book():
-    hotel = request.form['hotel']
-    return render_template('book.html', hotel=hotel)
+    hotel = request.form.get('hotel')
+    destination = request.form.get('destination')
+    checkin = request.form.get('checkin')
+    checkout = request.form.get('checkout')
+    guests = request.form.get('guests')
+
+    # Parse date strings into datetime objects
+    date_format = "%Y-%m-%d"
+    checkin_date = datetime.strptime(checkin, date_format)
+    checkout_date = datetime.strptime(checkout, date_format)
+
+    # Calculate number of nights
+    nights = (checkout_date - checkin_date).days
+
+    # Price setup
+    price_per_night = 4999
+    taxes = 1000
+    total_price = (price_per_night * nights) + taxes
+
+    return render_template("book.html",
+        hotel=hotel,
+        destination=destination,
+        checkin=checkin,
+        checkout=checkout,
+        guests=guests,
+        nights=nights,
+        price_per_night=price_per_night,
+        total_price=total_price,
+        taxes=taxes
+    )
+
 
 @app.route('/payment', methods=['POST'])
 def payment():

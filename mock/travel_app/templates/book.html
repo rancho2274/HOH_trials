@@ -2,93 +2,163 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hotel Booking</title>
+    <title>Book Your Stay</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
+            background-color: #f7f7f7;
             margin: 0;
-            background-color: #f5f7fa;
+            padding: 40px;
         }
 
-        .banner {
-            width: 100%;
-            height: 250px;
-            background: url('{{ url_for('static', filename='images/hotel_banner.jpg') }}') no-repeat center center/cover;
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: auto;
+            gap: 40px;
         }
 
-        .booking-container {
-            max-width: 700px;
-            margin: 40px auto;
-            background: #fff;
+        .left-panel {
+            flex: 2;
+            background: white;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        h2 {
-            text-align: center;
+        .left-panel h2 {
+            margin-top: 0;
             color: #00395D;
-            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
         }
 
         label {
             font-weight: bold;
             display: block;
-            margin-top: 15px;
-            color: #00395D;
+            margin-bottom: 5px;
+            color: #444;
         }
 
-        input, select {
+        input {
             width: 100%;
             padding: 10px;
-            margin-top: 5px;
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid #ccc;
         }
 
-        .submit-btn {
-            margin-top: 25px;
+        .summary-box {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .summary-box img {
             width: 100%;
-            background-color: #0072CE;
-            color: white;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .summary-box h3 {
+            margin: 10px 0 5px;
+            font-size: 18px;
+        }
+
+        .price-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+        }
+
+        .pay-btn {
+            margin-top: 20px;
+            width: 100%;
             padding: 12px;
             font-size: 16px;
+            background-color: #0072CE;
+            color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
         }
 
-        .submit-btn:hover {
-            background-color: #0059a3;
+        .pay-btn:hover {
+            background-color: #005a9e;
         }
     </style>
 </head>
 <body>
 
-<div class="banner"></div>
+<div class="container">
+    <!-- LEFT FORM -->
+    <div class="left-panel">
+        <h2>Confirm Your Booking</h2>
+        <form action="{{ url_for('feedback') }}" method="post">
+            <div class="form-group">
+                <label>Destination</label>
+                <input type="text" name="destination" value="{{ destination }}" readonly>
+            </div>
 
-<div class="booking-container">
-    <h2>Hotel Booking</h2>
-    <form action="{{ url_for('payment') }}" method="post">
-        <label>Name</label>
-        <input type="text" name="name" required>
+            <div class="form-group">
+                <label>Check-in Date</label>
+                <input type="text" name="checkin" value="{{ checkin }}" readonly>
+            </div>
 
-        <label>Email</label>
-        <input type="email" name="email" required>
+            <div class="form-group">
+                <label>Check-out Date</label>
+                <input type="text" name="checkout" value="{{ checkout }}" readonly>
+            </div>
 
-        <label>Arrival Date</label>
-        <input type="date" name="arrival_date" required>
+            <div class="form-group">
+                <label>Guests</label>
+                <input type="text" name="guests" value="{{ guests }}" readonly>
+            </div>
 
-        <label>Departure Date</label>
-        <input type="date" name="departure_date" required>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="name" placeholder="Enter your full name" required>
+            </div>
 
-        <label>Number of Rooms</label>
-        <input type="number" name="rooms" min="1" required>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="Enter your email" required>
+            </div>
 
-        <button type="submit" class="submit-btn">Proceed to Payment</button>
-    </form>
+            <button class="pay-btn" type="submit">Pay Now</button>
+        </form>
+    </div>
+
+    <!-- RIGHT PAYMENT SUMMARY -->
+    <div class="summary-box">
+        <img src="{{ url_for('static', filename='images/hotel_banner.jpg') }}" alt="Hotel Image">
+        <h3>{{ hotel }}</h3>
+        <p>Stay from {{ checkin }} to {{ checkout }}</p>
+
+<div class="price-line">
+  <span>₹{{ price_per_night }} x {{ nights }} night{{ 's' if nights > 1 else '' }}</span>
+  <span>₹{{ price_per_night * nights }}</span>
+</div>
+
+<div class="price-line">
+  <span>Taxes</span>
+  <span>₹{{ taxes }}</span>
+</div>
+
+<hr>
+
+<div class="price-line" style="font-weight: bold;">
+  <span>Total</span>
+  <span>₹{{ total_price }}</span>
+</div>
+
+    </div>
 </div>
 
 </body>
