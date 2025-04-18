@@ -1,4 +1,3 @@
-   # Calculate response time
 import json
 import random
 import datetime
@@ -124,6 +123,407 @@ ERROR_MESSAGES = {
         "Provider response timeout",
         "Request processing timeout"
     ]
+}
+
+def generate_ip():
+    """Generate a random IP address"""
+    return str(ipaddress.IPv4Address(random.randint(0, 2**32 - 1)))
+
+def generate_correlation_id():
+    """Generate a correlation ID in UUID format"""
+    return str(uuid.uuid4())
+
+def generate_request_headers(auth_required=True):
+    """Generate realistic request headers"""
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": random.choice(USER_AGENTS),
+        "X-Request-ID": str(uuid.uuid4())
+    }
+    
+    if auth_required:
+        auth_type = random.choice(["api-key", "jwt", "oauth2"])
+        if auth_type == "api-key":
+            headers["X-API-Key"] = f"apk_{uuid.uuid4().hex[:24]}"
+        elif auth_type in ["jwt", "oauth2"]:
+            headers["Authorization"] = f"Bearer {uuid.uuid4().hex}.{uuid.uuid4().hex}.{uuid.uuid4().hex}"
+    
+    return headers
+
+def generate_payment_details(amount=None, currency=None, is_anomalous=False):
+    """Generate payment details"""
+    if amount is None:
+        amount = round(random.uniform(50, 5000), 2)
+    
+    if currency is None:
+        currency = random.choice(CURRENCIES)
+    
+    card_number = "************4242"  # Masked for security
+    
+    if is_anomalous and random.random() < 0.5:
+        card_number = "************0000"  # Invalid card number
+    
+    return {
+        "payment_method": random.choice(PAYMENT_METHODS),
+        "amount": amount,
+        "currency": currency,
+        "card_type": random.choice(CREDIT_CARD_TYPES),
+        "card_number": card_number,
+        "expiry_date": f"{random.randint(1, 12)}/{random.randint(25, 30)}",
+        "cardholder_name": fake.name(),
+        "billing_address": {
+            "street": fake.street_address(),
+            "city": fake.city(),
+            "state": fake.state(),
+            "postal_code": fake.postcode(),
+            "country": fake.country_code()
+        }
+    }
+
+def calculate_response_time(operation, status_code, is_anomalous=False):
+    """Calculate realistic response times for payment operations"""
+    # Base times in seconds
+    base_times = {
+        "process_payment": 0.4,
+        "refund_payment": 0.3,
+        "payment_status_check": 0.1,
+        "authorize_payment": 0.3,
+        "capture_payment": 0.2,
+        "void_payment": 0.2
+    }
+    
+    # Get base time for this operation
+    base_time = base_times.get(operation, 0.2)
+    
+    # Add variability
+    response_time = base_time * random.uniform(0.8, 1.2)
+    
+    # Adjust for status code
+    if status_code >= 500:
+        # Server errors are often slower
+        response_time *= random.uniform(2.0, 5.0)
+    elif status_code == 429:
+        # Rate limiting checks are quick
+        response_time *= 0.5
+    elif status_code >= 400:
+        # Client errors are generally fast
+        response_time *= random.uniform(0.7, 1.0)
+    
+    # Anomalous times
+    if is_anomalous:
+        if random.random() < 0.7:
+            # Most anomalies are slower
+            response_time *= random.uniform(3.0, 10.0)
+        else:
+            # Some anomalies are suspiciously fast
+            response_time *= random.uniform(0.1, 0.3)
+    
+    return round(response_time, 3)
+
+def get_error_message(status_code):
+    """Get an appropriate error message based on status code"""
+    if status_code < 400:
+        return None
+    
+    if status_code in ERROR_MESSAGES:
+        return random.choice(ERROR_MESSAGES[status_code])
+    else:
+        return "Unknown error occurred"
+
+def generate_payment_log_entry(timestamp=None, operation=None, 
+                            correlation_id=None, user_id=None, 
+                            booking_id=None, payment_id=None,
+                            booking_data=None, is_anomalous=False):
+    """Generate a single payment service log entry"""
+    
+    # Generate timestamp if not provided
+    if timestamp is None:
+        timestamp = datetime.datetime.now() - datetime.timedelta(
+            days=random.randint(0, 30),
+            hours=random.randint(0, 23),
+            minutes=random.randint(0, 59),
+            seconds=random.randint(0, 59)
+        )
+    
+    # Generate correlation ID if not provided
+    if correlation_id is None:
+        correlation_id = generate_correlation_id()
+    
+    # User ID is required for payments
+    if user_id is None:
+        user_id = str(uuid.uuid4())
+    
+    # Select operation if not provided
+    if operation is None:
+        operation = random.choice(PAYMENT_OPERATIONS)
+    
+    # Environment and region
+    environment = random.choice(PAYMENT_ENVIRONMENTS)
+    region = random.choice(PAYMENT_REGIONS)
+    server = random.choice(PAYMENT_SERVERS)
+    instance_id = f"{server}-{region}-{random.randint(1, 5)}"
+    
+    # Request details
+    request_id = f"req-{uuid.uuid4().hex[:16]}"
+    
+    # Determine HTTP method based on operation
+    if operation in ["payment_status_check"]:
+        http_method = "GET"
+    elif operation in ["process_payment", "authorize_payment", "capture_payment"]:
+        http_method = "POST"
+    elif operation in ["refund_payment", "void_payment"]:
+        http_method = "PUT"
+    else:
+        http_method = "POST"
+    
+    # Generate booking ID if not provided
+    if booking_id is None and booking_data and "booking_id" in booking_data:
+        booking_id = booking_data["booking_id"]
+    elif booking_id is None:
+        booking_id = f"booking-{uuid.uuid4().hex[:8]}"
+    
+    # Generate payment ID if not provided
+    if payment_id is None and operation != "process_payment":
+        payment_id = f"payment-{uuid.uuid4().hex[:8]}"
+    
+    # Get path based on operation
+    if operation == "process_payment":
+        path = "/api/payments"
+    elif operation == "refund_payment":
+        path = f"/api/payments/{payment_id}/refund"
+    elif operation == "payment_status_check":
+        path = f"/api/payments/{payment_id}"
+    elif operation == "authorize_payment":
+        path = "/api/payments/authorize"
+    elif operation == "capture_payment":
+        path = f"/api/payments/{payment_id}/capture"
+    elif operation == "void_payment":
+        path = f"/api/payments/{payment_id}/void"
+    else:
+        path = f"/api/payments/{operation.replace('_', '/')}"
+    
+    client_id = f"client-{uuid.uuid4().hex[:8]}"
+    client_type = random.choice(["web-app", "mobile-ios", "mobile-android", "partner-api", "internal"])
+    source_ip = generate_ip()
+    
+    # Generate request headers
+    request_headers = generate_request_headers(auth_required=True)
+    
+    # Get payment amount from booking data if available
+    payment_amount = None
+    payment_currency = None
+    if booking_data and "total_price" in booking_data:
+        payment_amount = booking_data["total_price"].get("amount")
+        payment_currency = booking_data["total_price"].get("currency")
+    
+    # Generate payment details
+    payment_details = generate_payment_details(amount=payment_amount, currency=payment_currency, is_anomalous=is_anomalous)
+    
+    # Generate request body based on operation
+    request_body = {}
+    
+    if operation == "process_payment":
+        request_body = {
+            "booking_id": booking_id,
+            "user_id": user_id,
+            "payment_method": payment_details["payment_method"],
+            "amount": payment_details["amount"],
+            "currency": payment_details["currency"],
+            "card_details": {
+                "card_type": payment_details["card_type"],
+                "card_number": payment_details["card_number"],
+                "expiry_date": payment_details["expiry_date"],
+                "cardholder_name": payment_details["cardholder_name"],
+                "cvv": "***"  # Masked for security
+            },
+            "billing_address": payment_details["billing_address"]
+        }
+        
+        if is_anomalous and random.random() < 0.5:
+            # Create anomalous request
+            if random.random() < 0.5:
+                # Invalid card expiry
+                request_body["card_details"]["expiry_date"] = "00/00"
+            else:
+                # Zero or negative amount
+                request_body["amount"] = 0 if random.random() < 0.5 else -random.uniform(10, 100)
+    
+    elif operation == "refund_payment":
+        request_body = {
+            "payment_id": payment_id,
+            "booking_id": booking_id,
+            "user_id": user_id,
+            "amount": payment_details["amount"] if random.random() < 0.8 else payment_details["amount"] / 2,  # Partial refund sometimes
+            "currency": payment_details["currency"],
+            "reason": random.choice(["customer_request", "service_issue", "booking_cancelled", "duplicate_payment"]),
+            "refund_to_original_method": random.choice([True, False])
+        }
+    
+    elif operation == "payment_status_check":
+        # GET request typically doesn't have a body
+        request_body = {}
+    
+    elif operation == "authorize_payment":
+        request_body = {
+            "booking_id": booking_id,
+            "user_id": user_id,
+            "payment_method": payment_details["payment_method"],
+            "amount": payment_details["amount"],
+            "currency": payment_details["currency"],
+            "card_details": {
+                "card_type": payment_details["card_type"],
+                "card_number": payment_details["card_number"],
+                "expiry_date": payment_details["expiry_date"],
+                "cardholder_name": payment_details["cardholder_name"],
+                "cvv": "***"  # Masked for security
+            },
+            "capture_immediately": False,
+            "billing_address": payment_details["billing_address"]
+        }
+    
+    elif operation == "capture_payment":
+        request_body = {
+            "payment_id": payment_id,
+            "booking_id": booking_id,
+            "user_id": user_id,
+            "amount": payment_details["amount"],  # Can be less than or equal to authorized amount
+            "currency": payment_details["currency"]
+        }
+    
+    elif operation == "void_payment":
+        request_body = {
+            "payment_id": payment_id,
+            "booking_id": booking_id,
+            "user_id": user_id,
+            "reason": random.choice(["booking_cancelled", "payment_error", "customer_request", "fraud_prevention"])
+        }
+    
+    # Determine status code
+    if is_anomalous and random.random() < 0.8:
+        # Higher chance of error for anomalous requests
+        error_type = random.choice(["client_error", "server_error"])
+        status_code = random.choice(ERROR_STATUS_CODES[error_type])
+    else:
+        # Normal requests mostly succeed
+        weights = [0.95, 0.05]  # 95% success, 5% error
+        status_category = random.choices(["success", "error"], weights=weights)[0]
+        
+        if status_category == "success":
+            status_code = random.choice(SUCCESS_STATUS_CODES)
+        else:
+            error_type = random.choice(["client_error", "server_error"])
+            status_code = random.choice(ERROR_STATUS_CODES[error_type])
+    
+    # Generate response body
+    response_body = {}
+    
+    if status_code < 400:  # Success responses
+        if operation == "process_payment":
+            # Generate payment ID
+            if payment_id is None:
+                payment_id = f"payment-{uuid.uuid4().hex[:8]}"
+                
+            response_body = {
+                "payment_id": payment_id,
+                "booking_id": booking_id,
+                "status": "completed",
+                "transaction_id": f"txn-{uuid.uuid4().hex[:10]}",
+                "amount": request_body.get("amount"),
+                "currency": request_body.get("currency"),
+                "payment_method": request_body.get("payment_method"),
+                "card_details": {
+                    "card_type": request_body.get("card_details", {}).get("card_type"),
+                    "last_four": request_body.get("card_details", {}).get("card_number", "****")[-4:],
+                },
+                "processed_at": timestamp.isoformat(),
+                "receipt_url": f"https://example.com/receipts/{payment_id}"
+            }
+            
+        elif operation == "refund_payment":
+            response_body = {
+                "refund_id": f"refund-{uuid.uuid4().hex[:8]}",
+                "payment_id": payment_id,
+                "booking_id": booking_id,
+                "status": "completed",
+                "amount": request_body.get("amount"),
+                "currency": request_body.get("currency"),
+                "refund_transaction_id": f"txn-{uuid.uuid4().hex[:10]}",
+                "refunded_to_original_method": request_body.get("refund_to_original_method", True),
+                "refunded_at": timestamp.isoformat(),
+                "estimated_arrival": (timestamp + datetime.timedelta(days=random.randint(3, 10))).strftime("%Y-%m-%d")
+            }
+            
+        elif operation == "payment_status_check":
+            payment_status = random.choice(PAYMENT_STATUSES)
+            
+            response_body = {
+                "payment_id": payment_id,
+                "booking_id": booking_id,
+                "status": payment_status,
+                "amount": payment_details["amount"],
+                "currency": payment_details["currency"],
+                "payment_method": payment_details["payment_method"],
+                "card_details": {
+                    "card_type": payment_details["card_type"],
+                    "last_four": payment_details["card_number"][-4:],
+                },
+                "created_at": (timestamp - datetime.timedelta(minutes=random.randint(5, 60))).isoformat(),
+                "updated_at": timestamp.isoformat() if payment_status != "authorized" else None
+            }
+            
+        elif operation == "authorize_payment":
+            response_body = {
+                "payment_id": payment_id,
+                "booking_id": booking_id,
+                "status": "authorized",
+                "authorization_code": f"auth-{uuid.uuid4().hex[:10]}",
+                "amount": request_body.get("amount"),
+                "currency": request_body.get("currency"),
+                "payment_method": request_body.get("payment_method"),
+                "card_details": {
+                    "card_type": request_body.get("card_details", {}).get("card_type"),
+                    "last_four": request_body.get("card_details", {}).get("card_number", "****")[-4:],
+                },
+                "authorized_at": timestamp.isoformat(),
+                "expires_at": (timestamp + datetime.timedelta(days=7)).isoformat()
+            }
+            
+        elif operation == "capture_payment":
+            response_body = {
+                "payment_id": payment_id,
+                "booking_id": booking_id,
+                "status": "captured",
+                "transaction_id": f"txn-{uuid.uuid4().hex[:10]}",
+                "amount": request_body.get("amount"),
+                "currency": request_body.get("currency"),
+                "captured_at": timestamp.isoformat(),
+                "settlement_expected": (timestamp + datetime.timedelta(days=random.randint(1, 3))).strftime("%Y-%m-%d")
+            }
+            
+        elif operation == "void_payment":
+            response_body = {
+                "payment_id": payment_id,
+                "booking_id": booking_id,
+                "status": "voided",
+                "amount": payment_details["amount"],
+                "currency": payment_details["currency"],
+                "reason": request_body.get("reason"),
+                "voided_at": timestamp.isoformat()
+            }
+    else:
+        # Error response
+        error_message = get_error_message(status_code)
+        response_body = {
+            "error": "error_code",
+            "error_description": error_message,
+            "payment_id": payment_id if operation != "process_payment" else None,
+            "booking_id": booking_id,
+            "status": status_code,
+            "timestamp": timestamp.isoformat()
+        }
+    
+    # Calculate response time
     response_time = calculate_response_time(operation, status_code, is_anomalous)
     
     # Create the payment log entry
@@ -158,8 +558,7 @@ ERROR_MESSAGES = {
         "payment_id": payment_id,
         "tracing": {
             "correlation_id": correlation_id,
-            "request_id": request_id,
-            "parent_request_id": parent_request_id
+            "request_id": request_id
         },
         "is_anomalous": is_anomalous  # Meta field for labeling
     }
@@ -208,9 +607,6 @@ def generate_related_payments(correlation_id, user_id=None, booking_id=None,
     # Keep track of payment ID for the sequence
     payment_id = None
     
-    # Keep track of parent request ID for linking
-    parent_request_id = None
-    
     # Generate logs for each payment operation in the pattern
     for i, operation in enumerate(pattern):
         # Add some time between operations
@@ -228,8 +624,7 @@ def generate_related_payments(correlation_id, user_id=None, booking_id=None,
             booking_id=booking_id,
             payment_id=payment_id,
             booking_data=booking_data,
-            is_anomalous=op_is_anomalous,
-            parent_request_id=parent_request_id
+            is_anomalous=op_is_anomalous
         )
         
         related_logs.append(log_entry)
@@ -238,9 +633,6 @@ def generate_related_payments(correlation_id, user_id=None, booking_id=None,
         if operation == "process_payment" or operation == "authorize_payment":
             if log_entry["response"]["status_code"] < 400 and "body" in log_entry["response"]:
                 payment_id = log_entry["response"]["body"].get("payment_id")
-        
-        # Update parent request ID for the next operation
-        parent_request_id = log_entry["request"]["id"]
         
         # If we get an error, we might stop the sequence
         if op_is_anomalous and log_entry["response"]["status_code"] >= 400 and random.random() < 0.7:
@@ -344,7 +736,6 @@ def save_logs_to_file(logs, format='json', filename='payment_logs'):
                 "booking_id": log["booking_id"],
                 "payment_id": log["payment_id"],
                 "correlation_id": log["tracing"]["correlation_id"],
-                "parent_request_id": log["tracing"].get("parent_request_id"),
                 "is_anomalous": log["is_anomalous"]
             }
             flat_logs.append(flat_log)
@@ -540,15 +931,49 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Error loading booking logs: {e}")
     
+    print("Generating payment service logs...")
+    
     # Generate logs
     if args.auth_logs or args.booking_logs:
         logs = generate_interconnected_payment_logs(auth_logs, booking_logs, args.num_logs)
     else:
         logs = generate_payment_logs(args.num_logs, args.anomaly_percentage)
     
-    # Save logs to file
-    save_logs_to_file(logs, args.output_format, args.output_filename)
+    # Analyze logs
+    analyze_payment_logs(logs)
     
-    # Analyze logs if requested
-    if args.analyze:
-        analyze_payment_logs(logs)
+    # Save logs to file
+    json_path = save_logs_to_file(logs, format='json', filename=args.output_filename)
+    csv_path = save_logs_to_file(logs, format='csv', filename=args.output_filename)
+    
+    print(f"\nPayment logs have been saved to {json_path} and {csv_path}")
+    
+    # Print sample logs (1 normal, 1 anomalous)
+    print("\n=== Sample Normal Payment Log ===")
+    normal_log = next(log for log in logs if not log.get('is_anomalous', False))
+    print(json.dumps(normal_log, indent=2)[:1000] + "... (truncated)")
+    
+    print("\n=== Sample Anomalous Payment Log ===")
+    anomalous_log = next(log for log in logs if log.get('is_anomalous', True))
+    print(json.dumps(anomalous_log, indent=2)[:1000] + "... (truncated)")
+    
+    # Generate payment flow examples
+    print("\nGenerating example payment flows...")
+    payment_flows = [
+        ["process_payment"],
+        ["authorize_payment", "capture_payment"],
+        ["process_payment", "refund_payment"]
+    ]
+    
+    for flow in payment_flows:
+        flow_name = " -> ".join(flow)
+        print(f"\nExample flow: {flow_name}")
+        user_id = str(uuid.uuid4())
+        correlation_id = generate_correlation_id()
+        flow_logs = generate_related_payments(
+            correlation_id=correlation_id,
+            user_id=user_id,
+            is_anomalous=False
+        )
+        
+        print(f"Generated {len(flow_logs)} logs for this flow")

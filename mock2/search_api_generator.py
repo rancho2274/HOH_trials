@@ -231,7 +231,7 @@ def get_error_message(status_code):
 
 def generate_search_log_entry(timestamp=None, search_type=None, 
                             correlation_id=None, user_id=None, 
-                            is_anomalous=False):
+                            is_anomalous=False, parent_request_id=None):
     """Generate a single search service log entry"""
     
     # Generate timestamp if not provided
@@ -342,13 +342,22 @@ def generate_search_log_entry(timestamp=None, search_type=None,
             request_body["check_out_date"] = departure_date
             
     elif search_type == "car_rental_search":
+        # Create time strings for pickup and dropoff
+        pickup_hour = random.randint(0, 23)
+        pickup_minute = random.choice(["00", "30"])
+        pickup_time = f"{pickup_hour:02d}:{pickup_minute}"
+        
+        dropoff_hour = random.randint(0, 23)
+        dropoff_minute = random.choice(["00", "30"])
+        dropoff_time = f"{dropoff_hour:02d}:{dropoff_minute}"
+        
         request_body = {
             "pick_up_location": random.choice(POPULAR_DESTINATIONS),
             "drop_off_location": random.choice(POPULAR_DESTINATIONS),
             "pick_up_date": departure_date,
-            "pick_up_time": f"{random.randint(0, 23):02d}:{random.choice(['00', '30']):02d}",
+            "pick_up_time": pickup_time,
             "drop_off_date": return_date,
-            "drop_off_time": f"{random.randint(0, 23):02d}:{random.choice(['00', '30']):02d}",
+            "drop_off_time": dropoff_time,
             "car_category": random.choice(CAR_CATEGORIES),
             "driver_age": random.randint(21, 75)
         }
@@ -412,13 +421,22 @@ def generate_search_log_entry(timestamp=None, search_type=None,
             
             flights = []
             for _ in range(num_results):
+                # Create formatted departure and arrival times
+                departure_hour = random.randint(0, 23)
+                departure_minute = random.choice(["00", "15", "30", "45"])
+                departure_time = f"{departure_date}T{departure_hour:02d}:{departure_minute}:00"
+                
+                arrival_hour = random.randint(0, 23)
+                arrival_minute = random.choice(["00", "15", "30", "45"])
+                arrival_time = f"{departure_date}T{arrival_hour:02d}:{arrival_minute}:00"
+                
                 flight = {
                     "flight_id": f"flight-{uuid.uuid4().hex[:8]}",
                     "airline": random.choice(AIRLINES),
                     "origin": request_body.get("origin", "Unknown"),
                     "destination": request_body.get("destination", "Unknown"),
-                    "departure_time": f"{departure_date}T{random.randint(0, 23):02d}:{random.choice(['00', '15', '30', '45']):02d}:00",
-                    "arrival_time": f"{departure_date}T{random.randint(0, 23):02d}:{random.choice(['00', '15', '30', '45']):02d}:00",
+                    "departure_time": departure_time,
+                    "arrival_time": arrival_time,
                     "duration_minutes": random.randint(60, 1200),
                     "stops": random.choices([0, 1, 2], weights=[0.6, 0.3, 0.1])[0],
                     "cabin_class": request_body.get("cabin_class", "Economy"),
@@ -592,7 +610,8 @@ def generate_search_log_entry(timestamp=None, search_type=None,
         },
         "tracing": {
             "correlation_id": correlation_id,
-            "request_id": request_id
+            "request_id": request_id,
+            "parent_request_id": parent_request_id
         },
         "is_anomalous": is_anomalous  # Meta field for labeling
     }
@@ -641,7 +660,8 @@ def generate_related_searches(correlation_id, user_id=None, base_timestamp=None,
             search_type=search_type,
             correlation_id=correlation_id,
             user_id=user_id,
-            is_anomalous=search_is_anomalous
+            is_anomalous=search_is_anomalous,
+            parent_request_id=None if i == 0 else related_logs[-1]["request"]["id"]
         )
         
         related_logs.append(log_entry)
@@ -751,6 +771,7 @@ def save_logs_to_file(logs, format='json', filename='search_logs'):
                 "user_id": log["user"]["user_id"],
                 "authenticated": log["user"]["authenticated"],
                 "correlation_id": log["tracing"]["correlation_id"],
+                "parent_request_id": log["tracing"].get("parent_request_id"),
                 "is_anomalous": log["is_anomalous"]
             }
             flat_logs.append(flat_log)
@@ -825,22 +846,19 @@ def generate_interconnected_search_logs(auth_logs, num_logs=500):
     
     # Extract correlation IDs from auth logs
     correlation_ids = []
+    user_id_map = {}
     for log in auth_logs:
         if "tracing" in log and "correlation_id" in log["tracing"]:
             correlation_ids.append(log["tracing"]["correlation_id"])
+            
+            # Map user IDs to correlation IDs
+            if "operation" in log and "user_id" in log["operation"] and log["operation"]["user_id"]:
+                user_id_map[log["tracing"]["correlation_id"]] = log["operation"]["user_id"]
     
     # If no correlation IDs found, generate standalone logs
     if not correlation_ids:
         print("No correlation IDs found in auth logs. Generating standalone search logs.")
         return generate_search_logs(num_logs)
-    
-    # Extract user IDs from auth logs
-    user_id_map = {}
-    for log in auth_logs:
-        if "tracing" in log and "correlation_id" in log["tracing"]:
-            corr_id = log["tracing"]["correlation_id"]
-            if "operation" in log and "user_id" in log["operation"]:
-                user_id_map[corr_id] = log["operation"]["user_id"]
     
     # For each correlation ID, generate a small search flow
     print(f"Generating search logs connected to {len(correlation_ids)} auth flows...")
@@ -902,10 +920,12 @@ if __name__ == "__main__":
     random.seed(42)
     np.random.seed(42)
     
+    print("Generating search service logs...")
+    
     # Generate logs
     if args.connect_with:
-        print(f"Connecting with auth logs from: {args.connect_with}")
         try:
+            print(f"Loading auth logs from: {args.connect_with}")
             with open(args.connect_with, 'r') as f:
                 auth_logs = json.load(f)
             print(f"Loaded {len(auth_logs)} auth logs")
@@ -917,10 +937,58 @@ if __name__ == "__main__":
     else:
         logs = generate_search_logs(args.num_logs, args.anomaly_percentage)
     
-    # Save logs to file
-    save_logs_to_file(logs, args.output_format, args.output_filename)
+    # Analyze logs
+    analyze_search_logs(logs)
     
-    # Analyze logs if requested
-    if args.analyze:
-        analyze_search_logs(logs)
+    # Save logs to file
+    json_path = save_logs_to_file(logs, format='json', filename=args.output_filename)
+    csv_path = save_logs_to_file(logs, format='csv', filename=args.output_filename)
+    
+    print(f"\nSearch logs have been saved to {json_path} and {csv_path}")
+    
+    # Print sample logs (1 normal, 1 anomalous)
+    print("\n=== Sample Normal Search Log ===")
+    normal_log = next(log for log in logs if not log.get('is_anomalous', False))
+    print(json.dumps(normal_log, indent=2)[:1000] + "... (truncated)")
+    
+    print("\n=== Sample Anomalous Search Log ===")
+    anomalous_log = next(log for log in logs if log.get('is_anomalous', True))
+    print(json.dumps(anomalous_log, indent=2)[:1000] + "... (truncated)")
+    
+    # Generate search flow examples
+    print("\nGenerating example search flows...")
+    search_flow_examples = [
+        ["flight_search", "availability_check"],
+        ["destination_info", "hotel_search"],
+        ["flight_search", "hotel_search", "car_rental_search"]
+    ]
+    
+    for flow in search_flow_examples:
+        flow_name = " -> ".join(flow)
+        print(f"\nExample flow: {flow_name}")
+        user_id = str(uuid.uuid4())
+        correlation_id = generate_correlation_id()
         
+        # Create a custom flow with the specific pattern
+        flow_logs = []
+        current_timestamp = datetime.datetime.now()
+        
+        for i, search_type in enumerate(flow):
+            # Add some time between operations
+            current_timestamp += datetime.timedelta(seconds=random.randint(2, 10))
+            
+            # Generate the log entry
+            parent_request_id = None if i == 0 else flow_logs[-1]["request"]["id"]
+            
+            log_entry = generate_search_log_entry(
+                timestamp=current_timestamp,
+                search_type=search_type,
+                correlation_id=correlation_id,
+                user_id=user_id,
+                is_anomalous=False,
+                parent_request_id=parent_request_id
+            )
+            
+            flow_logs.append(log_entry)
+        
+        print(f"Generated {len(flow_logs)} logs for this flow")

@@ -1,395 +1,4 @@
-related_logs = []
-    
-    if base_timestamp is None:
-        base_timestamp = datetime.datetime.now() - datetime.timedelta(
-            days=random.randint(0, 30),
-            hours=random.randint(0, 23)
-        )
-    
-    current_timestamp = base_timestamp
-    
-    # Generate user ID if not provided
-    if user_id is None:
-        user_id = str(uuid.uuid4())
-    
-    # Generate booking ID if not provided
-    if booking_id is None and booking_data and "booking_id" in booking_data:
-        booking_id = booking_data["booking_id"]
-    elif booking_id is None:
-        booking_id = f"booking-{uuid.uuid4().hex[:8]}"
-    
-    # Choose a feedback sequence pattern
-    feedback_patterns = [
-        # Basic review
-        ["submit_review"],
-        # Review and update
-        ["submit_review", "update_review"],
-        # Submit and check
-        ["submit_review", "get_review"],
-        # Review with response
-        ["submit_review", "respond_to_feedback"],
-        # Rating and complaint
-        ["submit_rating", "submit_complaint"],
-        # Complete cycle
-        ["submit_review", "get_review", "respond_to_feedback"]
-    ]
-    
-    pattern = random.choice(feedback_patterns)
-    
-    # Keep track of review ID for the sequence
-    review_id = None
-    
-    # Keep track of parent request ID for linking
-    parent_request_id = None
-    
-    # Generate logs for each feedback operation in the pattern
-    for i, operation in enumerate(pattern):
-        # Add some time between operations
-        current_timestamp += datetime.timedelta(seconds=random.uniform(5, 30))
-        
-        if operation == "respond_to_feedback":
-            # Add more time for staff response
-            current_timestamp += datetime.timedelta(hours=random.uniform(2, 48))
-        
-        # Determine if this operation should be anomalous
-        op_is_anomalous = is_anomalous and (i == len(pattern) - 1 or random.random() < 0.3)
-        
-        # Generate the log entry
-        log_entry = generate_feedback_log_entry(
-            timestamp=current_timestamp,
-            operation=operation,
-            correlation_id=correlation_id,
-            user_id=user_id if operation != "respond_to_feedback" else None,  # Staff response
-            booking_id=booking_id,
-            review_id=review_id,
-            booking_data=booking_data,
-            is_anomalous=op_is_anomalous,
-            parent_request_id=parent_request_id
-        )
-        
-        related_logs.append(log_entry)
-        
-        # Extract review ID from the response for subsequent operations
-        if operation == "submit_review":
-            if log_entry["response"]["status_code"] < 400 and "body" in log_entry["response"]:
-                review_id = log_entry["response"]["body"].get("review_id")
-        
-        # Update parent request ID for the next operation
-        parent_request_id = log_entry["request"]["id"]
-        
-        # If we get an error, we might stop the sequence
-        if op_is_anomalous and log_entry["response"]["status_code"] >= 400 and random.random() < 0.7:
-            break
-    
-    return related_logs
-
-def generate_feedback_logs(num_logs=1000, anomaly_percentage=15):
-    """Generate a dataset of feedback service logs with a specified percentage of anomalies"""
-    logs = []
-    flow_logs = []
-    
-    # Calculate number of anomalous logs
-    num_anomalous = int(num_logs * (anomaly_percentage / 100))
-    num_normal = num_logs - num_anomalous
-    
-    # Generate individual normal logs
-    print(f"Generating {int(num_normal * 0.5)} individual normal feedback logs...")
-    for _ in range(int(num_normal * 0.5)):  # 50% of normal logs are individual
-        logs.append(generate_feedback_log_entry(is_anomalous=False))
-    
-    # Generate individual anomalous logs
-    print(f"Generating {int(num_anomalous * 0.3)} individual anomalous feedback logs...")
-    for _ in range(int(num_anomalous * 0.3)):  # 30% of anomalous logs are individual
-        logs.append(generate_feedback_log_entry(is_anomalous=True))
-    
-    # Generate normal feedback sequences
-    num_normal_flows = int(num_normal * 0.5 / 2)  # Approximately 2 logs per flow
-    print(f"Generating {num_normal_flows} normal feedback flows...")
-    for _ in range(num_normal_flows):
-        correlation_id = generate_correlation_id()
-        user_id = str(uuid.uuid4())
-        base_timestamp = datetime.datetime.now() - datetime.timedelta(
-            days=random.randint(0, 30),
-            hours=random.randint(0, 23)
-        )
-        
-        flow_logs.extend(generate_related_feedback(
-            correlation_id=correlation_id,
-            user_id=user_id,
-            base_timestamp=base_timestamp,
-            is_anomalous=False
-        ))
-    
-    # Generate anomalous feedback sequences
-    num_anomalous_flows = int(num_anomalous * 0.7 / 2)  # Approximately 2 logs per flow
-    print(f"Generating {num_anomalous_flows} anomalous feedback flows...")
-    for _ in range(num_anomalous_flows):
-        correlation_id = generate_correlation_id()
-        user_id = str(uuid.uuid4())
-        base_timestamp = datetime.datetime.now() - datetime.timedelta(
-            days=random.randint(0, 30),
-            hours=random.randint(0, 23)
-        )
-        
-        flow_logs.extend(generate_related_feedback(
-            correlation_id=correlation_id,
-            user_id=user_id,
-            base_timestamp=base_timestamp,
-            is_anomalous=True
-        ))
-    
-    # Combine all logs
-    all_logs = logs + flow_logs
-    
-    # Shuffle logs to mix normal and anomalous entries
-    random.shuffle(all_logs)
-    
-    return all_logs
-
-def save_logs_to_file(logs, format='json', filename='feedback_logs'):
-    """Save logs to a file in the specified format"""
-    if format.lower() == 'json':
-        file_path = f"{filename}.json"
-        with open(file_path, 'w') as f:
-            json.dump(logs, f, indent=2)
-        print(f"Saved {len(logs)} logs to {file_path}")
-        return file_path
-    
-    elif format.lower() == 'csv':
-        file_path = f"{filename}.csv"
-        
-        # Flatten the nested structure for CSV
-        flat_logs = []
-        for log in logs:
-            flat_log = {
-                "timestamp": log["timestamp"],
-                "feedback_operation": log["feedback_service"]["operation"],
-                "environment": log["feedback_service"]["environment"],
-                "region": log["feedback_service"]["region"],
-                "instance_id": log["feedback_service"]["instance_id"],
-                "request_id": log["request"]["id"],
-                "request_method": log["request"]["method"],
-                "request_path": log["request"]["path"],
-                "client_id": log["request"]["client_id"],
-                "client_type": log["request"]["client_type"],
-                "source_ip": log["request"]["source_ip"],
-                "response_status_code": log["response"]["status_code"],
-                "response_time_ms": log["response"]["time_ms"],
-                "user_id": log["user"]["user_id"],
-                "anonymous": log["user"]["anonymous"],
-                "booking_id": log["booking_id"],
-                "review_id": log["review_id"],
-                "correlation_id": log["tracing"]["correlation_id"],
-                "parent_request_id": log["tracing"].get("parent_request_id"),
-                "is_anomalous": log["is_anomalous"]
-            }
-            flat_logs.append(flat_log)
-        
-        # Convert to DataFrame and save as CSV
-        df = pd.DataFrame(flat_logs)
-        df.to_csv(file_path, index=False)
-        print(f"Saved {len(logs)} logs to {file_path}")
-        return file_path
-    
-    else:
-        raise ValueError(f"Unsupported format: {format}. Use 'json' or 'csv'.")
-
-def analyze_feedback_logs(logs):
-    """Print analysis of the generated feedback logs"""
-    total_logs = len(logs)
-    anomalous_count = sum(1 for log in logs if log.get('is_anomalous', False))
-    normal_count = total_logs - anomalous_count
-    
-    # Count by operation
-    operations = {}
-    for log in logs:
-        operation = log['feedback_service']['operation']
-        operations[operation] = operations.get(operation, 0) + 1
-    
-    # Count by status code
-    status_codes = {}
-    for log in logs:
-        status = log['response']['status_code']
-        status_codes[status] = status_codes.get(status, 0) + 1
-    
-    # Success vs. failure rate
-    success_count = sum(1 for log in logs if log['response']['status_code'] < 400)
-    failure_count = total_logs - success_count
-    
-    # Calculate average response times
-    normal_times = [log['response']['time_ms'] for log in logs if not log.get('is_anomalous', False)]
-    anomalous_times = [log['response']['time_ms'] for log in logs if log.get('is_anomalous', False)]
-    
-    avg_normal_time = sum(normal_times) / len(normal_times) if normal_times else 0
-    avg_anomalous_time = sum(anomalous_times) / len(anomalous_times) if anomalous_times else 0
-    
-    # Count anonymous feedback
-    anonymous_count = sum(1 for log in logs if log['user']['anonymous'])
-    
-    # Count unique correlation IDs (feedback flows)
-    correlation_ids = set(log['tracing']['correlation_id'] for log in logs)
-    
-    print("\n=== Feedback Log Analysis ===")
-    print(f"Total logs: {total_logs}")
-    print(f"Normal logs: {normal_count} ({normal_count/total_logs*100:.2f}%)")
-    print(f"Anomalous logs: {anomalous_count} ({anomalous_count/total_logs*100:.2f}%)")
-    print(f"Success rate: {success_count/total_logs*100:.2f}%")
-    print(f"Failure rate: {failure_count/total_logs*100:.2f}%)")
-    print(f"Anonymous feedback: {anonymous_count} ({anonymous_count/total_logs*100:.2f}%)")
-    print(f"Unique feedback flows: {len(correlation_ids)}")
-    print(f"Average response time (normal): {avg_normal_time:.2f} ms")
-    print(f"Average response time (anomalous): {avg_anomalous_time:.2f} ms")
-    
-    print("\n=== Operation Distribution ===")
-    for operation, count in sorted(operations.items(), key=lambda x: x[1], reverse=True):
-        print(f"{operation}: {count} logs ({count/total_logs*100:.2f}%)")
-    
-    print("\n=== Status Code Distribution ===")
-    for code in sorted(status_codes.keys()):
-        count = status_codes[code]
-        print(f"HTTP {code}: {count} logs ({count/total_logs*100:.2f}%)")
-
-def generate_interconnected_feedback_logs(auth_logs=None, booking_logs=None, num_logs=500):
-    """Generate feedback logs that share correlation IDs with existing auth/booking logs"""
-    feedback_logs = []
-    
-    # Extract correlation IDs from existing logs
-    correlation_ids = set()
-    user_id_map = {}
-    booking_data_map = {}
-    
-    # Process auth logs if available
-    if auth_logs:
-        for log in auth_logs:
-            if "tracing" in log and "correlation_id" in log["tracing"]:
-                corr_id = log["tracing"]["correlation_id"]
-                correlation_ids.add(corr_id)
-                
-                # Map user IDs to correlation IDs
-                if "operation" in log and "user_id" in log["operation"]:
-                    user_id_map[corr_id] = log["operation"]["user_id"]
-    
-    # Process booking logs if available
-    if booking_logs:
-        for log in booking_logs:
-            if "tracing" in log and "correlation_id" in log["tracing"]:
-                corr_id = log["tracing"]["correlation_id"]
-                correlation_ids.add(corr_id)
-                
-                # Map user IDs to correlation IDs if not already mapped from auth logs
-                if corr_id not in user_id_map and "user" in log and "user_id" in log["user"] and log["user"]["user_id"]:
-                    user_id_map[corr_id] = log["user"]["user_id"]
-                
-                # Extract booking data for feedback
-                if "booking_id" in log and log["booking_id"]:
-                    booking_data = {
-                        "booking_id": log["booking_id"]
-                    }
-                    
-                    # Try to extract booking type
-                    if "booking_service" in log and "type" in log["booking_service"]:
-                        booking_data["booking_type"] = log["booking_service"]["type"]
-                    
-                    booking_data_map[corr_id] = booking_data
-    
-    # If no correlation IDs found, generate standalone logs
-    if not correlation_ids:
-        print("No correlation IDs found in input logs. Generating standalone feedback logs.")
-        return generate_feedback_logs(num_logs)
-    
-    # Convert to list for random.choice
-    correlation_ids = list(correlation_ids)
-    
-    # For each correlation ID, generate a feedback flow
-    print(f"Generating feedback logs connected to {len(correlation_ids)} existing flows...")
-    corr_ids_processed = 0
-    
-    while len(feedback_logs) < num_logs and corr_ids_processed < len(correlation_ids):
-        # Pick a correlation ID
-        correlation_id = correlation_ids[corr_ids_processed]
-        corr_ids_processed += 1
-        
-        # Get user ID if available
-        user_id = user_id_map.get(correlation_id)
-        
-        # Get booking data if available
-        booking_data = booking_data_map.get(correlation_id)
-        
-        # Generate a base timestamp
-        base_time = datetime.datetime.now() - datetime.timedelta(
-            days=random.randint(0, 30),
-            hours=random.randint(0, 23)
-        )
-        
-        # Generate feedback flow with this correlation ID
-        flow_logs = generate_related_feedback(
-            correlation_id=correlation_id,
-            user_id=user_id,
-            booking_data=booking_data,
-            base_timestamp=base_time,
-            is_anomalous=random.random() < 0.15  # 15% chance of anomalous flow
-        )
-        
-        feedback_logs.extend(flow_logs)
-    
-    # If we need more logs, add some individual ones
-    while len(feedback_logs) < num_logs:
-        feedback_logs.append(generate_feedback_log_entry())
-    
-    return feedback_logs
-
-if __name__ == "__main__":
-    import argparse
-    
-    parser = argparse.ArgumentParser(description='Generate Feedback API logs')
-    parser.add_argument('--num-logs', type=int, default=1000, help='Number of logs to generate')
-    parser.add_argument('--anomaly-percentage', type=int, default=15, help='Percentage of anomalous logs')
-    parser.add_argument('--output-format', choices=['json', 'csv'], default='json', help='Output file format')
-    parser.add_argument('--output-filename', default='feedback_logs', help='Output filename (without extension)')
-    parser.add_argument('--analyze', action='store_true', help='Analyze generated logs')
-    parser.add_argument('--auth-logs', help='Path to auth logs file to connect with')
-    parser.add_argument('--booking-logs', help='Path to booking logs file to connect with')
-    
-    args = parser.parse_args()
-    
-    # Set random seed for reproducibility
-    random.seed(42)
-    np.random.seed(42)
-    
-    # Load existing logs if provided
-    auth_logs = None
-    booking_logs = None
-    
-    if args.auth_logs:
-        try:
-            print(f"Loading auth logs from {args.auth_logs}...")
-            with open(args.auth_logs, 'r') as f:
-                auth_logs = json.load(f)
-            print(f"Loaded {len(auth_logs)} auth logs")
-        except Exception as e:
-            print(f"Error loading auth logs: {e}")
-    
-    if args.booking_logs:
-        try:
-            print(f"Loading booking logs from {args.booking_logs}...")
-            with open(args.booking_logs, 'r') as f:
-                booking_logs = json.load(f)
-            print(f"Loaded {len(booking_logs)} booking logs")
-        except Exception as e:
-            print(f"Error loading booking logs: {e}")
-    
-    # Generate logs
-    if args.auth_logs or args.booking_logs:
-        logs = generate_interconnected_feedback_logs(auth_logs, booking_logs, args.num_logs)
-    else:
-        logs = generate_feedback_logs(args.num_logs, args.anomaly_percentage)
-    
-    # Save logs to file
-    save_logs_to_file(logs, args.output_format, args.output_filename)
-    
-    # Analyze logs if requested
-    if args.analyze:
-        analyze_feedback_logs(logs)import json
+import json
 import random
 import datetime
 import uuid
@@ -591,7 +200,7 @@ def get_error_message(status_code):
 def generate_feedback_log_entry(timestamp=None, operation=None, 
                              correlation_id=None, user_id=None, 
                              booking_id=None, review_id=None, 
-                             booking_data=None, is_anomalous=False, parent_request_id=None):
+                             booking_data=None, is_anomalous=False):
     """Generate a single feedback service log entry"""
     
     # Generate timestamp if not provided
@@ -895,8 +504,7 @@ def generate_feedback_log_entry(timestamp=None, operation=None,
         "review_id": review_id,
         "tracing": {
             "correlation_id": correlation_id,
-            "request_id": request_id,
-            "parent_request_id": parent_request_id
+            "request_id": request_id
         },
         "is_anomalous": is_anomalous  # Meta field for labeling
     }
@@ -915,3 +523,412 @@ def generate_related_feedback(correlation_id, user_id=None, booking_id=None,
         )
     
     current_timestamp = base_timestamp
+    
+    # Generate user ID if not provided
+    if user_id is None:
+        user_id = str(uuid.uuid4())
+    
+    # Generate booking ID if not provided
+    if booking_id is None and booking_data and "booking_id" in booking_data:
+        booking_id = booking_data["booking_id"]
+    elif booking_id is None:
+        booking_id = f"booking-{uuid.uuid4().hex[:8]}"
+    
+    # Choose a feedback sequence pattern
+    feedback_patterns = [
+        # Basic review
+        ["submit_review"],
+        # Review and update
+        ["submit_review", "update_review"],
+        # Submit and check
+        ["submit_review", "get_review"],
+        # Review with response
+        ["submit_review", "respond_to_feedback"],
+        # Rating and complaint
+        ["submit_rating", "submit_complaint"],
+        # Complete cycle
+        ["submit_review", "get_review", "respond_to_feedback"]
+    ]
+    
+    pattern = random.choice(feedback_patterns)
+    
+    # Keep track of review ID for the sequence
+    review_id = None
+    
+    # Generate logs for each feedback operation in the pattern
+    for i, operation in enumerate(pattern):
+        # Add some time between operations
+        current_timestamp += datetime.timedelta(seconds=random.uniform(5, 30))
+        
+        if operation == "respond_to_feedback":
+            # Add more time for staff response
+            current_timestamp += datetime.timedelta(hours=random.uniform(2, 48))
+        
+        # Determine if this operation should be anomalous
+        op_is_anomalous = is_anomalous and (i == len(pattern) - 1 or random.random() < 0.3)
+        
+        # Generate the log entry
+        log_entry = generate_feedback_log_entry(
+            timestamp=current_timestamp,
+            operation=operation,
+            correlation_id=correlation_id,
+            user_id=user_id if operation != "respond_to_feedback" else None,  # Staff response
+            booking_id=booking_id,
+            review_id=review_id,
+            booking_data=booking_data,
+            is_anomalous=op_is_anomalous
+        )
+        
+        related_logs.append(log_entry)
+        
+        # Extract review ID from the response for subsequent operations
+        if operation == "submit_review":
+            if log_entry["response"]["status_code"] < 400 and "body" in log_entry["response"]:
+                review_id = log_entry["response"]["body"].get("review_id")
+        
+        # If we get an error, we might stop the sequence
+        if op_is_anomalous and log_entry["response"]["status_code"] >= 400 and random.random() < 0.7:
+            break
+    
+    return related_logs
+
+def generate_feedback_logs(num_logs=1000, anomaly_percentage=15):
+    """Generate a dataset of feedback service logs with a specified percentage of anomalies"""
+    logs = []
+    flow_logs = []
+    
+    # Calculate number of anomalous logs
+    num_anomalous = int(num_logs * (anomaly_percentage / 100))
+    num_normal = num_logs - num_anomalous
+    
+    # Generate individual normal logs
+    print(f"Generating {int(num_normal * 0.5)} individual normal feedback logs...")
+    for _ in range(int(num_normal * 0.5)):  # 50% of normal logs are individual
+        logs.append(generate_feedback_log_entry(is_anomalous=False))
+    
+    # Generate individual anomalous logs
+    print(f"Generating {int(num_anomalous * 0.3)} individual anomalous feedback logs...")
+    for _ in range(int(num_anomalous * 0.3)):  # 30% of anomalous logs are individual
+        logs.append(generate_feedback_log_entry(is_anomalous=True))
+    
+    # Generate normal feedback sequences
+    num_normal_flows = int(num_normal * 0.5 / 2)  # Approximately 2 logs per flow
+    print(f"Generating {num_normal_flows} normal feedback flows...")
+    for _ in range(num_normal_flows):
+        correlation_id = generate_correlation_id()
+        user_id = str(uuid.uuid4())
+        base_timestamp = datetime.datetime.now() - datetime.timedelta(
+            days=random.randint(0, 30),
+            hours=random.randint(0, 23)
+        )
+        
+        flow_logs.extend(generate_related_feedback(
+            correlation_id=correlation_id,
+            user_id=user_id,
+            base_timestamp=base_timestamp,
+            is_anomalous=False
+        ))
+    
+    # Generate anomalous feedback sequences
+    num_anomalous_flows = int(num_anomalous * 0.7 / 2)  # Approximately 2 logs per flow
+    print(f"Generating {num_anomalous_flows} anomalous feedback flows...")
+    for _ in range(num_anomalous_flows):
+        correlation_id = generate_correlation_id()
+        user_id = str(uuid.uuid4())
+        base_timestamp = datetime.datetime.now() - datetime.timedelta(
+            days=random.randint(0, 30),
+            hours=random.randint(0, 23)
+        )
+        
+        flow_logs.extend(generate_related_feedback(
+            correlation_id=correlation_id,
+            user_id=user_id,
+            base_timestamp=base_timestamp,
+            is_anomalous=True
+        ))
+    
+    # Combine all logs
+    all_logs = logs + flow_logs
+    
+    # Shuffle logs to mix normal and anomalous entries
+    random.shuffle(all_logs)
+    
+    return all_logs
+
+def save_logs_to_file(logs, format='json', filename='feedback_logs'):
+    """Save logs to a file in the specified format"""
+    if format.lower() == 'json':
+        file_path = f"{filename}.json"
+        with open(file_path, 'w') as f:
+            json.dump(logs, f, indent=2)
+        print(f"Saved {len(logs)} logs to {file_path}")
+        return file_path
+    
+    elif format.lower() == 'csv':
+        file_path = f"{filename}.csv"
+        
+        # Flatten the nested structure for CSV
+        flat_logs = []
+        for log in logs:
+            flat_log = {
+                "timestamp": log["timestamp"],
+                "feedback_operation": log["feedback_service"]["operation"],
+                "environment": log["feedback_service"]["environment"],
+                "region": log["feedback_service"]["region"],
+                "instance_id": log["feedback_service"]["instance_id"],
+                "request_id": log["request"]["id"],
+                "request_method": log["request"]["method"],
+                "request_path": log["request"]["path"],
+                "client_id": log["request"]["client_id"],
+                "client_type": log["request"]["client_type"],
+                "source_ip": log["request"]["source_ip"],
+                "response_status_code": log["response"]["status_code"],
+                "response_time_ms": log["response"]["time_ms"],
+                "user_id": log["user"]["user_id"],
+                "anonymous": log["user"]["anonymous"],
+                "booking_id": log["booking_id"],
+                "review_id": log["review_id"],
+                "correlation_id": log["tracing"]["correlation_id"],
+                "is_anomalous": log["is_anomalous"]
+            }
+            flat_logs.append(flat_log)
+        
+        # Convert to DataFrame and save as CSV
+        df = pd.DataFrame(flat_logs)
+        df.to_csv(file_path, index=False)
+        print(f"Saved {len(logs)} logs to {file_path}")
+        return file_path
+    
+    else:
+        raise ValueError(f"Unsupported format: {format}. Use 'json' or 'csv'.")
+
+def analyze_feedback_logs(logs):
+    """Print analysis of the generated feedback logs"""
+    total_logs = len(logs)
+    anomalous_count = sum(1 for log in logs if log.get('is_anomalous', False))
+    normal_count = total_logs - anomalous_count
+    
+    # Count by operation
+    operations = {}
+    for log in logs:
+        operation = log['feedback_service']['operation']
+        operations[operation] = operations.get(operation, 0) + 1
+    
+    # Count by status code
+    status_codes = {}
+    for log in logs:
+        status = log['response']['status_code']
+        status_codes[status] = status_codes.get(status, 0) + 1
+    
+    # Success vs. failure rate
+    success_count = sum(1 for log in logs if log['response']['status_code'] < 400)
+    failure_count = total_logs - success_count
+    
+    # Calculate average response times
+    normal_times = [log['response']['time_ms'] for log in logs if not log.get('is_anomalous', False)]
+    anomalous_times = [log['response']['time_ms'] for log in logs if log.get('is_anomalous', False)]
+    
+    avg_normal_time = sum(normal_times) / len(normal_times) if normal_times else 0
+    avg_anomalous_time = sum(anomalous_times) / len(anomalous_times) if anomalous_times else 0
+    
+    # Count anonymous feedback
+    anonymous_count = sum(1 for log in logs if log['user']['anonymous'])
+    
+    # Count unique correlation IDs (feedback flows)
+    correlation_ids = set(log['tracing']['correlation_id'] for log in logs)
+    
+    print("\n=== Feedback Log Analysis ===")
+    print(f"Total logs: {total_logs}")
+    print(f"Normal logs: {normal_count} ({normal_count/total_logs*100:.2f}%)")
+    print(f"Anomalous logs: {anomalous_count} ({anomalous_count/total_logs*100:.2f}%)")
+    print(f"Success rate: {success_count/total_logs*100:.2f}%")
+    print(f"Failure rate: {failure_count/total_logs*100:.2f}%")
+    print(f"Anonymous feedback: {anonymous_count} ({anonymous_count/total_logs*100:.2f}%)")
+    print(f"Unique feedback flows: {len(correlation_ids)}")
+    print(f"Average response time (normal): {avg_normal_time:.2f} ms")
+    print(f"Average response time (anomalous): {avg_anomalous_time:.2f} ms")
+    
+    print("\n=== Operation Distribution ===")
+    for operation, count in sorted(operations.items(), key=lambda x: x[1], reverse=True):
+        print(f"{operation}: {count} logs ({count/total_logs*100:.2f}%)")
+    
+    print("\n=== Status Code Distribution ===")
+    for code in sorted(status_codes.keys()):
+        count = status_codes[code]
+        print(f"HTTP {code}: {count} logs ({count/total_logs*100:.2f}%)")
+
+def generate_interconnected_feedback_logs(auth_logs=None, booking_logs=None, num_logs=500):
+    """Generate feedback logs that share correlation IDs with existing auth/booking logs"""
+    feedback_logs = []
+    
+    # Extract correlation IDs from existing logs
+    correlation_ids = set()
+    user_id_map = {}
+    booking_data_map = {}
+    
+    # Process auth logs if available
+    if auth_logs:
+        for log in auth_logs:
+            if "tracing" in log and "correlation_id" in log["tracing"]:
+                corr_id = log["tracing"]["correlation_id"]
+                correlation_ids.add(corr_id)
+                
+                # Map user IDs to correlation IDs
+                if "operation" in log and "user_id" in log["operation"]:
+                    user_id_map[corr_id] = log["operation"]["user_id"]
+    
+    # Process booking logs if available
+    if booking_logs:
+        for log in booking_logs:
+            if "tracing" in log and "correlation_id" in log["tracing"]:
+                corr_id = log["tracing"]["correlation_id"]
+                correlation_ids.add(corr_id)
+                
+                # Map user IDs to correlation IDs if not already mapped from auth logs
+                if corr_id not in user_id_map and "user" in log and "user_id" in log["user"] and log["user"]["user_id"]:
+                    user_id_map[corr_id] = log["user"]["user_id"]
+                
+                # Extract booking data for feedback
+                if "booking_id" in log and log["booking_id"]:
+                    booking_data = {
+                        "booking_id": log["booking_id"]
+                    }
+                    
+                    # Try to extract booking type
+                    if "booking_service" in log and "type" in log["booking_service"]:
+                        booking_data["booking_type"] = log["booking_service"]["type"]
+                    
+                    booking_data_map[corr_id] = booking_data
+    
+    # If no correlation IDs found, generate standalone logs
+    if not correlation_ids:
+        print("No correlation IDs found in input logs. Generating standalone feedback logs.")
+        return generate_feedback_logs(num_logs)
+    
+    # Convert to list for random.choice
+    correlation_ids = list(correlation_ids)
+    
+    # For each correlation ID, generate a feedback flow
+    print(f"Generating feedback logs connected to {len(correlation_ids)} existing flows...")
+    corr_ids_processed = 0
+    
+    while len(feedback_logs) < num_logs and corr_ids_processed < len(correlation_ids):
+        # Pick a correlation ID
+        correlation_id = correlation_ids[corr_ids_processed]
+        corr_ids_processed += 1
+        
+        # Get user ID if available
+        user_id = user_id_map.get(correlation_id)
+        
+        # Get booking data if available
+        booking_data = booking_data_map.get(correlation_id)
+        
+        # Generate a base timestamp
+        base_time = datetime.datetime.now() - datetime.timedelta(
+            days=random.randint(0, 30),
+            hours=random.randint(0, 23)
+        )
+        
+        # Generate feedback flow with this correlation ID
+        flow_logs = generate_related_feedback(
+            correlation_id=correlation_id,
+            user_id=user_id,
+            booking_data=booking_data,
+            base_timestamp=base_time,
+            is_anomalous=random.random() < 0.15  # 15% chance of anomalous flow
+        )
+        
+        feedback_logs.extend(flow_logs)
+    
+    # If we need more logs, add some individual ones
+    while len(feedback_logs) < num_logs:
+        feedback_logs.append(generate_feedback_log_entry())
+    
+    return feedback_logs
+
+if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Generate Feedback API logs')
+    parser.add_argument('--num-logs', type=int, default=1000, help='Number of logs to generate')
+    parser.add_argument('--anomaly-percentage', type=int, default=15, help='Percentage of anomalous logs')
+    parser.add_argument('--output-format', choices=['json', 'csv'], default='json', help='Output file format')
+    parser.add_argument('--output-filename', default='feedback_logs', help='Output filename (without extension)')
+    parser.add_argument('--analyze', action='store_true', help='Analyze generated logs')
+    parser.add_argument('--auth-logs', help='Path to auth logs file to connect with')
+    parser.add_argument('--booking-logs', help='Path to booking logs file to connect with')
+    
+    args = parser.parse_args()
+    
+    # Set random seed for reproducibility
+    random.seed(42)
+    np.random.seed(42)
+    
+    # Load existing logs if provided
+    auth_logs = None
+    booking_logs = None
+    
+    if args.auth_logs:
+        try:
+            print(f"Loading auth logs from {args.auth_logs}...")
+            with open(args.auth_logs, 'r') as f:
+                auth_logs = json.load(f)
+            print(f"Loaded {len(auth_logs)} auth logs")
+        except Exception as e:
+            print(f"Error loading auth logs: {e}")
+    
+    if args.booking_logs:
+        try:
+            print(f"Loading booking logs from {args.booking_logs}...")
+            with open(args.booking_logs, 'r') as f:
+                booking_logs = json.load(f)
+            print(f"Loaded {len(booking_logs)} booking logs")
+        except Exception as e:
+            print(f"Error loading booking logs: {e}")
+    
+    print("Generating feedback service logs...")
+    
+    # Generate logs
+    if args.auth_logs or args.booking_logs:
+        logs = generate_interconnected_feedback_logs(auth_logs, booking_logs, args.num_logs)
+    else:
+        logs = generate_feedback_logs(args.num_logs, args.anomaly_percentage)
+    
+    # Analyze logs
+    analyze_feedback_logs(logs)
+    
+    # Save logs to file
+    json_path = save_logs_to_file(logs, format='json', filename=args.output_filename)
+    csv_path = save_logs_to_file(logs, format='csv', filename=args.output_filename)
+    
+    print(f"\nFeedback logs have been saved to {json_path} and {csv_path}")
+    
+    # Print sample logs (1 normal, 1 anomalous)
+    print("\n=== Sample Normal Feedback Log ===")
+    normal_log = next(log for log in logs if not log.get('is_anomalous', False))
+    print(json.dumps(normal_log, indent=2)[:1000] + "... (truncated)")
+    
+    print("\n=== Sample Anomalous Feedback Log ===")
+    anomalous_log = next(log for log in logs if log.get('is_anomalous', True))
+    print(json.dumps(anomalous_log, indent=2)[:1000] + "... (truncated)")
+    
+    # Generate feedback flow examples
+    print("\nGenerating example feedback flows...")
+    feedback_flows = [
+        ["submit_review"],
+        ["submit_review", "update_review"],
+        ["submit_review", "respond_to_feedback"]
+    ]
+    
+    for flow in feedback_flows:
+        flow_name = " -> ".join(flow)
+        print(f"\nExample flow: {flow_name}")
+        user_id = str(uuid.uuid4())
+        correlation_id = generate_correlation_id()
+        flow_logs = generate_related_feedback(
+            correlation_id=correlation_id,
+            user_id=user_id,
+            is_anomalous=False
+        )
+        
+        print(f"Generated {len(flow_logs)} logs for this flow")
