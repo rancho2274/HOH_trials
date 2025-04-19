@@ -62,10 +62,13 @@
         <p><strong>Total Amount:</strong> ₹ {{ total }} (₹4999 per room)</p>
 
     </div>
-    <form action="{{ url_for('feedback') }}" method="post">
-        <button class="pay-btn" type="submit">Pay Now</button>
-    </form>
-</div>
+    <div class="pay-options">
+        <button class="pay-btn upi-btn" onclick="alert('Payment not successful')">Pay by UPI</button>
+        <form action="{{ url_for('feedback') }}" method="post">
+            <button class="pay-btn netbanking-btn" type="submit">Pay by Netbanking</button>
+        </form>
+    </div>
+    
 
 </body>
 </html>

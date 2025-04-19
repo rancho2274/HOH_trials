@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Choose Destination</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -128,7 +130,13 @@
             <option value="2">2 Adults</option>
             <option value="3">3 Adults</option>
         </select>
-        <button type="submit">Search</button>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="submit" style="flex: 1;">Search</button>
+            <button type="submit" aria-label="Search" style="background: #0072CE; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer;">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        
     </form>
 
     <div class="hotels">
