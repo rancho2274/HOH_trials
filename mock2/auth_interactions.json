@@ -1,0 +1,62 @@
+{
+  "timestamp": "2025-04-19T00:56:19.921494",
+  "auth_service": {
+    "type": "saml",
+    "environment": "production",
+    "region": "ap-south",
+    "instance_id": "auth-replica-ap-south-5"
+  },
+  "request": {
+    "id": "req-7781c8ccf83c466a",
+    "method": "POST",
+    "path": "/auth/token",
+    "headers": {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "User-Agent": "python-requests/2.25.1",
+      "X-Request-ID": "229cba37-7ba5-4cc1-aa09-709bcff91fe9",
+      "X-Content-Type-Options": "nosniff",
+      "X-XSS-Protection": "1; mode=block",
+      "X-Frame-Options": "DENY",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+    },
+    "body": {
+      "username": "jonesamanda",
+      "password": "********",
+      "grant_type": "password"
+    },
+    "client_id": "client-7ee9ebbd",
+    "client_type": "mobile-android",
+    "source_ip": "1.160.156.179"
+  },
+  "response": {
+    "status_code": 200,
+    "body": {
+      "access_token": "3e007a00cdbe4144be606d4f5f59e950.62c75f4a85124f48b414520b696c3992.d94f100f5f6a497790d3dfd749cf9aa0",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "refresh_token": null
+    },
+    "time_ms": 220.09
+  },
+  "operation": {
+    "type": "login",
+    "success": true,
+    "user_id": "a4ea20b8-3053-438b-8ef3-93c6e6128c01",
+    "tenant_id": "tenant-18"
+  },
+  "security": {
+    "mfa_used": false,
+    "ip_reputation": "safe",
+    "rate_limit": {
+      "limit": 100,
+      "remaining": 22,
+      "reset": 1745006749
+    }
+  },
+  "tracing": {
+    "correlation_id": "0809728f-eb23-4e2d-ab55-9010470169e1",
+    "request_id": "req-7781c8ccf83c466a"
+  },
+  "is_anomalous": false
+}

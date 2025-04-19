@@ -1,4 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for
+from search_api_generator import generate_search_log_entry
+from booking_api_generator import generate_booking_log_entry
+from payment_api_generator import generate_payment_log_entry
+from feedback_api_generator import generate_feedback_log_entry
+from auth_api_generator import generate_auth_log_entry
+import json
+from datetime import datetime
+
+
 
 app = Flask(__name__)
 
@@ -15,6 +24,19 @@ def login():
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    # Generate auth log on login (POST)
+    if request.method == 'POST':
+        timestamp = datetime.now()
+        auth_log = generate_auth_log_entry(
+            timestamp=timestamp,
+            operation="login",
+            is_anomalous=False
+        )
+
+        # Save to file
+        with open("auth_interactions.json", "a") as f:
+            f.write(json.dumps(auth_log, indent=2) + "\n")
+
     return render_template('search.html')
 
 
@@ -41,10 +63,19 @@ def hotels():
             {"name": "The Big Ben Inn", "stars": "★★", "rating_label": "Good", "reviews": "63", "image": "london2.jpg", "description": "Urban chic hotel in vibrant Soho."},
             {"name": "Buckingham Suites", "stars": "★★★★", "rating_label": "Excellent", "reviews": "265", "image": "london3.jpg", "description": "Classic elegance near Buckingham Palace."}
         ],
+        
         # Add more destinations
     }
 
+
     hotels = hotel_data.get(destination, [])
+    search_log = generate_search_log_entry(
+        timestamp=datetime.now(),
+        search_type="hotel_search",
+        is_anomalous=False
+    )
+    with open("search_interactions.json", "a") as f:
+        f.write(json.dumps(search_log, indent=2) + "\n")
     return render_template(
         'search.html',
         destination=destination,
@@ -52,6 +83,7 @@ def hotels():
         checkout=checkout,
         guests=guests
     )
+    
 
 @app.route('/hotels/<location>')
 def hotels_by_location(location):
@@ -106,6 +138,13 @@ def book():
     price_per_night = 4999
     taxes = 1000
     total_price = (price_per_night * nights) + taxes
+    booking_log = generate_booking_log_entry(
+        timestamp=datetime.now(),
+        operation="create_booking",
+        is_anomalous=False
+    )
+    with open("booking_interactions.json", "a") as f:
+        f.write(json.dumps(booking_log, indent=2) + "\n")
 
     return render_template("book.html",
         hotel=hotel,
@@ -118,6 +157,7 @@ def book():
         total_price=total_price,
         taxes=taxes
     )
+    
 
 
 @app.route('/payment', methods=['POST'])
@@ -135,6 +175,14 @@ def payment():
         rooms_int = 1  # fallback in case of error
 
     total = rooms_int * 4999
+    # Generate payment log
+    payment_log = generate_payment_log_entry(
+        timestamp=datetime.now(),
+        operation="process_payment",
+        is_anomalous=False
+    )
+    with open("payment_interactions.json", "a") as f:
+        f.write(json.dumps(payment_log, indent=2) + "\n")
 
     return render_template('payment.html', name=name, email=email, arrival=arrival, departure=departure, rooms=rooms_int, total=total)
 
@@ -142,11 +190,19 @@ def payment():
 
 @app.route('/feedback', methods=['POST'])
 def feedback():
+    feedback_log = generate_feedback_log_entry(
+        timestamp=datetime.now(),
+        operation="submit_feedback",
+        is_anomalous=False
+    )
+    with open("feedback_interactions.json", "a") as f:
+        f.write(json.dumps(feedback_log, indent=2) + "\n")
     return render_template('feedback.html')
+
 
 @app.route('/thankyou', methods=['POST'])
 def thankyou():
     return render_template('thankyou.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5050)
