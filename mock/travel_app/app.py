@@ -189,7 +189,7 @@ def payment():
     with open("payment_interactions.json", "a") as f:
         f.write(json.dumps(payment_log, indent=2) + "\n")
 
-    return render_template('payment.html', name=name, email=email, arrival=arrival, departure=departure, rooms=rooms_int, total=total)
+    return render_template('book.html', name=name, email=email, arrival=arrival, departure=departure, rooms=rooms_int, total=total)
 
 
 

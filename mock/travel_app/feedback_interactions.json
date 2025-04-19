@@ -253,3 +253,87 @@
   "is_anomalous": false
 }
 
+{
+  "timestamp": "2025-04-19T13:22:36.331859",
+  "feedback_service": {
+    "type": "feedback",
+    "operation": "submit_feedback",
+    "environment": "production",
+    "region": "us-east",
+    "instance_id": "feedback-primary-us-east-3"
+  },
+  "request": {
+    "id": "req-d0e8c2f09c1545c8",
+    "method": "POST",
+    "path": "/api/feedback/submit/feedback",
+    "headers": {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "User-Agent": "TravelApp/2.3.0 iOS/15.4.1",
+      "X-Request-ID": "b18fc814-de82-4579-9bc9-995d340bbcfc",
+      "Authorization": "Bearer b735f680e71e4b38905f3f6f4fa98011.e5e30dc35829465ea51835e45c518b98.e540e11f94f047fc8ec4756a8f9ff65c"
+    },
+    "body": {},
+    "client_id": "client-f067c6c8",
+    "client_type": "internal",
+    "source_ip": "39.189.167.145"
+  },
+  "response": {
+    "status_code": 204,
+    "body": {},
+    "time_ms": 123.0
+  },
+  "user": {
+    "user_id": "7af37963-1016-4821-be15-2cd97141c02d",
+    "anonymous": false
+  },
+  "booking_id": "booking-e412c825",
+  "review_id": "review-01fc6e3e",
+  "tracing": {
+    "correlation_id": "52ea3a37-7ed4-4376-a953-c6b214663020",
+    "request_id": "req-d0e8c2f09c1545c8"
+  },
+  "is_anomalous": false
+}
+{
+  "timestamp": "2025-04-19T13:23:04.649390",
+  "feedback_service": {
+    "type": "feedback",
+    "operation": "submit_feedback",
+    "environment": "production",
+    "region": "ap-south",
+    "instance_id": "feedback-backup-ap-south-1"
+  },
+  "request": {
+    "id": "req-f29178bf0d4344f5",
+    "method": "POST",
+    "path": "/api/feedback/submit/feedback",
+    "headers": {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "User-Agent": "TravelApp/2.3.0 iOS/15.4.1",
+      "X-Request-ID": "9d3979a5-9186-4d1e-aae6-66bd6c6b3629",
+      "Authorization": "Bearer 02c551b4381f441a934917266a4721ec.96cda620ed9543f99a58248eeebd2691.2b852a0a4b9144a2b1e3cde4df854c7c"
+    },
+    "body": {},
+    "client_id": "client-a54ebeef",
+    "client_type": "mobile-android",
+    "source_ip": "221.129.189.177"
+  },
+  "response": {
+    "status_code": 204,
+    "body": {},
+    "time_ms": 165.0
+  },
+  "user": {
+    "user_id": "3a386998-d664-4942-acb0-11f6624bc451",
+    "anonymous": false
+  },
+  "booking_id": "booking-7c80d05c",
+  "review_id": "review-e1562b5e",
+  "tracing": {
+    "correlation_id": "c54c6c01-086d-4d2a-abe3-bed87445fbe6",
+    "request_id": "req-f29178bf0d4344f5"
+  },
+  "is_anomalous": false
+}

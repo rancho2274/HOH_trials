@@ -110,3 +110,10 @@
   "status": "success",
   "message": "Login triggered"
 }
+{
+  "timestamp": "2025-04-19T13:18:18.338565",
+  "action": "login",
+  "user_id": "123",
+  "status": "success",
+  "message": "Login triggered"
+}
