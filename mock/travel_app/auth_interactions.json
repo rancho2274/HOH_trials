@@ -1,317 +1,63 @@
-[
-  {
-  "timestamp": "2025-04-19T01:11:15.666190",
-  "auth_service": {
-    "type": "oauth2",
-    "environment": "production",
-    "region": "eu-central",
-    "instance_id": "auth-primary-eu-central-4"
-  },
-  "request": {
-    "id": "req-3a922f20d7a74866",
-    "method": "POST",
-    "path": "/auth/token",
-    "headers": {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "User-Agent": "PostmanRuntime/7.28.0",
-      "X-Request-ID": "faeec36b-19da-4cca-8f9d-6255fc7df814",
-      "Authorization": "Bearer c7d36996f92c4b3aad874400d8b76a55.bf70041b40d34b7396d90b40cc6c1aad.a6fd79a7ad684f89b54d58d7de6a13f6",
-      "X-Content-Type-Options": "nosniff",
-      "X-XSS-Protection": "1; mode=block",
-      "X-Frame-Options": "DENY",
-      "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
-    },
-    "body": {
-      "username": "daniel67",
-      "password": "********",
-      "grant_type": "password",
-      "client_id": "client-051a8cf1",
-      "client_secret": "secret-87b424af10734504"
-    },
-    "client_id": "client-7034e2de",
-    "client_type": "mobile-ios",
-    "source_ip": "11.189.65.184"
-  },
-  "response": {
-    "status_code": 200,
-    "body": {
-      "access_token": "cffdfbb7c18845b59d6c55d7bce37fad.5aa8325ed22041a5934ebd6b8ffc0281.d297a70210a84887b0eb0ee4fa19ec66",
-      "token_type": "Bearer",
-      "expires_in": 3600,
-      "refresh_token": "f6b9a498004f4b6895075c79b06833e2.7b314d8b6dbf4c1294f46e98d25e333c.c90828f63e26425ca513447219d44ace"
-    },
-    "time_ms": 172.09
-  },
-  "operation": {
-    "type": "login",
-    "success": true,
-    "user_id": "e123ba22-aa7a-4ebd-959b-107251b43c6c",
-    "tenant_id": "tenant-20"
-  },
-  "security": {
-    "mfa_used": false,
-    "ip_reputation": "safe",
-    "rate_limit": {
-      "limit": 100,
-      "remaining": 54,
-      "reset": 1745006582
-    }
-  },
-  "tracing": {
-    "correlation_id": "a4dee1b3-5045-46a6-b252-5bc56b5c9e8b",
-    "request_id": "req-3a922f20d7a74866"
-  },
-  "is_anomalous": false
-},
 {
-  "timestamp": "2025-04-19T01:35:44.851121",
-  "auth_service": {
-    "type": "basic",
-    "environment": "production",
-    "region": "ap-south",
-    "instance_id": "auth-failover-ap-south-5"
-  },
-  "request": {
-    "id": "req-308fd9f126ae490d",
-    "method": "POST",
-    "path": "/auth/token",
-    "headers": {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "User-Agent": "PostmanRuntime/7.28.0",
-      "X-Request-ID": "baec23dd-d01e-4f67-9a38-b00028d46619",
-      "Authorization": "Basic dGVyZXNhNTc6MGViYjIzNDhhMTky",
-      "X-Content-Type-Options": "nosniff",
-      "X-XSS-Protection": "1; mode=block",
-      "X-Frame-Options": "DENY",
-      "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
-    },
-    "body": {
-      "username": "swilliams",
-      "password": "********",
-      "grant_type": "password"
-    },
-    "client_id": "client-68f25b2c",
-    "client_type": "desktop-app",
-    "source_ip": "32.140.151.158"
-  },
-  "response": {
-    "status_code": 200,
-    "body": {
-      "access_token": "0e6c85a90ccd4eb3be35630e14295597.f86bb1df38f44a4cb83cc348eed90fb0.7422b08b97ae409fac20b3e4d04401af",
-      "token_type": "Bearer",
-      "expires_in": 3600,
-      "refresh_token": null
-    },
-    "time_ms": 214.52
-  },
-  "operation": {
-    "type": "login",
-    "success": true,
-    "user_id": "b11dca37-8445-4d42-b8f1-d572221b5af2",
-    "tenant_id": "tenant-59"
-  },
-  "security": {
-    "mfa_used": false,
-    "ip_reputation": "safe",
-    "rate_limit": {
-      "limit": 100,
-      "remaining": 34,
-      "reset": 1745009643
-    }
-  },
-  "tracing": {
-    "correlation_id": "0365ef74-aa7c-4709-8f4f-ee42555a0323",
-    "request_id": "req-308fd9f126ae490d"
-  },
-  "is_anomalous": false
-}
-]{
-  "timestamp": "2025-04-19T01:42:39.649969",
+  "timestamp": "2025-04-19T12:54:44.763344",
   "auth_service": {
     "type": "api-key",
     "environment": "staging",
-    "region": "us-east",
-    "instance_id": "auth-backup-us-east-5"
-  },
-  "request": {
-    "id": "req-c67090e6186d4126",
-    "method": "POST",
-    "path": "/auth/token",
-    "headers": {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      "X-Request-ID": "b5e26acf-9144-4f33-b94c-331018ccd345",
-      "X-API-Key": "apk_f9aa6eea2721480da4b7afaf",
-      "X-Content-Type-Options": "nosniff",
-      "X-XSS-Protection": "1; mode=block",
-      "X-Frame-Options": "DENY",
-      "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
-    },
-    "body": {
-      "username": "christopherriggs",
-      "password": "********",
-      "grant_type": "password"
-    },
-    "client_id": "client-5381b1f3",
-    "client_type": "web-app",
-    "source_ip": "136.95.182.249"
-  },
-  "response": {
-    "status_code": 200,
-    "body": {
-      "access_token": "f2a31001ff9f437e8b1d89c9035beb00.9b69915519f14b0a8f72be1c2a0968d7.6fdedfb555c541cb82c01f318ecd6e49",
-      "token_type": "Bearer",
-      "expires_in": 3600,
-      "refresh_token": null
-    },
-    "time_ms": 219.46
-  },
-  "operation": {
-    "type": "login",
-    "success": true,
-    "user_id": "3e58225a-d599-4d30-adbe-941be92e358f",
-    "tenant_id": "tenant-88"
-  },
-  "security": {
-    "mfa_used": false,
-    "ip_reputation": "safe",
-    "rate_limit": {
-      "limit": 100,
-      "remaining": 89,
-      "reset": 1745009061
-    }
-  },
-  "tracing": {
-    "correlation_id": "c5ab2662-8e6d-40b8-8491-8f69918f4935",
-    "request_id": "req-c67090e6186d4126"
-  },
-  "is_anomalous": false
-}
-{
-  "timestamp": "2025-04-19T11:34:46.438993",
-  "auth_service": {
-    "type": "saml",
-    "environment": "production",
     "region": "ap-south",
-    "instance_id": "auth-replica-ap-south-3"
+    "instance_id": "auth-failover-ap-south-2"
   },
   "request": {
-    "id": "req-49cb11f01b0e4865",
+    "id": "req-a6a0f10e1ed44ce6",
     "method": "POST",
     "path": "/auth/token",
     "headers": {
       "Content-Type": "application/json",
       "Accept": "application/json",
-      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
-      "X-Request-ID": "56980683-089a-4bf1-a31d-b4f7a1a741a9",
+      "User-Agent": "PostmanRuntime/7.28.0",
+      "X-Request-ID": "d8af123c-b55c-4554-9e00-6e49b8b0f01e",
+      "X-API-Key": "apk_ee4264f4e8df47d0a60b0835",
       "X-Content-Type-Options": "nosniff",
       "X-XSS-Protection": "1; mode=block",
       "X-Frame-Options": "DENY",
       "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
     },
     "body": {
-      "username": "bankscharles",
+      "username": "dennismartinez",
       "password": "********",
       "grant_type": "password"
     },
-    "client_id": "client-76d9d4cf",
-    "client_type": "third-party-service",
-    "source_ip": "166.229.248.107"
+    "client_id": "client-889e5e62",
+    "client_type": "admin-portal",
+    "source_ip": "170.79.35.115"
   },
   "response": {
     "status_code": 200,
     "body": {
-      "access_token": "f6ecc6f527f241f3a4bfe0a24aaff1fc.25ffc069cde44ac595dbb2f5298bb27c.b95a63652d9c47f2929d485a6d949d22",
+      "access_token": "852901c1bdd94d46b7ad92dbc57d786c.3c8baedae6dd49c5bba04886b8aaba37.203ba67c53cb4d82b2fd0e84e6a2bb2b",
       "token_type": "Bearer",
       "expires_in": 3600,
       "refresh_token": null
     },
-    "time_ms": 220.75
+    "time_ms": 194.17
   },
   "operation": {
     "type": "login",
     "success": true,
-    "user_id": "d6bf66d8-f19c-4670-ab8a-5220f51d33a3",
-    "tenant_id": "tenant-80"
+    "user_id": "fa276a07-ce44-439f-bb69-05fe4c85d980",
+    "tenant_id": "tenant-91"
   },
   "security": {
     "mfa_used": false,
     "ip_reputation": "safe",
     "rate_limit": {
       "limit": 100,
-      "remaining": 92,
-      "reset": 1745046010
+      "remaining": 83,
+      "reset": 1745048851
     }
   },
   "tracing": {
-    "correlation_id": "b2958ac0-602e-4035-9ef3-24112641b753",
-    "request_id": "req-49cb11f01b0e4865"
-  },
-  "is_anomalous": false
-}
-{
-  "timestamp": "2025-04-19T11:41:07.727505",
-  "auth_service": {
-    "type": "api-key",
-    "environment": "production",
-    "region": "eu-central",
-    "instance_id": "auth-replica-eu-central-5"
-  },
-  "request": {
-    "id": "req-5f51f4f6a0cc4645",
-    "method": "POST",
-    "path": "/auth/token",
-    "headers": {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "User-Agent": "python-requests/2.25.1",
-      "X-Request-ID": "bd23c5a5-c28e-45dd-ae4f-a361005f4d01",
-      "X-API-Key": "apk_6a43e985c14e4392a5a1c348",
-      "X-Content-Type-Options": "nosniff",
-      "X-XSS-Protection": "1; mode=block",
-      "X-Frame-Options": "DENY",
-      "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
-    },
-    "body": {
-      "username": "donaldhall",
-      "password": "********",
-      "grant_type": "password"
-    },
-    "client_id": "client-f6a526bb",
-    "client_type": "internal-service",
-    "source_ip": "135.26.194.194"
-  },
-  "response": {
-    "status_code": 200,
-    "body": {
-      "access_token": "5dedf3a918024d55af47809d22e8a94b.9bfa1783f86d41b9be021072ea7bc404.c67f217093584b47a70656e88d030f0d",
-      "token_type": "Bearer",
-      "expires_in": 3600,
-      "refresh_token": null
-    },
-    "time_ms": 179.37
-  },
-  "operation": {
-    "type": "login",
-    "success": true,
-    "user_id": "8f8c2ed5-0d63-4ecf-bd97-5e11d357dec1",
-    "tenant_id": "tenant-90"
-  },
-  "security": {
-    "mfa_used": false,
-    "ip_reputation": "safe",
-    "rate_limit": {
-      "limit": 100,
-      "remaining": 91,
-      "reset": 1745043998
-    }
-  },
-  "tracing": {
-    "correlation_id": "f07eb1ad-4462-4a76-b9a6-24ac02933d1a",
-    "request_id": "req-5f51f4f6a0cc4645"
+    "correlation_id": "03634503-eeb0-42d9-aa26-8180da806584",
+    "request_id": "req-a6a0f10e1ed44ce6"
   },
   "is_anomalous": false
 }
