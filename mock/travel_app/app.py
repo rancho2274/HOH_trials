@@ -26,14 +26,19 @@ def login():
 def search():
     # Generate auth log on login (POST)
     if request.method == 'POST':
-        timestamp = datetime.now()
-        auth_log = generate_auth_log_entry(
-            timestamp=timestamp,
-            operation="login",
-            is_anomalous=False
-        )
+        action = request.form.get('action')  # Detect which button was clicked
 
-        # Save to file
+        # Create a log entry
+        timestamp = datetime.now()
+        auth_log = {
+            "timestamp": timestamp.isoformat(),
+            "action": action,
+            "user_id": request.form.get('loginid'),
+            "status": "success",
+            "message": f"{action.capitalize()} triggered"
+        }
+
+        # Save log
         with open("auth_interactions.json", "a") as f:
             f.write(json.dumps(auth_log, indent=2) + "\n")
 

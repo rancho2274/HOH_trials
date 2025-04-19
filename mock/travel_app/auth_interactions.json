@@ -315,3 +315,45 @@
   },
   "is_anomalous": false
 }
+{
+  "timestamp": "2025-04-19T12:06:43.448740",
+  "action": "login",
+  "user_id": "ytrew",
+  "status": "success",
+  "message": "Login triggered"
+}
+{
+  "timestamp": "2025-04-19T12:06:47.668969",
+  "action": "signin",
+  "user_id": "ytrew",
+  "status": "success",
+  "message": "Signin triggered"
+}
+{
+  "timestamp": "2025-04-19T12:21:29.467834",
+  "action": "signin",
+  "user_id": "ytrew",
+  "status": "success",
+  "message": "Signin triggered"
+}
+{
+  "timestamp": "2025-04-19T12:34:41.122042",
+  "action": "signin",
+  "user_id": "ytrew",
+  "status": "success",
+  "message": "Signin triggered"
+}
+{
+  "timestamp": "2025-04-19T12:35:54.323056",
+  "action": "login",
+  "user_id": "ytrew",
+  "status": "success",
+  "message": "Login triggered"
+}
+{
+  "timestamp": "2025-04-19T12:49:15.537655",
+  "action": "login",
+  "user_id": "gargi",
+  "status": "success",
+  "message": "Login triggered"
+}
