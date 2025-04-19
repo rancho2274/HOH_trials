@@ -12,32 +12,17 @@ from pathlib import Path
 # Initialize Faker for generating realistic data
 fake = Faker()
 
-# Define constants for Search Service log generation
-SEARCH_TYPES = [
-    "flight_search", "hotel_search", "car_rental_search", 
-    "package_search", "destination_info", "availability_check"
-]
+# Define constants for Search Service log generation - limited to location search only
+SEARCH_TYPES = ["location_search", "destination_info"]
 
 SEARCH_ENVIRONMENTS = ["dev", "staging", "production", "test"]
 SEARCH_SERVERS = ["search-primary", "search-replica", "search-cache"]
 SEARCH_REGIONS = ["us-east", "us-west", "eu-central", "ap-south", "global"]
 
-# Popular destinations
-POPULAR_DESTINATIONS = [
-    "New York", "Paris", "Tokyo", "London", "Sydney", "Dubai",
-    "Rome", "Bangkok", "Singapore", "Hong Kong", "Barcelona",
-    "Istanbul", "Prague", "Amsterdam", "Rio de Janeiro",
-    "Vienna", "Madrid", "Toronto", "San Francisco", "Berlin"
-]
+# Limit destinations to only New York, Paris, and London
+POPULAR_DESTINATIONS = ["New York", "Paris", "London"]
 
-AIRLINES = [
-    "Air France", "British Airways", "Lufthansa", "Emirates",
-    "Delta Airlines", "United Airlines", "Qatar Airways",
-    "Singapore Airlines", "Japan Airlines", "KLM",
-    "American Airlines", "Turkish Airlines", "Cathay Pacific",
-    "Etihad Airways", "Qantas", "Eva Air", "ANA", "Virgin Atlantic"
-]
-
+# Hotel chains for location search results
 HOTEL_CHAINS = [
     "Marriott", "Hilton", "Hyatt", "InterContinental", "Accor",
     "Wyndham", "Best Western", "Radisson", "Four Seasons",
@@ -45,14 +30,7 @@ HOTEL_CHAINS = [
     "Holiday Inn", "Sheraton", "Westin", "Novotel"
 ]
 
-CAR_RENTAL_COMPANIES = [
-    "Hertz", "Avis", "Enterprise", "Budget", "Sixt",
-    "Europcar", "National", "Alamo", "Dollar", "Thrifty"
-]
-
-CABIN_CLASSES = ["Economy", "Premium Economy", "Business", "First"]
 ROOM_TYPES = ["Single", "Double", "Twin", "Suite", "Deluxe", "Presidential"]
-CAR_CATEGORIES = ["Economy", "Compact", "Midsize", "Full-size", "SUV", "Luxury"]
 
 # User agents
 USER_AGENTS = [
@@ -76,7 +54,7 @@ ERROR_STATUS_CODES = {
 }
 
 # Currencies
-CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "SGD", "AED"]
+CURRENCIES = ["USD", "EUR", "GBP"]
 
 # Error messages by status code
 ERROR_MESSAGES = {
@@ -101,7 +79,6 @@ ERROR_MESSAGES = {
     404: [
         "No results found",
         "Destination not supported",
-        "Route not available",
         "No available inventory"
     ],
     422: [
@@ -183,12 +160,8 @@ def calculate_response_time(search_type, status_code, is_anomalous=False):
     """Calculate realistic response times for search operations"""
     # Base times in seconds
     base_times = {
-        "flight_search": 0.4,
-        "hotel_search": 0.3,
-        "car_rental_search": 0.2,
-        "package_search": 0.5,
-        "destination_info": 0.1,
-        "availability_check": 0.2
+        "location_search": 0.3,
+        "destination_info": 0.1
     }
     
     # Get base time for this search type
@@ -262,18 +235,10 @@ def generate_search_log_entry(timestamp=None, search_type=None,
     http_method = "GET" if random.random() < 0.8 else "POST"  # Most searches are GET, some are POST with complex params
     
     # Get path based on search type
-    if search_type == "flight_search":
-        path = "/api/search/flights"
-    elif search_type == "hotel_search":
-        path = "/api/search/hotels"
-    elif search_type == "car_rental_search":
-        path = "/api/search/cars"
-    elif search_type == "package_search":
-        path = "/api/search/packages"
+    if search_type == "location_search":
+        path = "/api/search/locations"
     elif search_type == "destination_info":
         path = "/api/destinations"
-    elif search_type == "availability_check":
-        path = "/api/availability"
     else:
         path = f"/api/search/{search_type}"
     
@@ -288,112 +253,37 @@ def generate_search_log_entry(timestamp=None, search_type=None,
     request_headers = generate_request_headers(auth_required=auth_required)
     
     # Generate travel dates for search
-    departure_date, return_date = generate_travel_dates()
+    check_in_date, check_out_date = generate_travel_dates()
     
     # Generate request body based on search type
     request_body = {}
     
-    if search_type == "flight_search":
-        origin = random.choice(POPULAR_DESTINATIONS)
-        destination = random.choice([d for d in POPULAR_DESTINATIONS if d != origin])
-        
+    if search_type == "location_search":
+        destination = random.choice(POPULAR_DESTINATIONS)
+            
         request_body = {
-            "origin": origin,
             "destination": destination,
-            "departure_date": departure_date,
-            "return_date": return_date if random.random() < 0.8 else None,  # 80% round trips
-            "passengers": {
-                "adults": random.randint(1, 4),
-                "children": random.randint(0, 2),
-                "infants": random.randint(0, 1)
-            },
-            "cabin_class": random.choice(CABIN_CLASSES),
-            "flexible_dates": random.choice([True, False]),
-            "direct_flights_only": random.choice([True, False])
-        }
-        
-        if is_anomalous and random.random() < 0.5:
-            # Create anomalous request
-            if random.random() < 0.5:
-                # Missing required field
-                del request_body["destination"]
-            else:
-                # Invalid date format
-                request_body["departure_date"] = "invalid-date"
-                
-    elif search_type == "hotel_search":
-        request_body = {
-            "destination": random.choice(POPULAR_DESTINATIONS),
-            "check_in_date": departure_date,
-            "check_out_date": return_date,
+            "check_in_date": check_in_date,
+            "check_out_date": check_out_date,
             "rooms": random.randint(1, 3),
             "guests": {
                 "adults": random.randint(1, 4),
                 "children": random.randint(0, 2)
             },
-            "star_rating_min": random.randint(1, 5),
-            "amenities": random.sample(["pool", "wifi", "breakfast", "parking", "gym", "spa", "restaurant"], 
-                                      k=random.randint(0, 4))
+            "star_rating_min": random.randint(1, 5)
         }
         
         if is_anomalous and random.random() < 0.5:
             # Create anomalous request
-            request_body["check_in_date"] = return_date  # Check-in after check-out
-            request_body["check_out_date"] = departure_date
+            request_body["check_in_date"] = check_out_date  # Check-in after check-out
+            request_body["check_out_date"] = check_in_date
             
-    elif search_type == "car_rental_search":
-        # Create time strings for pickup and dropoff
-        pickup_hour = random.randint(0, 23)
-        pickup_minute = random.choice(["00", "30"])
-        pickup_time = f"{pickup_hour:02d}:{pickup_minute}"
-        
-        dropoff_hour = random.randint(0, 23)
-        dropoff_minute = random.choice(["00", "30"])
-        dropoff_time = f"{dropoff_hour:02d}:{dropoff_minute}"
-        
-        request_body = {
-            "pick_up_location": random.choice(POPULAR_DESTINATIONS),
-            "drop_off_location": random.choice(POPULAR_DESTINATIONS),
-            "pick_up_date": departure_date,
-            "pick_up_time": pickup_time,
-            "drop_off_date": return_date,
-            "drop_off_time": dropoff_time,
-            "car_category": random.choice(CAR_CATEGORIES),
-            "driver_age": random.randint(21, 75)
-        }
-        
-    elif search_type == "package_search":
-        origin = random.choice(POPULAR_DESTINATIONS)
-        destination = random.choice([d for d in POPULAR_DESTINATIONS if d != origin])
-        
-        request_body = {
-            "origin": origin,
-            "destination": destination,
-            "departure_date": departure_date,
-            "return_date": return_date,
-            "passengers": {
-                "adults": random.randint(1, 4),
-                "children": random.randint(0, 2)
-            },
-            "include_flight": True,
-            "include_hotel": True,
-            "include_car": random.choice([True, False]),
-            "star_rating_min": random.randint(3, 5)
-        }
-        
     elif search_type == "destination_info":
         request_body = {
             "destination": random.choice(POPULAR_DESTINATIONS),
             "include_attractions": True,
             "include_weather": True,
             "include_travel_advisories": random.choice([True, False])
-        }
-        
-    elif search_type == "availability_check":
-        request_body = {
-            "item_type": random.choice(["flight", "hotel", "car", "package"]),
-            "item_id": f"item-{uuid.uuid4().hex[:8]}",
-            "date": departure_date
         }
     
     # Determine status code
@@ -416,53 +306,24 @@ def generate_search_log_entry(timestamp=None, search_type=None,
     response_body = {}
     
     if status_code < 400:  # Success responses
-        if search_type == "flight_search":
-            num_results = random.randint(1, 10) if random.random() < 0.9 else 0  # Sometimes return empty results
-            
-            flights = []
-            for _ in range(num_results):
-                # Create formatted departure and arrival times
-                departure_hour = random.randint(0, 23)
-                departure_minute = random.choice(["00", "15", "30", "45"])
-                departure_time = f"{departure_date}T{departure_hour:02d}:{departure_minute}:00"
-                
-                arrival_hour = random.randint(0, 23)
-                arrival_minute = random.choice(["00", "15", "30", "45"])
-                arrival_time = f"{departure_date}T{arrival_hour:02d}:{arrival_minute}:00"
-                
-                flight = {
-                    "flight_id": f"flight-{uuid.uuid4().hex[:8]}",
-                    "airline": random.choice(AIRLINES),
-                    "origin": request_body.get("origin", "Unknown"),
-                    "destination": request_body.get("destination", "Unknown"),
-                    "departure_time": departure_time,
-                    "arrival_time": arrival_time,
-                    "duration_minutes": random.randint(60, 1200),
-                    "stops": random.choices([0, 1, 2], weights=[0.6, 0.3, 0.1])[0],
-                    "cabin_class": request_body.get("cabin_class", "Economy"),
-                    "price": {
-                        "amount": round(random.uniform(100, 5000), 2),
-                        "currency": random.choice(CURRENCIES)
-                    },
-                    "seats_available": random.randint(1, 50)
-                }
-                flights.append(flight)
-            
-            response_body = {
-                "search_id": f"search-{uuid.uuid4().hex[:8]}",
-                "num_results": len(flights),
-                "flights": flights
-            }
-            
-        elif search_type == "hotel_search":
+        if search_type == "location_search":
             num_results = random.randint(1, 15) if random.random() < 0.9 else 0
+            destination = request_body.get("destination", "Unknown")
             
             hotels = []
             for _ in range(num_results):
+                hotel_id = f"hotel-{uuid.uuid4().hex[:8]}"
+                
+                # Generate hotel name based on destination
+                hotel_chain = random.choice(HOTEL_CHAINS)
+                hotel_name = f"{hotel_chain} {destination}" if random.random() < 0.3 else \
+                            f"{destination} {hotel_chain}" if random.random() < 0.5 else \
+                            f"{hotel_chain} {random.choice(['Resort', 'Hotel', 'Suites', 'Inn'])}"
+                
                 hotel = {
-                    "hotel_id": f"hotel-{uuid.uuid4().hex[:8]}",
-                    "name": f"{random.choice(HOTEL_CHAINS)} {random.choice(['Resort', 'Hotel', 'Suites', 'Inn'])}",
-                    "destination": request_body.get("destination", "Unknown"),
+                    "hotel_id": hotel_id,
+                    "name": hotel_name,
+                    "destination": destination,
                     "star_rating": random.randint(request_body.get("star_rating_min", 1), 5),
                     "user_rating": round(random.uniform(3.0, 5.0), 1),
                     "price_per_night": {
@@ -471,76 +332,26 @@ def generate_search_log_entry(timestamp=None, search_type=None,
                     },
                     "available_rooms": random.randint(1, 20),
                     "amenities": random.sample(["pool", "wifi", "breakfast", "parking", "gym", "spa", "restaurant"], 
-                                              k=random.randint(2, 7))
+                                             k=random.randint(2, 7))
                 }
                 hotels.append(hotel)
             
             response_body = {
                 "search_id": f"search-{uuid.uuid4().hex[:8]}",
+                "destination": destination,
                 "num_results": len(hotels),
                 "hotels": hotels
             }
             
-        elif search_type == "car_rental_search":
-            num_results = random.randint(1, 8) if random.random() < 0.9 else 0
-            
-            cars = []
-            for _ in range(num_results):
-                car = {
-                    "car_id": f"car-{uuid.uuid4().hex[:8]}",
-                    "company": random.choice(CAR_RENTAL_COMPANIES),
-                    "category": request_body.get("car_category", "Economy"),
-                    "model": f"{fake.company()} {fake.last_name()}",
-                    "pick_up_location": request_body.get("pick_up_location", "Unknown"),
-                    "drop_off_location": request_body.get("drop_off_location", "Unknown"),
-                    "price": {
-                        "amount": round(random.uniform(20, 200), 2),
-                        "currency": random.choice(CURRENCIES),
-                        "rate": "daily"
-                    },
-                    "features": random.sample(["GPS", "A/C", "Automatic", "Unlimited mileage", "Bluetooth"], 
-                                             k=random.randint(1, 5))
-                }
-                cars.append(car)
-            
-            response_body = {
-                "search_id": f"search-{uuid.uuid4().hex[:8]}",
-                "num_results": len(cars),
-                "cars": cars
-            }
-            
-        elif search_type == "package_search":
-            num_results = random.randint(1, 5) if random.random() < 0.9 else 0
-            
-            packages = []
-            for _ in range(num_results):
-                package = {
-                    "package_id": f"package-{uuid.uuid4().hex[:8]}",
-                    "name": f"{request_body.get('destination', 'Destination')} {random.choice(['Getaway', 'Adventure', 'Escape', 'Package'])}",
-                    "origin": request_body.get("origin", "Unknown"),
-                    "destination": request_body.get("destination", "Unknown"),
-                    "includes_flight": request_body.get("include_flight", True),
-                    "includes_hotel": request_body.get("include_hotel", True),
-                    "includes_car": request_body.get("include_car", False),
-                    "duration_days": (datetime.datetime.strptime(return_date, "%Y-%m-%d") - 
-                                    datetime.datetime.strptime(departure_date, "%Y-%m-%d")).days,
-                    "total_price": {
-                        "amount": round(random.uniform(500, 10000), 2),
-                        "currency": random.choice(CURRENCIES)
-                    }
-                }
-                packages.append(package)
-            
-            response_body = {
-                "search_id": f"search-{uuid.uuid4().hex[:8]}",
-                "num_results": len(packages),
-                "packages": packages
-            }
-            
         elif search_type == "destination_info":
+            destination = request_body.get("destination", "Unknown")
+            
             response_body = {
-                "destination": request_body.get("destination", "Unknown"),
-                "country": fake.country(),
+                "destination": destination,
+                "country": "France" if destination == "Paris" else 
+                          "United Kingdom" if destination == "London" else
+                          "United States" if destination == "New York" else
+                          fake.country(),
                 "description": fake.paragraph(nb_sentences=5),
                 "popular_attractions": [fake.text(max_nb_chars=20) for _ in range(random.randint(3, 8))],
                 "weather": {
@@ -550,21 +361,6 @@ def generate_search_log_entry(timestamp=None, search_type=None,
                 } if request_body.get("include_weather", False) else None,
                 "travel_advisory": random.choice(["Low Risk", "Medium Risk", "Exercise Caution", "Reconsider Travel"]) 
                 if request_body.get("include_travel_advisories", False) else None
-            }
-            
-        elif search_type == "availability_check":
-            is_available = random.random() < 0.8  # 80% of checks return available
-            
-            response_body = {
-                "item_type": request_body.get("item_type", "Unknown"),
-                "item_id": request_body.get("item_id", "Unknown"),
-                "date": request_body.get("date", "Unknown"),
-                "available": is_available,
-                "quantity_available": random.randint(1, 20) if is_available else 0,
-                "price": {
-                    "amount": round(random.uniform(50, 1000), 2),
-                    "currency": random.choice(CURRENCIES)
-                } if is_available else None
             }
     else:
         # Error response
@@ -630,18 +426,14 @@ def generate_related_searches(correlation_id, user_id=None, base_timestamp=None,
     
     current_timestamp = base_timestamp
     
-    # Choose a search sequence pattern
+    # Choose a search sequence pattern - simplified to match our limited search types
     search_patterns = [
-        # Flight-focused pattern
-        ["flight_search", "flight_search", "availability_check"],
-        # Hotel-focused pattern
-        ["destination_info", "hotel_search", "hotel_search"],
-        # Car rental pattern
-        ["destination_info", "car_rental_search", "availability_check"],
-        # Package search pattern
-        ["destination_info", "package_search", "availability_check"],
-        # Comprehensive search pattern
-        ["flight_search", "hotel_search", "car_rental_search"]
+        # Location-focused pattern
+        ["destination_info", "location_search"],
+        # Simple location search
+        ["location_search"],
+        # Information first
+        ["destination_info"]
     ]
     
     pattern = random.choice(search_patterns)
@@ -692,7 +484,7 @@ def generate_search_logs(num_logs=1000, anomaly_percentage=15):
         logs.append(generate_search_log_entry(is_anomalous=True))
     
     # Generate normal search sequences
-    num_normal_flows = int(num_normal * 0.4 / 3)  # Approximately 3 logs per flow
+    num_normal_flows = int(num_normal * 0.4 / 2)  # Approximately 2 logs per flow
     print(f"Generating {num_normal_flows} normal search flows...")
     for _ in range(num_normal_flows):
         # Generate user ID (80% of flows have a user ID)
@@ -712,7 +504,7 @@ def generate_search_logs(num_logs=1000, anomaly_percentage=15):
         ))
     
     # Generate anomalous search sequences
-    num_anomalous_flows = int(num_anomalous * 0.6 / 3)  # Approximately 3 logs per flow
+    num_anomalous_flows = int(num_anomalous * 0.6 / 2)  # Approximately 2 logs per flow
     print(f"Generating {num_anomalous_flows} anomalous search flows...")
     for _ in range(num_anomalous_flows):
         # Generate user ID (80% of flows have a user ID)
@@ -820,6 +612,13 @@ def analyze_search_logs(logs):
     # Count unique correlation IDs (search flows)
     correlation_ids = set(log['tracing']['correlation_id'] for log in logs)
     
+    # Count destinations
+    destinations = {}
+    for log in logs:
+        if 'body' in log['request'] and 'destination' in log['request']['body']:
+            destination = log['request']['body']['destination']
+            destinations[destination] = destinations.get(destination, 0) + 1
+    
     print("\n=== Search Log Analysis ===")
     print(f"Total logs: {total_logs}")
     print(f"Normal logs: {normal_count} ({normal_count/total_logs*100:.2f}%)")
@@ -839,8 +638,12 @@ def analyze_search_logs(logs):
     for code in sorted(status_codes.keys()):
         count = status_codes[code]
         print(f"HTTP {code}: {count} logs ({count/total_logs*100:.2f}%)")
+    
+    print("\n=== Destination Distribution ===")
+    for destination, count in sorted(destinations.items(), key=lambda x: x[1], reverse=True):
+        print(f"{destination}: {count} searches")
 
-def generate_interconnected_search_logs(auth_logs, num_logs=500):
+def generate_interconnected_search_logs(auth_logs=None, num_logs=500):
     """Generate search logs that share correlation IDs with existing auth logs"""
     search_logs = []
     
@@ -900,95 +703,3 @@ def generate_interconnected_search_logs(auth_logs, num_logs=500):
             correlation_id=correlation_id,
             user_id=user_id
         ))
-    
-    return search_logs
-
-if __name__ == "__main__":
-    import argparse
-    
-    parser = argparse.ArgumentParser(description='Generate Search API logs')
-    parser.add_argument('--num-logs', type=int, default=1000, help='Number of logs to generate')
-    parser.add_argument('--anomaly-percentage', type=int, default=15, help='Percentage of anomalous logs')
-    parser.add_argument('--output-format', choices=['json', 'csv'], default='json', help='Output file format')
-    parser.add_argument('--output-filename', default='search_logs', help='Output filename (without extension)')
-    parser.add_argument('--analyze', action='store_true', help='Analyze generated logs')
-    parser.add_argument('--connect-with', help='Path to auth logs file to connect with')
-    
-    args = parser.parse_args()
-    
-    # Set random seed for reproducibility
-    random.seed(42)
-    np.random.seed(42)
-    
-    print("Generating search service logs...")
-    
-    # Generate logs
-    if args.connect_with:
-        try:
-            print(f"Loading auth logs from: {args.connect_with}")
-            with open(args.connect_with, 'r') as f:
-                auth_logs = json.load(f)
-            print(f"Loaded {len(auth_logs)} auth logs")
-            logs = generate_interconnected_search_logs(auth_logs, args.num_logs)
-        except Exception as e:
-            print(f"Error loading auth logs: {e}")
-            print("Falling back to standalone log generation")
-            logs = generate_search_logs(args.num_logs, args.anomaly_percentage)
-    else:
-        logs = generate_search_logs(args.num_logs, args.anomaly_percentage)
-    
-    # Analyze logs
-    analyze_search_logs(logs)
-    
-    # Save logs to file
-    json_path = save_logs_to_file(logs, format='json', filename=args.output_filename)
-    csv_path = save_logs_to_file(logs, format='csv', filename=args.output_filename)
-    
-    print(f"\nSearch logs have been saved to {json_path} and {csv_path}")
-    
-    # Print sample logs (1 normal, 1 anomalous)
-    print("\n=== Sample Normal Search Log ===")
-    normal_log = next(log for log in logs if not log.get('is_anomalous', False))
-    print(json.dumps(normal_log, indent=2)[:1000] + "... (truncated)")
-    
-    print("\n=== Sample Anomalous Search Log ===")
-    anomalous_log = next(log for log in logs if log.get('is_anomalous', True))
-    print(json.dumps(anomalous_log, indent=2)[:1000] + "... (truncated)")
-    
-    # Generate search flow examples
-    print("\nGenerating example search flows...")
-    search_flow_examples = [
-        ["flight_search", "availability_check"],
-        ["destination_info", "hotel_search"],
-        ["flight_search", "hotel_search", "car_rental_search"]
-    ]
-    
-    for flow in search_flow_examples:
-        flow_name = " -> ".join(flow)
-        print(f"\nExample flow: {flow_name}")
-        user_id = str(uuid.uuid4())
-        correlation_id = generate_correlation_id()
-        
-        # Create a custom flow with the specific pattern
-        flow_logs = []
-        current_timestamp = datetime.datetime.now()
-        
-        for i, search_type in enumerate(flow):
-            # Add some time between operations
-            current_timestamp += datetime.timedelta(seconds=random.randint(2, 10))
-            
-            # Generate the log entry
-            parent_request_id = None if i == 0 else flow_logs[-1]["request"]["id"]
-            
-            log_entry = generate_search_log_entry(
-                timestamp=current_timestamp,
-                search_type=search_type,
-                correlation_id=correlation_id,
-                user_id=user_id,
-                is_anomalous=False,
-                parent_request_id=parent_request_id
-            )
-            
-            flow_logs.append(log_entry)
-        
-        print(f"Generated {len(flow_logs)} logs for this flow")
