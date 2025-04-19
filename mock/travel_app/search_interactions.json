@@ -1,0 +1,487 @@
+[
+  {
+    "timestamp": "2025-04-19T14:50:06.776459",
+    "search_service": {
+      "type": "initial_search",
+      "environment": "staging",
+      "region": "ap-south",
+      "instance_id": "search-primary-ap-south-4"
+    },
+    "request": {
+      "id": "req-b7313efb82e947db",
+      "method": "GET",
+      "path": "/api/search/initial_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "X-Request-ID": "36cfd72d-9f26-42a6-8c24-69dac51def58",
+        "Authorization": "Bearer 55a0e588fa694d4a8820f814065c8b9a.dfc86c92b58b4f3d8b19cdf215ceb1df.7340cb9678604e25b3739cf790269aac"
+      },
+      "body": {},
+      "client_id": "client-9bc8f925",
+      "client_type": "internal",
+      "source_ip": "148.165.248.87"
+    },
+    "response": {
+      "status_code": 204,
+      "body": {},
+      "time_ms": 329.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "c674ad42-28d2-4c21-a71b-eb3cc2282ceb",
+      "request_id": "req-b7313efb82e947db",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T14:50:25.213809",
+    "search_service": {
+      "type": "hotel_details_search",
+      "environment": "dev",
+      "region": "us-east",
+      "instance_id": "search-cache-us-east-3"
+    },
+    "request": {
+      "id": "req-b63ce7906fdf4361",
+      "method": "GET",
+      "path": "/api/search/hotel_details_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15",
+        "X-Request-ID": "a36cdaa4-cff8-413d-9da4-f3fa0ec153f2",
+        "Authorization": "Bearer 3a7bfcdc8f73444eb3e665eb478f616b.b15bd16168a145be81c729eabb5fd4c7.eb110ba232ca445a8dd6975774f744c2"
+      },
+      "body": {},
+      "client_id": "client-50f87ae7",
+      "client_type": "mobile-ios",
+      "source_ip": "155.44.182.54"
+    },
+    "response": {
+      "status_code": 204,
+      "body": {},
+      "time_ms": 342.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "97443868-8a6e-48ba-94f7-e80ab656c67c",
+      "request_id": "req-b63ce7906fdf4361",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T15:56:53.851534",
+    "search_service": {
+      "type": "initial_search",
+      "environment": "test",
+      "region": "global",
+      "instance_id": "search-cache-global-1"
+    },
+    "request": {
+      "id": "req-1cd0993d4dbb4a7a",
+      "method": "GET",
+      "path": "/api/search/initial_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
+        "X-Request-ID": "f39eec3a-0a1a-4868-b29e-f78eff7d101b"
+      },
+      "body": {},
+      "client_id": "client-e28a2580",
+      "client_type": "internal",
+      "source_ip": "58.32.182.65"
+    },
+    "response": {
+      "status_code": 200,
+      "body": {},
+      "time_ms": 358.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": false
+    },
+    "tracing": {
+      "correlation_id": "8973ecdc-6148-4cc9-9cb9-e5587ce62ecd",
+      "request_id": "req-1cd0993d4dbb4a7a",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T15:57:04.368166",
+    "search_service": {
+      "type": "hotel_details_search",
+      "environment": "dev",
+      "region": "us-east",
+      "instance_id": "search-primary-us-east-2"
+    },
+    "request": {
+      "id": "req-1fd667512414425a",
+      "method": "GET",
+      "path": "/api/search/hotel_details_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "X-Request-ID": "12aa15b0-fb52-49ec-879d-91747209a5e6",
+        "X-API-Key": "apk_e4d282b43ca54ec7b63b8c48"
+      },
+      "body": {},
+      "client_id": "client-9e04db56",
+      "client_type": "internal",
+      "source_ip": "94.39.72.130"
+    },
+    "response": {
+      "status_code": 200,
+      "body": {},
+      "time_ms": 305.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "a7d8bfd3-55f6-42cb-a6cb-1cee9c650c37",
+      "request_id": "req-1fd667512414425a",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T16:00:26.193471",
+    "search_service": {
+      "type": "initial_search",
+      "environment": "test",
+      "region": "eu-central",
+      "instance_id": "search-replica-eu-central-5"
+    },
+    "request": {
+      "id": "req-f9a0aba38ad541e4",
+      "method": "GET",
+      "path": "/api/search/initial_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "TravelApp/2.3.0 iOS/15.4.1",
+        "X-Request-ID": "4a682ad7-c4cb-454e-98d2-4f9ad080cea3",
+        "Authorization": "Bearer 0c43923fbbc742eeb25d0ae9f5d27fe7.41ed1f2864704885aa37c0b12e00ef74.ab103b84f61a40769c06bd5919bf1f43"
+      },
+      "body": {},
+      "client_id": "client-e649a6e0",
+      "client_type": "partner-api",
+      "source_ip": "107.118.95.118"
+    },
+    "response": {
+      "status_code": 204,
+      "body": {},
+      "time_ms": 343.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "03d1d13c-00b5-4021-935f-f7fbf44bd569",
+      "request_id": "req-f9a0aba38ad541e4",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T16:00:36.107466",
+    "search_service": {
+      "type": "hotel_details_search",
+      "environment": "staging",
+      "region": "eu-central",
+      "instance_id": "search-primary-eu-central-2"
+    },
+    "request": {
+      "id": "req-65e8c520de334050",
+      "method": "GET",
+      "path": "/api/search/hotel_details_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+        "X-Request-ID": "30e2286b-33e9-41ff-a5f3-5f61686d628a",
+        "Authorization": "Bearer a0a0cf37f1d646bba90184c38cc0d678.6fa2b7e0a64946deb773795bdabe89a4.3e1bec99c7a342a3b3b09318d2d19317"
+      },
+      "body": {},
+      "client_id": "client-5f910bb8",
+      "client_type": "partner-api",
+      "source_ip": "160.97.99.193"
+    },
+    "response": {
+      "status_code": 204,
+      "body": {},
+      "time_ms": 280.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "8111f31b-a889-4ab7-aa7a-9f3ff83376f8",
+      "request_id": "req-65e8c520de334050",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T16:20:05.549571",
+    "search_service": {
+      "type": "initial_search",
+      "environment": "production",
+      "region": "global",
+      "instance_id": "search-replica-global-4"
+    },
+    "request": {
+      "id": "req-b537395533834431",
+      "method": "GET",
+      "path": "/api/search/initial_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15",
+        "X-Request-ID": "501eb755-a94d-4d6d-979b-3e46edaa624b",
+        "Authorization": "Bearer c0cc3c1031194e6ba3d3789f065eaf31.f94925825e4a43129a185540f2693823.c5c268229d29400a9697b112a2a9608d"
+      },
+      "body": {},
+      "client_id": "client-7288eb2f",
+      "client_type": "web-app",
+      "source_ip": "114.235.98.56"
+    },
+    "response": {
+      "status_code": 201,
+      "body": {},
+      "time_ms": 246.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "fbc7e498-9a59-4183-86cb-663f0cf89520",
+      "request_id": "req-b537395533834431",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T16:22:06.500046",
+    "search_service": {
+      "type": "hotel_details_search",
+      "environment": "dev",
+      "region": "us-east",
+      "instance_id": "search-cache-us-east-1"
+    },
+    "request": {
+      "id": "req-52beaa034a494f2c",
+      "method": "GET",
+      "path": "/api/search/hotel_details_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "TravelApp/2.3.0 iOS/15.4.1",
+        "X-Request-ID": "ad0b25d0-d323-4b7e-a053-e1435f390937",
+        "Authorization": "Bearer 905aff710cb6458e9e93c20d6b212758.374d460d347e402dab40efd0fb994045.f74771b5fc66432991baf8770ce3d847"
+      },
+      "body": {},
+      "client_id": "client-9d55aa0f",
+      "client_type": "web-app",
+      "source_ip": "81.154.178.169"
+    },
+    "response": {
+      "status_code": 200,
+      "body": {},
+      "time_ms": 260.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "4a26630e-4efd-456d-900e-02243202273e",
+      "request_id": "req-52beaa034a494f2c",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T16:28:19.941737",
+    "search_service": {
+      "type": "initial_search",
+      "environment": "test",
+      "region": "eu-central",
+      "instance_id": "search-primary-eu-central-5"
+    },
+    "request": {
+      "id": "req-e0273ae9636b46aa",
+      "method": "GET",
+      "path": "/api/search/initial_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
+        "X-Request-ID": "52f010c2-df9d-49e1-9855-e91806a1d1ce",
+        "X-API-Key": "apk_3a51efb42ee541e29cce1af2"
+      },
+      "body": {},
+      "client_id": "client-856ff120",
+      "client_type": "mobile-android",
+      "source_ip": "74.12.249.142"
+    },
+    "response": {
+      "status_code": 200,
+      "body": {},
+      "time_ms": 272.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "71e0f309-c070-49f9-ab3b-424f2718c0ac",
+      "request_id": "req-e0273ae9636b46aa",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T16:28:39.437547",
+    "search_service": {
+      "type": "hotel_details_search",
+      "environment": "test",
+      "region": "us-east",
+      "instance_id": "search-cache-us-east-3"
+    },
+    "request": {
+      "id": "req-47adeedda72f4e2e",
+      "method": "GET",
+      "path": "/api/search/hotel_details_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+        "X-Request-ID": "e7d01dd9-5814-44ef-aa3b-ce53f08b0eda",
+        "Authorization": "Bearer 985e817e274d4912ac71970d24df4cc5.1d7656848eec489cb51e376190dbc351.279e332e7a62432b9da789351d0ed77b"
+      },
+      "body": {},
+      "client_id": "client-390e7d5b",
+      "client_type": "mobile-ios",
+      "source_ip": "222.179.107.13"
+    },
+    "response": {
+      "status_code": 204,
+      "body": {},
+      "time_ms": 243.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "4cf82757-a827-4749-9500-94542fe94d44",
+      "request_id": "req-47adeedda72f4e2e",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T16:33:41.281643",
+    "search_service": {
+      "type": "initial_search",
+      "environment": "production",
+      "region": "global",
+      "instance_id": "search-cache-global-2"
+    },
+    "request": {
+      "id": "req-b2f593c4ce324ec3",
+      "method": "GET",
+      "path": "/api/search/initial_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+        "X-Request-ID": "715f2703-8d46-48de-95c6-cd3e26551f5c",
+        "X-API-Key": "apk_5925109ef0b049baa4be4d32"
+      },
+      "body": {},
+      "client_id": "client-6505a75a",
+      "client_type": "mobile-ios",
+      "source_ip": "34.131.123.16"
+    },
+    "response": {
+      "status_code": 200,
+      "body": {},
+      "time_ms": 297.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "cf7f012a-bdef-4c3e-b848-20a572fe166d",
+      "request_id": "req-b2f593c4ce324ec3",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  },
+  {
+    "timestamp": "2025-04-19T16:33:51.197774",
+    "search_service": {
+      "type": "hotel_details_search",
+      "environment": "production",
+      "region": "us-east",
+      "instance_id": "search-cache-us-east-4"
+    },
+    "request": {
+      "id": "req-77d7d714a9724900",
+      "method": "GET",
+      "path": "/api/search/hotel_details_search",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
+        "X-Request-ID": "de033d0b-408a-4aa8-90b3-3520d2a41018",
+        "Authorization": "Bearer b52d3ae6830f49fa9361af54d3322141.694c618235bf451295e55fa6a7db1df8.c8b16297cedc4c509a34e1ae9377d6af"
+      },
+      "body": {},
+      "client_id": "client-c1acffab",
+      "client_type": "mobile-ios",
+      "source_ip": "225.223.131.211"
+    },
+    "response": {
+      "status_code": 429,
+      "body": {
+        "error": "error_code",
+        "error_description": "Search rate limit exceeded",
+        "search_id": "search-a41f4497",
+        "status": 429,
+        "timestamp": "2025-04-19T16:33:51.197774"
+      },
+      "time_ms": 132.0
+    },
+    "user": {
+      "user_id": null,
+      "authenticated": true
+    },
+    "tracing": {
+      "correlation_id": "ca7c0eb1-51df-4db3-974d-a61bed95c29a",
+      "request_id": "req-77d7d714a9724900",
+      "parent_request_id": null
+    },
+    "is_anomalous": false
+  }
+]
