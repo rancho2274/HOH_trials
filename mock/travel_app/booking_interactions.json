@@ -2699,3 +2699,172 @@
   },
   "is_anomalous": false
 }
+{
+  "timestamp": "2025-04-19T13:37:05.221514",
+  "booking_service": {
+    "type": "flight",
+    "operation": "create_booking",
+    "environment": "production",
+    "region": "us-west",
+    "instance_id": "booking-replica-us-west-1"
+  },
+  "request": {
+    "id": "req-62442fb5a3944540",
+    "method": "POST",
+    "path": "/api/bookings",
+    "headers": {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+      "X-Request-ID": "829feb16-889a-43cf-b2ec-b3a5929280c9",
+      "Authorization": "Bearer 6ac21cda2a1149dca61ee52cb8ed1267.5d2d9c50a323449280d1c3f87d8f936b.10bfd7811c9e457797d4e2a512e029a9"
+    },
+    "body": {
+      "booking_type": "flight",
+      "item_id": "item-0ae352bf",
+      "user_id": "e6babe89-ce8c-457e-a7d7-15707ed2acee",
+      "departure_date": "2025-05-28",
+      "return_date": "2025-05-30",
+      "passengers": [
+        {
+          "id": "bee20a62-531e-4884-a1c4-46407a882c29",
+          "type": "adult",
+          "first_name": "Carla",
+          "last_name": "Ramsey",
+          "nationality": "IR",
+          "date_of_birth": "1944-11-15",
+          "email": "davistyler@example.com",
+          "phone": "+1-675-485-8590x4020"
+        },
+        {
+          "id": "65423870-ec25-4c1e-b6ee-9323d0154424",
+          "type": "child",
+          "first_name": "Haley",
+          "last_name": "Goodwin",
+          "nationality": "VC",
+          "date_of_birth": "2019-12-14"
+        },
+        {
+          "id": "d64cd57a-0b72-4c9f-825e-d682620c23e0",
+          "type": "adult",
+          "first_name": "Alexandra",
+          "last_name": "Wise",
+          "nationality": "LT",
+          "date_of_birth": "1957-08-05",
+          "email": "ahenry@example.com",
+          "phone": "843.719.3626x5392"
+        },
+        {
+          "id": "1e1377bb-9d42-4901-9ebd-db5695cd81c0",
+          "type": "adult",
+          "first_name": "Anthony",
+          "last_name": "Franklin",
+          "nationality": "SB",
+          "date_of_birth": "1967-03-31",
+          "email": "ztaylor@example.com",
+          "phone": "001-616-821-2403"
+        },
+        {
+          "id": "27283b79-bc07-462c-bb29-3af7ff9ad31b",
+          "type": "adult",
+          "first_name": "Shawn",
+          "last_name": "Taylor",
+          "nationality": "AG",
+          "date_of_birth": "1964-06-13",
+          "email": "johnsonchristine@example.net",
+          "phone": "(697)314-9033x125"
+        }
+      ],
+      "contact_info": {
+        "email": "melissaclark@example.net",
+        "phone": "001-898-555-0829"
+      },
+      "special_requests": [
+        "airport_pickup",
+        "assistance_animal"
+      ]
+    },
+    "client_id": "client-4a147461",
+    "client_type": "partner-api",
+    "source_ip": "236.50.115.109"
+  },
+  "response": {
+    "status_code": 200,
+    "body": {
+      "booking_id": "booking-5cab5b89",
+      "status": "pending",
+      "booking_type": "flight",
+      "item_id": "item-0ae352bf",
+      "user_id": "e6babe89-ce8c-457e-a7d7-15707ed2acee",
+      "departure_date": "2025-05-28",
+      "return_date": "2025-05-30",
+      "passengers": [
+        {
+          "id": "bee20a62-531e-4884-a1c4-46407a882c29",
+          "type": "adult",
+          "first_name": "Carla",
+          "last_name": "Ramsey",
+          "nationality": "IR",
+          "date_of_birth": "1944-11-15",
+          "email": "davistyler@example.com",
+          "phone": "+1-675-485-8590x4020"
+        },
+        {
+          "id": "65423870-ec25-4c1e-b6ee-9323d0154424",
+          "type": "child",
+          "first_name": "Haley",
+          "last_name": "Goodwin",
+          "nationality": "VC",
+          "date_of_birth": "2019-12-14"
+        },
+        {
+          "id": "d64cd57a-0b72-4c9f-825e-d682620c23e0",
+          "type": "adult",
+          "first_name": "Alexandra",
+          "last_name": "Wise",
+          "nationality": "LT",
+          "date_of_birth": "1957-08-05",
+          "email": "ahenry@example.com",
+          "phone": "843.719.3626x5392"
+        },
+        {
+          "id": "1e1377bb-9d42-4901-9ebd-db5695cd81c0",
+          "type": "adult",
+          "first_name": "Anthony",
+          "last_name": "Franklin",
+          "nationality": "SB",
+          "date_of_birth": "1967-03-31",
+          "email": "ztaylor@example.com",
+          "phone": "001-616-821-2403"
+        },
+        {
+          "id": "27283b79-bc07-462c-bb29-3af7ff9ad31b",
+          "type": "adult",
+          "first_name": "Shawn",
+          "last_name": "Taylor",
+          "nationality": "AG",
+          "date_of_birth": "1964-06-13",
+          "email": "johnsonchristine@example.net",
+          "phone": "(697)314-9033x125"
+        }
+      ],
+      "total_price": {
+        "amount": 341.29,
+        "currency": "EUR"
+      },
+      "created_at": "2025-04-19T13:37:05.221514",
+      "expiration_time": "2025-04-19T14:07:05.221514"
+    },
+    "time_ms": 335.0
+  },
+  "user": {
+    "user_id": "e6babe89-ce8c-457e-a7d7-15707ed2acee"
+  },
+  "booking_id": "booking-5cab5b89",
+  "tracing": {
+    "correlation_id": "30843f28-3c71-4b0a-820f-0bb24ca068d8",
+    "request_id": "req-62442fb5a3944540",
+    "parent_request_id": null
+  },
+  "is_anomalous": false
+}

@@ -65,6 +65,38 @@
     .submit-btn:hover {
       background-color: #005a9e;
     }
+
+    .btn-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.submit-btn {
+    background-color: #0072CE;
+    color: white;
+}
+.submit-btn:hover {
+    background-color: #005a9e;
+}
+
+.star-btn {
+    background-color: #28a745;
+    color: white;
+}
+.star-btn:hover {
+    background-color: #1e7e34;
+}
+
   </style>
 </head>
 <body>
@@ -75,7 +107,11 @@
     <form action="{{ url_for('thankyou') }}" method="post">
       <textarea name="feedback" placeholder="Leave your feedback here..."></textarea>
       <br>
-      <button type="submit" class="submit-btn">Submit Feedback</button>
+      <div class="btn-group">
+        <button type="submit" class="btn submit-btn">Submit Feedback</button>
+        <button type="submit" class="btn star-btn">Give 5 Stars</button>
+    </div>
+    
     </form>
   </div>
 </body>
