@@ -98,6 +98,33 @@
             border-radius: 6px;
             cursor: pointer;
         }
+        
+        .icon-btn {
+            background: #0072CE; 
+            border: none; 
+            border-radius: 50%; 
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            cursor: pointer;
+        }
+        
+        .icon-btn:hover {
+            background-color: #005a9e;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .regular-btn {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -110,34 +137,40 @@
         <strong>Departure:</strong> {{ checkout }} |
         <strong>Guests:</strong> {{ guests }}
     </div>
-{% endif %}
+    {% endif %}
 
-<form class="search-bar" onsubmit="redirectToHotels(event)">
-
-
-        <select name="destination" required>
+    <!-- First, create a hidden form that will be used for search logging -->
+    <form id="log-form" action="{{ url_for('search') }}" method="post" style="display:none;">
+        <input type="hidden" name="search_type" id="log-search-type" value="regular">
+    </form>
+    
+    <!-- Main form that will redirect to hotels -->
+    <div class="search-bar">
+        <select id="destination" required>
             <option value="">Destination</option>
-            <option value="New York">New York</option>
-            <option value="Paris">Paris</option>
-            <option value="London">London</option>
-            
+            <option value="newyork">New York</option>
+            <option value="paris">Paris</option>
+            <option value="london">London</option>
         </select>
-        <input type="date" name="checkin" required>
-        <input type="date" name="checkout" required>
-        <select name="guests" required>
+        <input type="date" id="checkin" required>
+        <input type="date" id="checkout" required>
+        <select id="guests" required>
             <option value="">Guests</option>
             <option value="1">1 Adult</option>
             <option value="2">2 Adults</option>
             <option value="3">3 Adults</option>
         </select>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <button type="submit" style="flex: 1;">Search</button>
-            <button type="submit" aria-label="Search" style="background: #0072CE; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer;">
+        
+        <div class="btn-container">
+            <!-- Regular search button (non-anomalous) -->
+            <button type="button" onclick="submitSearch('regular')" class="regular-btn">Search</button>
+            
+            <!-- Icon search button (anomalous) -->
+            <button type="button" onclick="submitSearch('icon')" class="icon-btn" aria-label="Search">
                 <i class="fas fa-search"></i>
             </button>
         </div>
-        
-    </form>
+    </div>
 
     <div class="hotels">
         <div class="hotel-card">
@@ -176,29 +209,69 @@
                 <button>View more</button>
             </div>
         </div>
-        
     </div>
 </div>
-</body>
-</html>
 
 <script>
-    function redirectToHotels(event) {
-        event.preventDefault();
-        const form = event.target;
-        const destination = form.destination.value.toLowerCase().replace(/\s+/g, '');
-        const checkin = form.checkin.value;
-        const checkout = form.checkout.value;
-        const guests = form.guests.value;
-    
-        const params = new URLSearchParams({
-            checkin,
-            checkout,
-            guests
+    function submitSearch(searchType) {
+        // First, log the search type to generate appropriate logs
+        const logForm = document.getElementById('log-form');
+        document.getElementById('log-search-type').value = searchType;
+        
+        // Get form values
+        const destination = document.getElementById('destination').value;
+        const checkin = document.getElementById('checkin').value;
+        const checkout = document.getElementById('checkout').value;
+        const guests = document.getElementById('guests').value;
+        
+        // Validate form
+        if (!destination || !checkin || !checkout || !guests) {
+            alert('Please fill in all fields before searching');
+            return;
+        }
+        
+        // Submit the log form first
+        fetch("{{ url_for('search') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'search_type': searchType
+            })
+        }).then(() => {
+            // After logging, redirect to the hotels page
+            const params = new URLSearchParams({
+                checkin,
+                checkout,
+                guests
+            });
+            
+            window.location.href = `/hotels/${destination}?${params.toString()}`;
         });
-    
-        window.location.href = `/hotels/${destination}?${params.toString()}`;
     }
-    </script>
     
-  
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup for location links if necessary
+        const viewButtons = document.querySelectorAll('.hotel-card button');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const hotelCard = this.closest('.hotel-card');
+                const location = hotelCard.querySelector('p').textContent.toLowerCase();
+                
+                // Use form values if available, otherwise prompt user
+                const checkin = document.getElementById('checkin').value;
+                const checkout = document.getElementById('checkout').value;
+                const guests = document.getElementById('guests').value;
+                
+                if (checkin && checkout && guests) {
+                    window.location.href = `/hotels/${location}?checkin=${checkin}&checkout=${checkout}&guests=${guests}`;
+                } else {
+                    alert('Please select dates and number of guests first');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>`

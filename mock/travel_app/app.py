@@ -6,54 +6,280 @@ from feedback_api_generator import generate_feedback_log_entry
 from auth_api_generator import generate_auth_log_entry
 import json
 import os
+import traceback
 from datetime import datetime
-
-
 
 app = Flask(__name__)
 
-# Mock hotel data
-hotels_data = {
-    "paris": ["Hotel Eiffel", "Paris Inn", "Louvre Palace"],
-    "new york": ["Times Square Hotel", "NY Comfort Inn", "Empire Lodge"],
-    "london": ["London Bridge Hotel", "The Big Ben Inn", "Buckingham Suites"]
-}
-def append_log_to_json_array(file_path, log_entry):
-            if os.path.exists(file_path):
-                with open(file_path, "r") as f:
-                    try:
-                        data = json.load(f)
-
-                        if not isinstance(data, list):
-                            data = [data]
-                    except json.JSONDecodeError:
-                        data = []
-            else:
+# Direct file writing approach
+def write_auth_log(log_entry):
+    """Directly write auth log to a file with detailed error handling"""
+    try:
+        # Get current directory of the app.py file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, "auth_interactions.json")
+        
+        print(f"Attempting to write auth log to: {file_path}")
+        
+        # Create an empty list if file doesn't exist
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
+            print(f"Created new file: {file_path}")
+        
+        # Read existing data
+        with open(file_path, 'r') as f:
+            try:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    data = [data]
+            except json.JSONDecodeError:
+                print("Error decoding JSON, starting with empty list")
                 data = []
+        
+        # Append new log
+        data.append(log_entry)
+        
+        # Write back to file
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        print(f"Successfully wrote auth log to {file_path}")
+        return True
+    except Exception as e:
+        print(f"ERROR writing auth log: {str(e)}")
+        print(traceback.format_exc())
+        return False
 
-            data.append(log_entry)
+def write_booking_log(log_entry):
+    """Directly write booking log to a file with detailed error handling"""
+    try:
+        # Get current directory of the app.py file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, "booking_interactions.json")
+        
+        print(f"Attempting to write booking log to: {file_path}")
+        
+        # Create an empty list if file doesn't exist
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
+            print(f"Created new file: {file_path}")
+        
+        # Read existing data
+        with open(file_path, 'r') as f:
+            try:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    data = [data]
+            except json.JSONDecodeError:
+                print("Error decoding JSON, starting with empty list")
+                data = []
+        
+        # Append new log
+        data.append(log_entry)
+        
+        # Write back to file
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        print(f"Successfully wrote booking log to {file_path}")
+        return True
+    except Exception as e:
+        print(f"ERROR writing booking log: {str(e)}")
+        print(traceback.format_exc())
+        return False
 
-            with open(file_path, "w") as f:
-                json.dump(data, f, indent=2)
+def write_payment_log(log_entry):
+    """Directly write payment log to a file with detailed error handling"""
+    try:
+        # Get current directory of the app.py file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, "payment_interactions.json")
+        
+        print(f"Attempting to write payment log to: {file_path}")
+        
+        # Create an empty list if file doesn't exist
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
+            print(f"Created new file: {file_path}")
+        
+        # Read existing data
+        with open(file_path, 'r') as f:
+            try:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    data = [data]
+            except json.JSONDecodeError:
+                print("Error decoding JSON, starting with empty list")
+                data = []
+        
+        # Append new log
+        data.append(log_entry)
+        
+        # Write back to file
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        print(f"Successfully wrote payment log to {file_path}")
+        return True
+    except Exception as e:
+        print(f"ERROR writing payment log: {str(e)}")
+        print(traceback.format_exc())
+        return False
+
+def write_feedback_log(log_entry):
+    """Directly write feedback log to a file with detailed error handling"""
+    try:
+        # Get current directory of the app.py file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, "feedback_interactions.json")
+        
+        print(f"Attempting to write feedback log to: {file_path}")
+        
+        # Create an empty list if file doesn't exist
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
+            print(f"Created new file: {file_path}")
+        
+        # Read existing data
+        with open(file_path, 'r') as f:
+            try:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    data = [data]
+            except json.JSONDecodeError:
+                print("Error decoding JSON, starting with empty list")
+                data = []
+        
+        # Append new log
+        data.append(log_entry)
+        
+        # Write back to file
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        print(f"Successfully wrote feedback log to {file_path}")
+        return True
+    except Exception as e:
+        print(f"ERROR writing feedback log: {str(e)}")
+        print(traceback.format_exc())
+        return False
+
+def write_search_log(log_entry):
+    """Directly write search log to a file with detailed error handling"""
+    try:
+        # Get current directory of the app.py file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, "search_interactions.json")
+        
+        print(f"Attempting to write search log to: {file_path}")
+        
+        # Create an empty list if file doesn't exist
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
+            print(f"Created new file: {file_path}")
+        
+        # Read existing data
+        with open(file_path, 'r') as f:
+            try:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    data = [data]
+            except json.JSONDecodeError:
+                print("Error decoding JSON, starting with empty list")
+                data = []
+        
+        # Append new log
+        data.append(log_entry)
+        
+        # Write back to file
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        print(f"Successfully wrote search log to {file_path}")
+        return True
+    except Exception as e:
+        print(f"ERROR writing search log: {str(e)}")
+        print(traceback.format_exc())
+        return False
+
+def append_log_to_json_array(file_path, log_entry):
+    """Append a log entry to a JSON file"""
+    try:
+        # Create directory if it doesn't exist
+        directory = os.path.dirname(file_path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+            print(f"Created directory: {directory}")
+        
+        # Create empty file if it doesn't exist
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
+            print(f"Created new file: {file_path}")
+        
+        # Read existing data
+        with open(file_path, 'r') as f:
+            try:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    data = [data]
+            except json.JSONDecodeError:
+                print(f"Error decoding JSON in {file_path}, starting with empty list")
+                data = []
+        
+        # Append new log
+        data.append(log_entry)
+        
+        # Write back to file
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        print(f"Successfully wrote log to {file_path}")
+        return True
+    except Exception as e:
+        print(f"ERROR writing log to {file_path}: {str(e)}")
+        print(traceback.format_exc())
+        return False
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     # Handle login form submission
     if request.method == 'POST':
-        action = request.form.get('action')  # Detect which button was clicked
-        
-        # Create auth log entry when login button is clicked
-        auth_log = generate_auth_log_entry(
-            timestamp=datetime.now(),
-            operation="user_login",  # Or you can use the 'action' value from the form
-            auth_type="form_login",
-            is_anomalous=False
-        )
-        
-        # Save auth log
-        append_log_to_json_array("auth_interactions.json", auth_log)
-        
-        # Redirect to search page after successful login
-        return redirect(url_for('search'))
+        try:
+            action = request.form.get('action', 'login')  # Default to login if not specified
+            print(f"Login form submitted with action: {action}")
+            
+            # Create auth log entry
+            # Login is anomalous, signup is non-anomalous
+            is_anomalous = (action == "login")
+            
+            auth_log = generate_auth_log_entry(
+                timestamp=datetime.now(),
+                operation="login" if action == "login" else "signin",
+                auth_type="form_login",
+                is_anomalous=is_anomalous
+            )
+            
+            # Try to write directly with our specialized function
+            success = write_auth_log(auth_log)
+            
+            if success:
+                print(f"Auth log written successfully for {action}!")
+            else:
+                print(f"Failed to write auth log for {action}")
+                
+            # Redirect to search page after successful login
+            return redirect(url_for('search'))
+        except Exception as e:
+            print(f"Exception in login route: {str(e)}")
+            print(traceback.format_exc())
+            # Still redirect to search even if logging fails
+            return redirect(url_for('search'))
     
     # Display login form for GET requests
     return render_template('login.html')
@@ -62,15 +288,18 @@ def login():
 def search():
     # This route now only handles search functionality, not authentication
     if request.method == 'POST':
+        # Check if it's the icon search (which should be anomalous)
+        is_icon_search = request.form.get('search_type') == 'icon'
+        
         # Generate search log when search form is submitted
         search_log = generate_search_log_entry(
             timestamp=datetime.now(),
             search_type="initial_search",
-            is_anomalous=False
+            is_anomalous=is_icon_search  # Icon search is anomalous
         )
         
         # Save search log
-        append_log_to_json_array("search_interactions.json", search_log)
+        write_search_log(search_log)
     
     return render_template('search.html')
 
@@ -96,10 +325,7 @@ def hotels():
             {"name": "The Big Ben Inn", "stars": "★★", "rating_label": "Good", "reviews": "63", "image": "london2.jpg", "description": "Urban chic hotel in vibrant Soho."},
             {"name": "Buckingham Suites", "stars": "★★★★", "rating_label": "Excellent", "reviews": "265", "image": "london3.jpg", "description": "Classic elegance near Buckingham Palace."}
         ],
-        
-        # Add more destinations
     }
-
 
     hotels = hotel_data.get(destination, [])
     search_log = generate_search_log_entry(
@@ -107,7 +333,10 @@ def hotels():
         search_type="location_search",
         is_anomalous=False
     )
-    append_log_to_json_array("search_interactions.json", search_log)
+    
+    log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "search_interactions.json")
+    append_log_to_json_array(log_file, search_log)
+    
     return render_template(
         'search.html',
         destination=destination,
@@ -115,12 +344,9 @@ def hotels():
         checkout=checkout,
         guests=guests
     )
-    
 
 @app.route('/hotels/<location>')
 def hotels_by_location(location):
-    
-
     checkin = request.args.get('checkin')
     checkout = request.args.get('checkout')
     guests = request.args.get('guests')
@@ -147,16 +373,11 @@ def hotels_by_location(location):
         is_anomalous=False
     )
 
-    append_log_to_json_array("search_interactions.json", search_log)
-
+    log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "search_interactions.json")
+    append_log_to_json_array(log_file, search_log)
 
     hotels = hotels_data.get(location, [])
     return render_template("hotels.html", location = location.title(), hotels=hotels, checkin=checkin, checkout=checkout, guests=guests)
-       
-
-
-
-from datetime import datetime
 
 @app.route('/book', methods=['POST'])
 def book():
@@ -165,6 +386,10 @@ def book():
     checkin = request.form.get('checkin')
     checkout = request.form.get('checkout')
     guests = request.form.get('guests')
+    
+    # Check if this is an anomalous booking (3rd hotel)
+    is_anomalous = request.form.get('is_anomalous') == 'true'
+    print(f"Booking hotel: {hotel}, Anomalous: {is_anomalous}")
 
     # Parse date strings into datetime objects
     date_format = "%Y-%m-%d"
@@ -178,13 +403,17 @@ def book():
     price_per_night = 4999
     taxes = 1000
     total_price = (price_per_night * nights) + taxes
+    
+    # Generate booking log with appropriate anomalous flag
     booking_log = generate_booking_log_entry(
         timestamp=datetime.now(),
         operation="create_booking",
-        is_anomalous=False
+        is_anomalous=is_anomalous
     )
-    append_log_to_json_array("booking_interactions.json", booking_log)
-
+    
+    # Write booking log
+    write_booking_log(booking_log)
+    
     return render_template("book.html",
         hotel=hotel,
         destination=destination,
@@ -196,70 +425,111 @@ def book():
         total_price=total_price,
         taxes=taxes
     )
-    
-
 
 @app.route('/payment', methods=['POST'])
 def payment():
-    name = request.form.get('name')
-    email = request.form.get('email')
-    arrival = request.form.get('arrival_date')
-    departure = request.form.get('departure_date')
-    method = request.form.get('method')
-    rooms = request.form.get('rooms')
-    hotel = request.form.get('hotel')
-    nights = int(request.form.get('nights', 1))
-    price_per_night = int(request.form.get('price_per_night', 4999))
-    taxes = int(request.form.get('taxes', 1000))
-    total_price = int(request.form.get('total_price', price_per_night * nights + taxes))
-
     try:
-        rooms_int = int(rooms)
-    except:
-        rooms_int = 1
+        name = request.form.get('name')
+        email = request.form.get('email')
+        arrival = request.form.get('arrival_date')
+        departure = request.form.get('departure_date')
+        method = request.form.get('method')
+        rooms = request.form.get('rooms')
+        hotel = request.form.get('hotel')
+        nights = int(request.form.get('nights', 1))
+        price_per_night = int(request.form.get('price_per_night', 4999))
+        taxes = int(request.form.get('taxes', 1000))
+        total_price = int(request.form.get('total_price', price_per_night * nights + taxes))
 
-    is_anomalous = method == 'upi'
+        print(f"Payment form submitted with method: {method}")
+        
+        try:
+            rooms_int = int(rooms)
+        except:
+            rooms_int = 1
 
-    # Generate payment log
-    payment_log = generate_payment_log_entry(
-        timestamp=datetime.now(),
-        operation="process_payment",
-        is_anomalous=is_anomalous
-    )
-    append_log_to_json_array("payment_interactions.json", payment_log)
+        # UPI payment is considered anomalous (will fail)
+        is_anomalous = method == 'upi'
 
-    if is_anomalous:
-        return render_template('book.html',
-            name=name,
-            email=email,
-            arrival=arrival,
-            departure=departure,
-            rooms=rooms_int,
-            hotel=hotel,
-            nights=nights,
-            price_per_night=price_per_night,
-            taxes=taxes,
-            total_price=total_price,
-            payment_failed=True
+        # Generate payment log
+        payment_log = generate_payment_log_entry(
+            timestamp=datetime.now(),
+            operation="process_payment",
+            is_anomalous=is_anomalous
         )
-    else:
-        return redirect(url_for('feedback'))
+        
+        # Try to write directly with our specialized function
+        success = write_payment_log(payment_log)
+        
+        if success:
+            print("Payment log written successfully!")
+        else:
+            print("Failed to write payment log")
 
+        if is_anomalous:
+            # Payment failed (UPI method)
+            return render_template('book.html',
+                name=name,
+                email=email,
+                arrival=arrival,
+                departure=departure,
+                rooms=rooms_int,
+                hotel=hotel,
+                nights=nights,
+                price_per_night=price_per_night,
+                taxes=taxes,
+                total_price=total_price,
+                payment_failed=True
+            )
+        else:
+            # Payment successful (Netbanking method)
+            return redirect(url_for('feedback'))
+    except Exception as e:
+        print(f"Exception in payment route: {str(e)}")
+        print(traceback.format_exc())
+        return redirect(url_for('search'))
 
-@app.route('/feedback', methods=['POST'])
+@app.route('/feedback', methods=['GET', 'POST'])
 def feedback():
-    feedback_log = generate_feedback_log_entry(
-        timestamp=datetime.now(),
-        operation="submit_feedback",
-        is_anomalous=False
-    )
-    append_log_to_json_array("feedback_interactions.json", feedback_log)
+    # Only generate logs for GET requests to avoid duplicate logging
+    if request.method == 'GET':
+        feedback_log = generate_feedback_log_entry(
+            timestamp=datetime.now(),
+            operation="view_feedback_form",
+            is_anomalous=False
+        )
+        
+        write_feedback_log(feedback_log)
+    
     return render_template('feedback.html')
-
 
 @app.route('/thankyou', methods=['POST'])
 def thankyou():
-    return render_template('thankyou.html')
+    try:
+        # Get feedback text and anomalous flag from form
+        feedback_text = request.form.get('feedback', '')
+        is_anomalous = request.form.get('is_anomalous') == 'true'
+        
+        print(f"Feedback submitted. Is 5-star (anomalous): {is_anomalous}")
+        print(f"Feedback text: {feedback_text[:50]}...")  # Print first 50 chars
+        
+        # Generate feedback log with appropriate anomalous flag
+        feedback_log = generate_feedback_log_entry(
+            timestamp=datetime.now(),
+            operation="submit_feedback",
+            is_anomalous=is_anomalous
+        )
+        
+        # Write feedback log
+        write_feedback_log(feedback_log)
+        
+        return render_template('thankyou.html')
+    except Exception as e:
+        print(f"Exception in thankyou route: {str(e)}")
+        print(traceback.format_exc())
+        return render_template('thankyou.html')
 
 if __name__ == '__main__':
+    # Print working directory for debugging
+    print(f"Current working directory: {os.getcwd()}")
     app.run(debug=True, port=5050)

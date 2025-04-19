@@ -67,35 +67,35 @@
     }
 
     .btn-group {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
 
-.btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-}
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+    }
 
-.submit-btn {
-    background-color: #0072CE;
-    color: white;
-}
-.submit-btn:hover {
-    background-color: #005a9e;
-}
+    .submit-btn {
+      background-color: #0072CE;
+      color: white;
+    }
+    .submit-btn:hover {
+      background-color: #005a9e;
+    }
 
-.star-btn {
-    background-color: #28a745;
-    color: white;
-}
-.star-btn:hover {
-    background-color: #1e7e34;
-}
+    .star-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    .star-btn:hover {
+      background-color: #1e7e34;
+    }
 
   </style>
 </head>
@@ -104,15 +104,38 @@
     <div class="brand-name">TravelEase</div>
     <h1>Booking Confirmed!</h1>
     <p>Thank you for booking with TravelEase. We'd love to hear your thoughts about your experience.</p>
-    <form action="{{ url_for('thankyou') }}" method="post">
-      <textarea name="feedback" placeholder="Leave your feedback here..."></textarea>
+    
+    <!-- Hidden form for submitting feedback data -->
+    <form id="feedback-form" action="{{ url_for('thankyou') }}" method="post">
+      <textarea name="feedback" id="feedback-text" placeholder="Leave your feedback here..."></textarea>
+      <input type="hidden" name="is_anomalous" id="is-anomalous" value="false">
       <br>
       <div class="btn-group">
-        <button type="submit" class="btn submit-btn">Submit Feedback</button>
-        <button type="submit" class="btn star-btn">Give 5 Stars</button>
-    </div>
-    
+        <!-- Regular feedback button (non-anomalous) -->
+        <button type="button" onclick="submitFeedback('normal')" class="btn submit-btn">Submit Feedback</button>
+        
+        <!-- 5-star button (anomalous) -->
+        <button type="button" onclick="submitFeedback('star')" class="btn star-btn">Give 5 Stars</button>
+      </div>
     </form>
   </div>
+
+  <script>
+    function submitFeedback(type) {
+      // Get the feedback text
+      const feedbackText = document.getElementById('feedback-text').value;
+      
+      // Set the anomalous flag based on button type
+      document.getElementById('is-anomalous').value = (type === 'star') ? 'true' : 'false';
+      
+      // If it's a 5-star rating with no text, add a default message
+      if (type === 'star' && (!feedbackText || feedbackText.trim() === '')) {
+        document.getElementById('feedback-text').value = 'Excellent service and experience! 5 stars!';
+      }
+      
+      // Submit the form
+      document.getElementById('feedback-form').submit();
+    }
+  </script>
 </body>
 </html>

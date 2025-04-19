@@ -4,6 +4,39 @@
     <meta charset="UTF-8">
     <title>Hotels</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .hotel-card {
+            position: relative;
+        }
+        
+        .hotel-card form {
+            margin-top: 10px;
+        }
+        
+        .hotel-card button {
+            background-color: #0072CE;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s ease;
+        }
+        
+        .hotel-card button:hover {
+            background-color: #005a9e;
+        }
+        
+        /* Add a subtle indicator for the anomalous hotel */
+        .hotel-card.anomalous button {
+            background-color: #d35400;
+        }
+        
+        .hotel-card.anomalous button:hover {
+            background-color: #a04000;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
@@ -17,7 +50,7 @@
         </p>
         <div class="hotels-container">
             {% for hotel in hotels %}
-            <div class="hotel-card">
+            <div class="hotel-card {% if loop.index == 3 %}anomalous{% endif %}">
                 <img src="{{ url_for('static', filename='images/' + hotel.image) }}" alt="Hotel Image">
                 <div class="hotel-info">
                     <h3>{{ hotel.name }} <span class="stars">{{ hotel.stars }}</span></h3>
@@ -29,13 +62,20 @@
                         <input type="hidden" name="checkin" value="{{ checkin }}">
                         <input type="hidden" name="checkout" value="{{ checkout }}">
                         <input type="hidden" name="guests" value="{{ guests }}">
-                        <button type="submit">Book</button>
+                        
+                        <!-- Add hidden field to indicate if this should generate anomalous logs -->
+                        <input type="hidden" name="is_anomalous" value="{% if loop.index == 3 %}true{% else %}false{% endif %}">
+                        
+                        <button type="submit">Book Now</button>
                     </form>
-                    
                 </div>
             </div>
             {% endfor %}
         </div>
     </main>
+
+    <script>
+        // Add any JavaScript needed here
+    </script>
 </body>
 </html>

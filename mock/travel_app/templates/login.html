@@ -90,6 +90,28 @@
     .login-btn:hover {
       background-color: #005a8c;
     }
+    
+    /* Added styles for the button group */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .login-btn.anomalous {
+      background-color: #006699;
+    }
+    
+    .login-btn.non-anomalous {
+      background-color: #28a745;
+    }
+    
+    .login-btn.anomalous:hover {
+      background-color: #004C73;
+    }
+    
+    .login-btn.non-anomalous:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 <body>
@@ -100,7 +122,7 @@
     <p>Discover your next destination with ease and style</p>
   </div>
   <div class="right-panel">
-    <form class="login-box" action="{{ url_for('search') }}" method="post">
+    <form class="login-box" action="{{ url_for('login') }}" method="post">
       <h2>Login to Your Account</h2>
       <div class="form-group">
         <label for="username">Login ID</label>
@@ -110,11 +132,13 @@
         <label for="password">Password</label>
         <input type="password" name="password" id="password" required>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <button type="submit" name="action" value="login" class="login-btn" style="flex: 1;">Login</button>
-        <button type="submit" name="action" value="signin" class="login-btn" style="flex: 1;">Sign In</button>
+      <div class="btn-group">
+        <!-- Login button will generate anomalous logs -->
+        <button type="submit" name="action" value="login" class="login-btn anomalous">Login</button>
+        
+        <!-- Sign in button will generate non-anomalous logs -->
+        <button type="submit" name="action" value="signin" class="login-btn non-anomalous">Sign Up</button>
       </div>
-      
     </form>
   </div>
 </div>
