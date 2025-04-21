@@ -1,3 +1,4 @@
+# Modified app.py functions to write single-line JSON logs
 from flask import Flask, render_template, request, redirect, url_for
 from search_api_generator import generate_search_log_entry
 from booking_api_generator import generate_booking_log_entry
@@ -11,204 +12,16 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Direct file writing approach
-def write_auth_log(log_entry):
-    """Directly write auth log to a file with detailed error handling"""
-    try:
-        # Get current directory of the app.py file
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "auth_interactions.json")
-        
-        print(f"Attempting to write auth log to: {file_path}")
-        
-        # Create an empty list if file doesn't exist
-        if not os.path.exists(file_path):
-            with open(file_path, 'w') as f:
-                json.dump([], f)
-            print(f"Created new file: {file_path}")
-        
-        # Read existing data
-        with open(file_path, 'r') as f:
-            try:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    data = [data]
-            except json.JSONDecodeError:
-                print("Error decoding JSON, starting with empty list")
-                data = []
-        
-        # Append new log
-        data.append(log_entry)
-        
-        # Write back to file
-        with open(file_path, 'w') as f:
-            json.dump(data, f, indent=2)
-        
-        print(f"Successfully wrote auth log to {file_path}")
-        return True
-    except Exception as e:
-        print(f"ERROR writing auth log: {str(e)}")
-        print(traceback.format_exc())
-        return False
-
-def write_booking_log(log_entry):
-    """Directly write booking log to a file with detailed error handling"""
-    try:
-        # Get current directory of the app.py file
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "booking_interactions.json")
-        
-        print(f"Attempting to write booking log to: {file_path}")
-        
-        # Create an empty list if file doesn't exist
-        if not os.path.exists(file_path):
-            with open(file_path, 'w') as f:
-                json.dump([], f)
-            print(f"Created new file: {file_path}")
-        
-        # Read existing data
-        with open(file_path, 'r') as f:
-            try:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    data = [data]
-            except json.JSONDecodeError:
-                print("Error decoding JSON, starting with empty list")
-                data = []
-        
-        # Append new log
-        data.append(log_entry)
-        
-        # Write back to file
-        with open(file_path, 'w') as f:
-            json.dump(data, f, indent=2)
-        
-        print(f"Successfully wrote booking log to {file_path}")
-        return True
-    except Exception as e:
-        print(f"ERROR writing booking log: {str(e)}")
-        print(traceback.format_exc())
-        return False
-
-def write_payment_log(log_entry):
-    """Directly write payment log to a file with detailed error handling"""
-    try:
-        # Get current directory of the app.py file
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "payment_interactions.json")
-        
-        print(f"Attempting to write payment log to: {file_path}")
-        
-        # Create an empty list if file doesn't exist
-        if not os.path.exists(file_path):
-            with open(file_path, 'w') as f:
-                json.dump([], f)
-            print(f"Created new file: {file_path}")
-        
-        # Read existing data
-        with open(file_path, 'r') as f:
-            try:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    data = [data]
-            except json.JSONDecodeError:
-                print("Error decoding JSON, starting with empty list")
-                data = []
-        
-        # Append new log
-        data.append(log_entry)
-        
-        # Write back to file
-        with open(file_path, 'w') as f:
-            json.dump(data, f, indent=2)
-        
-        print(f"Successfully wrote payment log to {file_path}")
-        return True
-    except Exception as e:
-        print(f"ERROR writing payment log: {str(e)}")
-        print(traceback.format_exc())
-        return False
-
-def write_feedback_log(log_entry):
-    """Directly write feedback log to a file with detailed error handling"""
-    try:
-        # Get current directory of the app.py file
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "feedback_interactions.json")
-        
-        print(f"Attempting to write feedback log to: {file_path}")
-        
-        # Create an empty list if file doesn't exist
-        if not os.path.exists(file_path):
-            with open(file_path, 'w') as f:
-                json.dump([], f)
-            print(f"Created new file: {file_path}")
-        
-        # Read existing data
-        with open(file_path, 'r') as f:
-            try:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    data = [data]
-            except json.JSONDecodeError:
-                print("Error decoding JSON, starting with empty list")
-                data = []
-        
-        # Append new log
-        data.append(log_entry)
-        
-        # Write back to file
-        with open(file_path, 'w') as f:
-            json.dump(data, f, indent=2)
-        
-        print(f"Successfully wrote feedback log to {file_path}")
-        return True
-    except Exception as e:
-        print(f"ERROR writing feedback log: {str(e)}")
-        print(traceback.format_exc())
-        return False
-
-def write_search_log(log_entry):
-    """Directly write search log to a file with detailed error handling"""
-    try:
-        # Get current directory of the app.py file
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "search_interactions.json")
-        
-        print(f"Attempting to write search log to: {file_path}")
-        
-        # Create an empty list if file doesn't exist
-        if not os.path.exists(file_path):
-            with open(file_path, 'w') as f:
-                json.dump([], f)
-            print(f"Created new file: {file_path}")
-        
-        # Read existing data
-        with open(file_path, 'r') as f:
-            try:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    data = [data]
-            except json.JSONDecodeError:
-                print("Error decoding JSON, starting with empty list")
-                data = []
-        
-        # Append new log
-        data.append(log_entry)
-        
-        # Write back to file
-        with open(file_path, 'w') as f:
-            json.dump(data, f, indent=2)
-        
-        print(f"Successfully wrote search log to {file_path}")
-        return True
-    except Exception as e:
-        print(f"ERROR writing search log: {str(e)}")
-        print(traceback.format_exc())
-        return False
-
-def append_log_to_json_array(file_path, log_entry):
-    """Append a log entry to a JSON file"""
+# Single-line JSON writer function
+# Define a consistent function for writing logs in JSON array format
+def append_log_to_json_array(log_entry, file_path):
+    """
+    Appends a single log entry to a JSON array file.
+    If the file doesn't exist, creates a new file with a JSON array containing the log entry.
+    """
+    import json
+     
+    
     try:
         # Create directory if it doesn't exist
         directory = os.path.dirname(file_path)
@@ -216,35 +29,111 @@ def append_log_to_json_array(file_path, log_entry):
             os.makedirs(directory)
             print(f"Created directory: {directory}")
         
-        # Create empty file if it doesn't exist
+        # If file doesn't exist, create it with a new JSON array
         if not os.path.exists(file_path):
             with open(file_path, 'w') as f:
-                json.dump([], f)
-            print(f"Created new file: {file_path}")
+                f.write('[\n')
+                f.write(json.dumps(log_entry))
+                f.write('\n]\n')
+            print(f"Created new JSON array file with 1 log: {file_path}")
+            return True
         
-        # Read existing data
-        with open(file_path, 'r') as f:
-            try:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    data = [data]
-            except json.JSONDecodeError:
-                print(f"Error decoding JSON in {file_path}, starting with empty list")
-                data = []
+        # File exists, need to append to the JSON array
+        with open(file_path, 'r+') as f:
+            # Move cursor to position before the closing bracket
+            f.seek(0, os.SEEK_END)  # Go to end of file
+            pos = f.tell()  # Get position
+            
+            # Search backwards to find the last bracket
+            while pos > 0:
+                pos -= 1
+                f.seek(pos)
+                char = f.read(1)
+                if char == ']':
+                    break
+            
+            if pos <= 0:
+                # File is not a valid JSON array, overwrite it
+                f.seek(0)
+                f.truncate()
+                f.write('[\n')
+                f.write(json.dumps(log_entry))
+                f.write('\n]\n')
+            else:
+                # Position cursor before the closing bracket
+                f.seek(pos)
+                f.truncate()  # Remove closing bracket
+                
+                # Check if there are existing entries (need a comma)
+                f.seek(0)
+                content = f.read(pos)
+                need_comma = '}' in content or ']' in content
+                
+                # Move cursor back to truncation point
+                f.seek(pos)
+                
+                # Add comma if needed
+                if need_comma:
+                    f.write(',\n')
+                
+                # Write new log entry and closing bracket
+                f.write(json.dumps(log_entry))
+                f.write('\n]\n')
         
-        # Append new log
-        data.append(log_entry)
-        
-        # Write back to file
-        with open(file_path, 'w') as f:
-            json.dump(data, f, indent=2)
-        
-        print(f"Successfully wrote log to {file_path}")
+        print(f"Successfully appended log to JSON array: {file_path}")
         return True
     except Exception as e:
-        print(f"ERROR writing log to {file_path}: {str(e)}")
+        import traceback
+        print(f"ERROR appending log to {file_path}: {str(e)}")
         print(traceback.format_exc())
         return False
+
+# Direct file writing approach
+def write_auth_log(log_entry):
+    """Write auth log to a file as part of a JSON array"""
+     
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "auth_interactions.json")
+    
+    return append_log_to_json_array(log_entry, file_path)
+
+def write_booking_log(log_entry):
+    """Write booking log to a file as part of a JSON array"""
+     
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "booking_interactions.json")
+    
+    return append_log_to_json_array(log_entry, file_path)
+
+def write_payment_log(log_entry):
+    """Write payment log to a file as part of a JSON array"""
+     
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "payment_interactions.json")
+    
+    return append_log_to_json_array(log_entry, file_path)
+
+def write_feedback_log(log_entry):
+    """Write feedback log to a file as part of a JSON array"""
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "feedback_interactions.json")
+    
+    return append_log_to_json_array(log_entry, file_path)
+
+def write_search_log(log_entry):
+    """Write search log to a file as part of a JSON array"""
+     
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "search_interactions.json")
+    
+    return append_log_to_json_array(log_entry, file_path)
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():

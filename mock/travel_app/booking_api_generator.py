@@ -195,7 +195,44 @@ def generate_passenger_details(num_passengers=None):
         passengers.append(passenger)
     
     return passengers
-
+def write_logs_as_json_array(log_entries, file_path):
+    """
+    Writes log entries as a valid JSON array to a file.
+    Creates a new file or overwrites an existing one.
+    """
+    import json
+    import os
+    
+    try:
+        # Create directory if it doesn't exist
+        directory = os.path.dirname(file_path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+            print(f"Created directory: {directory}")
+        
+        # Write logs as a valid JSON array
+        with open(file_path, 'w') as f:
+            # Start with an opening bracket
+            f.write('[\n')
+            
+            # Write each log entry followed by a comma (except the last one)
+            for i, log in enumerate(log_entries):
+                f.write(json.dumps(log))
+                if i < len(log_entries) - 1:
+                    f.write(',\n')
+                else:
+                    f.write('\n')
+            
+            # End with a closing bracket
+            f.write(']\n')
+            
+        print(f"Successfully wrote {len(log_entries)} logs to {file_path}")
+        return True
+    except Exception as e:
+        import traceback
+        print(f"ERROR writing logs to {file_path}: {str(e)}")
+        print(traceback.format_exc())
+        return False
 def calculate_response_time(operation, status_code, is_anomalous=False):
     """Calculate realistic response times for booking operations"""
     # Base times in seconds
@@ -741,14 +778,17 @@ def generate_booking_logs(num_logs=1000, anomaly_percentage=15):
 
 def save_logs_to_file(logs, format='json', filename='booking_logs'):
     """Save logs to a file in the specified format"""
+    import json
+    import pandas as pd
+    
     if format.lower() == 'json':
         file_path = f"{filename}.json"
-        with open(file_path, 'w') as f:
-            json.dump(logs, f, indent=2)
-        print(f"Saved {len(logs)} logs to {file_path}")
+        # Use the new function to write as JSON array
+        write_logs_as_json_array(logs, file_path)
         return file_path
     
     elif format.lower() == 'csv':
+        # CSV output remains unchanged
         file_path = f"{filename}.csv"
         
         # Flatten the nested structure for CSV
@@ -785,6 +825,8 @@ def save_logs_to_file(logs, format='json', filename='booking_logs'):
     
     else:
         raise ValueError(f"Unsupported format: {format}. Use 'json' or 'csv'.")
+
+
 
 def analyze_booking_logs(logs):
     """Print analysis of the generated booking logs"""
