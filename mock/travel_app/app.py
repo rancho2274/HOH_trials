@@ -123,7 +123,7 @@ def write_auth_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "auth_interactions.json")
-    text_file_path = os.path.join(current_dir, "auth_interactions.txt")
+    text_file_path = os.path.join(current_dir, "auth_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
@@ -139,7 +139,7 @@ def write_booking_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "booking_interactions.json")
-    text_file_path = os.path.join(current_dir, "booking_interactions.txt")
+    text_file_path = os.path.join(current_dir, "booking_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
@@ -155,7 +155,7 @@ def write_payment_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "payment_interactions.json")
-    text_file_path = os.path.join(current_dir, "payment_interactions.txt")
+    text_file_path = os.path.join(current_dir, "payment_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
@@ -171,7 +171,7 @@ def write_feedback_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "feedback_interactions.json")
-    text_file_path = os.path.join(current_dir, "feedback_interactions.txt")
+    text_file_path = os.path.join(current_dir, "feedback_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
@@ -187,7 +187,7 @@ def write_search_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "search_interactions.json")
-    text_file_path = os.path.join(current_dir, "search_interactions.txt")
+    text_file_path = os.path.join(current_dir, "search_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
