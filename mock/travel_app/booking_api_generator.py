@@ -61,6 +61,64 @@ ERROR_STATUS_CODES = {
     "client_error": [400, 401, 403, 404, 422, 429],
     "server_error": [500, 502, 503, 504]
 }
+def save_booking_logs(logs, format='json', filename='booking_logs', single_line=True):
+    """Save logs to a file in the specified format"""
+    import json
+    import pandas as pd
+    
+    if format.lower() == 'json':
+        file_path = f"{filename}.json"
+        
+        if single_line:
+            # Write each log as a separate JSON line (JSON Lines format)
+            with open(file_path, 'w') as f:
+                for log in logs:
+                    f.write(json.dumps(log) + '\n')
+        else:
+            # Original pretty-printed format
+            with open(file_path, 'w') as f:
+                json.dump(logs, f, indent=2)
+                
+        print(f"Saved {len(logs)} logs to {file_path}")
+        return file_path
+    
+    elif format.lower() == 'csv':
+        file_path = f"{filename}.csv"
+        
+        # Flatten the nested structure for CSV (implementation unchanged)
+        flat_logs = []
+        for log in logs:
+            flat_log = {
+                "timestamp": log["timestamp"],
+                "booking_type": log["booking_service"]["type"],
+                "operation": log["booking_service"]["operation"],
+                "environment": log["booking_service"]["environment"],
+                "region": log["booking_service"]["region"],
+                "instance_id": log["booking_service"]["instance_id"],
+                "request_id": log["request"]["id"],
+                "request_method": log["request"]["method"],
+                "request_path": log["request"]["path"],
+                "client_id": log["request"]["client_id"],
+                "client_type": log["request"]["client_type"],
+                "source_ip": log["request"]["source_ip"],
+                "response_status_code": log["response"]["status_code"],
+                "response_time_ms": log["response"]["time_ms"],
+                "user_id": log["user"]["user_id"],
+                "booking_id": log["booking_id"],
+                "correlation_id": log["tracing"]["correlation_id"],
+                "parent_request_id": log["tracing"].get("parent_request_id"),
+                "is_anomalous": log["is_anomalous"]
+            }
+            flat_logs.append(flat_log)
+        
+        # Convert to DataFrame and save as CSV
+        df = pd.DataFrame(flat_logs)
+        df.to_csv(file_path, index=False)
+        print(f"Saved {len(logs)} logs to {file_path}")
+        return file_path
+    
+    else:
+        raise ValueError(f"Unsupported format: {format}. Use 'json' or 'csv'.")
 
 # Currencies
 CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "SGD", "AED"]

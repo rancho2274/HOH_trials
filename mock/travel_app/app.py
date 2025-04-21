@@ -88,10 +88,11 @@ def append_log_to_json_array(log_entry, file_path):
         print(traceback.format_exc())
         return False
 
+
 # Direct file writing approach
 def write_auth_log(log_entry):
     """Write auth log to a file as part of a JSON array"""
-     
+    import os
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(current_dir, "auth_interactions.json")
@@ -100,7 +101,7 @@ def write_auth_log(log_entry):
 
 def write_booking_log(log_entry):
     """Write booking log to a file as part of a JSON array"""
-     
+    import os
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(current_dir, "booking_interactions.json")
