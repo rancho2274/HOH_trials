@@ -834,7 +834,7 @@ def generate_booking_logs(num_logs=1000, anomaly_percentage=15):
     
     return all_logs
 
-def save_logs_to_file(logs, format='json', filename='booking_logs'):
+def save_booking_logs(logs, format='json', filename='booking_logs'):
     """Save logs to a file in the specified format"""
     import json
     import pandas as pd

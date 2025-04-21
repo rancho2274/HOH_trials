@@ -687,21 +687,68 @@ def write_logs_as_json_array(log_entries, file_path):
         print(f"ERROR writing logs to {file_path}: {str(e)}")
         print(traceback.format_exc())
         return False
+    
+def write_logs_as_text(log_entries, file_path):
+    """
+    Writes log entries to a simple text file.
+    Each log entry is written as a single line of JSON, 
+    no commas between entries, no enclosing square brackets, 
+    and entries are separated by newlines.
+    
+    Args:
+        log_entries: List of log entries (dictionaries)
+        file_path: Path to the output file
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    import json
+    import os
+    
+    try:
+        # Create directory if it doesn't exist
+        directory = os.path.dirname(file_path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+            print(f"Created directory: {directory}")
+        
+        # Write each log as a separate JSON line
+        with open(file_path, 'w') as f:
+            for log in log_entries:
+                f.write(json.dumps(log) + '\n')
+            
+        print(f"Successfully wrote {len(log_entries)} logs to {file_path}")
+        return True
+    except Exception as e:
+        import traceback
+        print(f"ERROR writing logs to {file_path}: {str(e)}")
+        print(traceback.format_exc())
+        return False
+
+# Add this to your existing save_auth_logs function in auth_api_generator.py
 
 def save_auth_logs(logs, format='json', filename='auth_logs'):
     """Save auth logs to a file in the specified format"""
     import json
     import pandas as pd
     
+    # First, save logs to a text file (simple format with no commas or brackets)
+    text_file_path = f"{filename}.txt"
+    try:
+        with open(text_file_path, 'w') as f:
+            for log in logs:
+                f.write(json.dumps(log) + '\n')
+        print(f"Saved {len(logs)} auth logs to {text_file_path}")
+    except Exception as e:
+        print(f"Error saving logs to text file: {e}")
+    
+    # Then proceed with the original JSON or CSV saving
     if format.lower() == 'json':
         file_path = f"{filename}.json"
 
         write_logs_as_json_array(logs, file_path)
         return file_path
         
-        # Write each log as a separate JSON line (JSON Lines format)
-        
-    
     elif format.lower() == 'csv':
         # CSV output remains the same
         file_path = f"{filename}.csv"

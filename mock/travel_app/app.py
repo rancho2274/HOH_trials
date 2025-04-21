@@ -14,6 +14,33 @@ app = Flask(__name__)
 
 # Single-line JSON writer function
 # Define a consistent function for writing logs in JSON array format
+def append_log_to_text_file(log_entry, file_path):
+    """
+    Appends a single log entry to a text file.
+    If the file doesn't exist, creates a new file.
+    Each log is a JSON string on a single line.
+    """
+    import json
+    import os
+    
+    try:
+        # Create directory if it doesn't exist
+        directory = os.path.dirname(file_path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+            print(f"Created directory: {directory}")
+        
+        # Append the log entry to the text file
+        with open(file_path, 'a') as f:
+            f.write(json.dumps(log_entry) + '\n\n')
+        
+        print(f"Successfully appended log to text file: {file_path}")
+        return True
+    except Exception as e:
+        import traceback
+        print(f"ERROR appending log to {file_path}: {str(e)}")
+        print(traceback.format_exc())
+        return False
 def append_log_to_json_array(log_entry, file_path):
     """
     Appends a single log entry to a JSON array file.
@@ -91,48 +118,84 @@ def append_log_to_json_array(log_entry, file_path):
 
 # Direct file writing approach
 def write_auth_log(log_entry):
-    """Write auth log to a file as part of a JSON array"""
+    """Write auth log to a file as part of a JSON array and to a text file"""
     import os
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "auth_interactions.json")
+    json_file_path = os.path.join(current_dir, "auth_interactions.json")
+    text_file_path = os.path.join(current_dir, "auth_interactions.txt")
     
-    return append_log_to_json_array(log_entry, file_path)
+    # Write to JSON array
+    json_success = append_log_to_json_array(log_entry, json_file_path)
+    
+    # Write to text file
+    text_success = append_log_to_text_file(log_entry, text_file_path)
+    
+    return json_success and text_success
 
 def write_booking_log(log_entry):
-    """Write booking log to a file as part of a JSON array"""
+    """Write booking log to a file as part of a JSON array and to a text file"""
     import os
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "booking_interactions.json")
+    json_file_path = os.path.join(current_dir, "booking_interactions.json")
+    text_file_path = os.path.join(current_dir, "booking_interactions.txt")
     
-    return append_log_to_json_array(log_entry, file_path)
+    # Write to JSON array
+    json_success = append_log_to_json_array(log_entry, json_file_path)
+    
+    # Write to text file
+    text_success = append_log_to_text_file(log_entry, text_file_path)
+    
+    return json_success and text_success
 
 def write_payment_log(log_entry):
-    """Write payment log to a file as part of a JSON array"""
-     
+    """Write payment log to a file as part of a JSON array and to a text file"""
+    import os
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "payment_interactions.json")
+    json_file_path = os.path.join(current_dir, "payment_interactions.json")
+    text_file_path = os.path.join(current_dir, "payment_interactions.txt")
     
-    return append_log_to_json_array(log_entry, file_path)
+    # Write to JSON array
+    json_success = append_log_to_json_array(log_entry, json_file_path)
+    
+    # Write to text file
+    text_success = append_log_to_text_file(log_entry, text_file_path)
+    
+    return json_success and text_success
 
 def write_feedback_log(log_entry):
-    """Write feedback log to a file as part of a JSON array"""
+    """Write feedback log to a file as part of a JSON array and to a text file"""
+    import os
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "feedback_interactions.json")
+    json_file_path = os.path.join(current_dir, "feedback_interactions.json")
+    text_file_path = os.path.join(current_dir, "feedback_interactions.txt")
     
-    return append_log_to_json_array(log_entry, file_path)
+    # Write to JSON array
+    json_success = append_log_to_json_array(log_entry, json_file_path)
+    
+    # Write to text file
+    text_success = append_log_to_text_file(log_entry, text_file_path)
+    
+    return json_success and text_success
 
 def write_search_log(log_entry):
-    """Write search log to a file as part of a JSON array"""
-     
+    """Write search log to a file as part of a JSON array and to a text file"""
+    import os
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "search_interactions.json")
+    json_file_path = os.path.join(current_dir, "search_interactions.json")
+    text_file_path = os.path.join(current_dir, "search_interactions.txt")
     
-    return append_log_to_json_array(log_entry, file_path)
+    # Write to JSON array
+    json_success = append_log_to_json_array(log_entry, json_file_path)
+    
+    # Write to text file
+    text_success = append_log_to_text_file(log_entry, text_file_path)
+    
+    return json_success and text_success
 
 
 

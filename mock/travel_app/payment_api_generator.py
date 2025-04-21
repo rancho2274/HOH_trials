@@ -740,7 +740,7 @@ def generate_payment_logs(num_logs=1000, anomaly_percentage=15):
     
     return all_logs
 
-def save_logs_to_file(logs, format='json', filename='payment_logs'):
+def save_payment_logs(logs, format='json', filename='payment_logs'):
     """Save logs to a file in the specified format"""
     
     if format.lower() == 'json':

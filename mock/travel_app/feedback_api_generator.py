@@ -693,7 +693,7 @@ def generate_feedback_logs(num_logs=1000, anomaly_percentage=15):
     
     return all_logs
 
-def save_logs_to_file(logs, format='json', filename='feedback_logs'):
+def save_feedback_logs(logs, format='json', filename='feedback_logs'):
     """Save logs to a file in the specified format"""
     import json
     import pandas as pd
