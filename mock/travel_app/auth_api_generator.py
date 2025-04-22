@@ -109,7 +109,7 @@ def generate_auth_headers(auth_type, include_security_headers=True):
             "python-requests/2.25.1",
             "Internal Service Client/1.0"
         ]),
-        "X-Request-ID": str(uuid.uuid4())
+        # "X-Request-ID": str(uuid.uuid4())
     }
     
     # Add auth specific headers
@@ -122,11 +122,11 @@ def generate_auth_headers(auth_type, include_security_headers=True):
         headers["Authorization"] = f"Basic {fake_token}"
     
     # Add security headers
-    if include_security_headers:
-        headers["X-Content-Type-Options"] = "nosniff"
-        headers["X-XSS-Protection"] = "1; mode=block"
-        headers["X-Frame-Options"] = "DENY"
-        headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    # if include_security_headers:
+    #     headers["X-Content-Type-Options"] = "nosniff"
+    #     headers["X-XSS-Protection"] = "1; mode=block"
+    #     headers["X-Frame-Options"] = "DENY"
+    #     headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     
     return headers
 

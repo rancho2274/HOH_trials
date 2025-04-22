@@ -133,7 +133,7 @@ def generate_request_headers(auth_required=False):
         "Accept": "application/json",
         "Content-Type": "application/json",
         "User-Agent": random.choice(USER_AGENTS),
-        "X-Request-ID": str(uuid.uuid4())
+        
     }
     
     if auth_required:
