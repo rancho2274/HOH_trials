@@ -511,4 +511,4 @@ def thankyou():
 if __name__ == '__main__':
     # Print working directory for debugging
     print(f"Current working directory: {os.getcwd()}")
-    app.run(debug=True, port=5050)
+    app.run(debug=True, port=8000)

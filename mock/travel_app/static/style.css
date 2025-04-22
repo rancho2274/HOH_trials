@@ -29,10 +29,11 @@ body {
 
 .hotels-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(3, 1fr); /* Force 3 cards per row */
     gap: 2rem;
     padding: 2rem;
 }
+
 
 .hotel-card {
     background: white;
