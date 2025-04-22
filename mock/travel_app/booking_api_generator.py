@@ -345,7 +345,7 @@ def get_error_message(status_code):
 
 def generate_booking_log_entry(timestamp=None, operation=None, 
                             correlation_id=None, user_id=None, booking_id=None,
-                            search_data=None, is_anomalous=False, parent_request_id=None):
+                            search_data=None, is_anomalous=False, parent_request_id=None, session_id=None):
     """Generate a single booking service log entry"""
     
     # Generate timestamp if not provided
@@ -660,7 +660,8 @@ def generate_booking_log_entry(timestamp=None, operation=None,
     
     # Calculate response time
     response_time = calculate_response_time(operation, status_code, is_anomalous)
-    
+    if session_id is None:
+        session_id = f"session-{uuid.uuid4().hex[:12]}"
     # Create the booking log entry
     log_entry = {
         "timestamp": timestamp.isoformat(),
@@ -693,11 +694,12 @@ def generate_booking_log_entry(timestamp=None, operation=None,
         "tracing": {
             "correlation_id": correlation_id,
             "request_id": request_id,
-            "parent_request_id": parent_request_id
+            "parent_request_id": parent_request_id,
+            "session_id": session_id  # Add session_id to tracing information
         },
-        "is_anomalous": is_anomalous  # Meta field for labeling
+        "is_anomalous": is_anomalous
     }
-    
+
     return log_entry
 
 def generate_related_bookings(correlation_id, user_id=None, search_data=None, base_timestamp=None, is_anomalous=False):

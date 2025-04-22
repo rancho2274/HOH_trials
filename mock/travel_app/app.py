@@ -1,17 +1,24 @@
-# Modified app.py functions to write single-line JSON logs
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from search_api_generator import generate_search_log_entry
 from booking_api_generator import generate_booking_log_entry
 from payment_api_generator import generate_payment_log_entry
 from feedback_api_generator import generate_feedback_log_entry
 from auth_api_generator import generate_auth_log_entry
+import secrets
+import uuid
+
 import json
 import os
 import traceback
 from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)
 
+def get_or_create_session_id():
+    if 'session_id' not in session:
+        session['session_id'] = f"session-{uuid.uuid4().hex[:12]}"
+    return session['session_id']
 # Single-line JSON writer function
 # Define a consistent function for writing logs in JSON array format
 def append_log_to_text_file(log_entry, file_path):
@@ -123,15 +130,15 @@ def write_auth_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "auth_interactions.json")
-    text_file_path = os.path.join(current_dir, "combine_logs\euth_interactions1.json")
+    # text_file_path = os.path.join(current_dir, "combine_logs\euth_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
     
     # Write to text file
-    text_success = append_log_to_text_file(log_entry, text_file_path)
+    #text_success = append_log_to_text_file(log_entry, text_file_path)
     
-    return json_success and text_success
+    return json_success
 
 def write_booking_log(log_entry):
     """Write booking log to a file as part of a JSON array and to a text file"""
@@ -139,15 +146,15 @@ def write_booking_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "booking_interactions.json")
-    text_file_path = os.path.join(current_dir, "combine_logs\mooking_interactions1.json")
+    #text_file_path = os.path.join(current_dir, "combine_logs\mooking_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
     
     # Write to text file
-    text_success = append_log_to_text_file(log_entry, text_file_path)
+    #text_success = append_log_to_text_file(log_entry, text_file_path)
     
-    return json_success and text_success
+    return json_success
 
 def write_payment_log(log_entry):
     """Write payment log to a file as part of a JSON array and to a text file"""
@@ -155,15 +162,15 @@ def write_payment_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "payment_interactions.json")
-    text_file_path = os.path.join(current_dir, "combine_logs\payment_interactions1.json")
+    # text_file_path = os.path.join(current_dir, "combine_logs\payment_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
     
     # Write to text file
-    text_success = append_log_to_text_file(log_entry, text_file_path)
+    #text_success = append_log_to_text_file(log_entry, text_file_path)
     
-    return json_success and text_success
+    return json_success
 
 def write_feedback_log(log_entry):
     """Write feedback log to a file as part of a JSON array and to a text file"""
@@ -171,15 +178,15 @@ def write_feedback_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "feedback_interactions.json")
-    text_file_path = os.path.join(current_dir, "combine_logs\ceedback_interactions1.json")
+    #text_file_path = os.path.join(current_dir, "combine_logs\ceedback_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
     
     # Write to text file
-    text_success = append_log_to_text_file(log_entry, text_file_path)
+    #text_success = append_log_to_text_file(log_entry, text_file_path)
     
-    return json_success and text_success
+    return json_success
 
 def write_search_log(log_entry):
     """Write search log to a file as part of a JSON array and to a text file"""
@@ -187,15 +194,15 @@ def write_search_log(log_entry):
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_file_path = os.path.join(current_dir, "search_interactions.json")
-    text_file_path = os.path.join(current_dir, "combine_logs\search_interactions1.json")
+    # text_file_path = os.path.join(current_dir, "combine_logs\search_interactions1.json")
     
     # Write to JSON array
     json_success = append_log_to_json_array(log_entry, json_file_path)
     
     # Write to text file
-    text_success = append_log_to_text_file(log_entry, text_file_path)
+    #text_success = append_log_to_text_file(log_entry, text_file_path)
     
-    return json_success and text_success
+    return json_success
 
 
 
@@ -208,6 +215,8 @@ def login():
             print(f"Login form submitted with action: {action}")
             
             # Create auth log entry
+            session_id = f"session-{uuid.uuid4().hex[:12]}"
+            session['session_id'] = session_id
             # Login is anomalous, signup is non-anomalous
             is_anomalous = (action == "login")
             
@@ -215,7 +224,8 @@ def login():
                 timestamp=datetime.now(),
                 operation="login" if action == "login" else "signin",
                 auth_type="form_login",
-                is_anomalous=is_anomalous
+                is_anomalous=is_anomalous,
+                
             )
             
             # Try to write directly with our specialized function
@@ -239,6 +249,7 @@ def login():
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    session_id = get_or_create_session_id()
     # This route now only handles search functionality, not authentication
     if request.method == 'POST':
         # Check if it's the icon search (which should be anomalous)
@@ -248,7 +259,8 @@ def search():
         search_log = generate_search_log_entry(
             timestamp=datetime.now(),
             search_type="initial_search",
-            is_anomalous=is_icon_search  # Icon search is anomalous
+            is_anomalous=is_icon_search ,
+            session_id=session_id  # Icon search is anomalous
         )
         
         # Save search log
@@ -258,6 +270,7 @@ def search():
 
 @app.route('/hotels', methods=['POST'])
 def hotels():
+    session_id = get_or_create_session_id()
     destination = request.form.get('destination')
     checkin = request.form.get('checkin')
     checkout = request.form.get('checkout')
@@ -284,7 +297,8 @@ def hotels():
     search_log = generate_search_log_entry(
         timestamp=datetime.now(),
         search_type="location_search",
-        is_anomalous=False
+        is_anomalous=False, 
+        session_id=session_id 
     )
     
     log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "search_interactions.json")
@@ -303,6 +317,7 @@ def hotels_by_location(location):
     checkin = request.args.get('checkin')
     checkout = request.args.get('checkout')
     guests = request.args.get('guests')
+    session_id = get_or_create_session_id()
     hotels_data = {
         "paris": [
             {"name": "Hotel Eiffel", "stars": "★★★", "rating_label": "Exceptional", "reviews": "128", "image": "paris1.jpg", "description": "Beachside hotel with pool and cozy rooms."},
@@ -323,7 +338,8 @@ def hotels_by_location(location):
     search_log = generate_search_log_entry(
         timestamp=datetime.now(),
         search_type="hotel_details_search",
-        is_anomalous=False
+        is_anomalous=False,
+        session_id=session_id
     )
 
     log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "search_interactions.json")
@@ -334,6 +350,7 @@ def hotels_by_location(location):
 
 @app.route('/book', methods=['POST'])
 def book():
+    session_id = get_or_create_session_id()
     hotel = request.form.get('hotel')
     destination = request.form.get('destination')
     checkin = request.form.get('checkin')
@@ -361,7 +378,8 @@ def book():
     booking_log = generate_booking_log_entry(
         timestamp=datetime.now(),
         operation="create_booking",
-        is_anomalous=is_anomalous
+        is_anomalous=is_anomalous,
+        session_id=session_id
     )
     
     # Write booking log
@@ -381,6 +399,7 @@ def book():
 
 @app.route('/payment', methods=['POST'])
 def payment():
+    session_id = get_or_create_session_id()
     try:
         name = request.form.get('name')
         email = request.form.get('email')
@@ -408,7 +427,8 @@ def payment():
         payment_log = generate_payment_log_entry(
             timestamp=datetime.now(),
             operation="process_payment",
-            is_anomalous=is_anomalous
+            is_anomalous=is_anomalous,
+            session_id=session_id
         )
         
         # Try to write directly with our specialized function
@@ -444,20 +464,24 @@ def payment():
 
 @app.route('/feedback', methods=['GET', 'POST'])
 def feedback():
+    session_id = get_or_create_session_id()
     # Only generate logs for GET requests to avoid duplicate logging
     if request.method == 'GET':
         feedback_log = generate_feedback_log_entry(
             timestamp=datetime.now(),
             operation="view_feedback_form",
-            is_anomalous=False
+            is_anomalous=False,
+            session_id=session_id
         )
         
         write_feedback_log(feedback_log)
+        
     
     return render_template('feedback.html')
 
 @app.route('/thankyou', methods=['POST'])
 def thankyou():
+    session_id = get_or_create_session_id()
     try:
         # Get feedback text and anomalous flag from form
         feedback_text = request.form.get('feedback', '')
@@ -470,7 +494,8 @@ def thankyou():
         feedback_log = generate_feedback_log_entry(
             timestamp=datetime.now(),
             operation="submit_feedback",
-            is_anomalous=is_anomalous
+            is_anomalous=is_anomalous,
+            session_id=session_id
         )
         
         # Write feedback log
@@ -481,6 +506,7 @@ def thankyou():
         print(f"Exception in thankyou route: {str(e)}")
         print(traceback.format_exc())
         return render_template('thankyou.html')
+    
 
 if __name__ == '__main__':
     # Print working directory for debugging

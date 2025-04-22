@@ -242,7 +242,7 @@ def get_error_message(status_code):
 
 def generate_search_log_entry(timestamp=None, search_type=None, 
                             correlation_id=None, user_id=None, 
-                            is_anomalous=False, parent_request_id=None):
+                            is_anomalous=False, parent_request_id=None, session_id=None):
     """Generate a single search service log entry"""
     
     # Generate timestamp if not provided
@@ -413,7 +413,8 @@ def generate_search_log_entry(timestamp=None, search_type=None,
     
     # Calculate response time
     response_time = calculate_response_time(search_type, status_code, is_anomalous)
-    
+    if session_id is None:
+        session_id = f"session-{uuid.uuid4().hex[:12]}"
     # Create the search log entry
     log_entry = {
         "timestamp": timestamp.isoformat(),
@@ -445,10 +446,11 @@ def generate_search_log_entry(timestamp=None, search_type=None,
         "tracing": {
             "correlation_id": correlation_id,
             "request_id": request_id,
-            "parent_request_id": parent_request_id
+            "parent_request_id": parent_request_id,
+            "session_id": session_id  # Add session_id to tracing information
         },
-        "is_anomalous": is_anomalous  # Meta field for labeling
-    }
+        "is_anomalous": is_anomalous
+    }  # Meta field for labeling
     
     return log_entry
 

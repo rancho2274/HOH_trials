@@ -271,7 +271,7 @@ def get_error_message(status_code):
 def generate_payment_log_entry(timestamp=None, operation=None, 
                             correlation_id=None, user_id=None, 
                             booking_id=None, payment_id=None,
-                            booking_data=None, is_anomalous=False):
+                            booking_data=None, is_anomalous=False, session_id=None):
     """Generate a single payment service log entry"""
     
     # Generate timestamp if not provided
@@ -313,7 +313,8 @@ def generate_payment_log_entry(timestamp=None, operation=None,
         http_method = "PUT"
     else:
         http_method = "POST"
-    
+    if session_id is None:
+        session_id = f"session-{uuid.uuid4().hex[:12]}"
     # Generate booking ID if not provided
     if booking_id is None and booking_data and "booking_id" in booking_data:
         booking_id = booking_data["booking_id"]
@@ -595,7 +596,8 @@ def generate_payment_log_entry(timestamp=None, operation=None,
         "payment_id": payment_id,
         "tracing": {
             "correlation_id": correlation_id,
-            "request_id": request_id
+            "request_id": request_id,
+            "session_id": session_id  # Add session_id to tracing information
         },
         "is_anomalous": is_anomalous  # Meta field for labeling
     }

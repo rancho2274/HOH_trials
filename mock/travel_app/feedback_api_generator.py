@@ -238,7 +238,7 @@ def get_error_message(status_code):
 def generate_feedback_log_entry(timestamp=None, operation=None, 
                              correlation_id=None, user_id=None, 
                              booking_id=None, review_id=None, 
-                             booking_data=None, is_anomalous=False):
+                             booking_data=None, is_anomalous=False, session_id=None):
     """Generate a single feedback service log entry"""
     
     # Generate timestamp if not provided
@@ -413,7 +413,8 @@ def generate_feedback_log_entry(timestamp=None, operation=None,
     
     # Generate response body
     response_body = {}
-    
+    if session_id is None:
+        session_id = f"session-{uuid.uuid4().hex[:12]}"
     if status_code < 400:  # Success responses
         if operation == "submit_review":
             # Generate review ID if not provided
@@ -542,7 +543,8 @@ def generate_feedback_log_entry(timestamp=None, operation=None,
         "review_id": review_id,
         "tracing": {
             "correlation_id": correlation_id,
-            "request_id": request_id
+            "request_id": request_id,
+            "session_id": session_id  
         },
         "is_anomalous": is_anomalous  # Meta field for labeling
     }

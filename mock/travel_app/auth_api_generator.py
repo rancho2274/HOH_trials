@@ -425,9 +425,11 @@ def get_auth_path(operation):
         return f"/auth/{operation}"
 
 def generate_auth_log_entry(timestamp=None, operation=None, auth_type=None, 
-                          correlation_id=None, is_anomalous=False):
+                          correlation_id=None, is_anomalous=False, session_id=None):
     """Generate a single auth service log entry"""
     
+    if session_id is None:
+        session_id = f"session-{uuid.uuid4().hex[:12]}"
     # Generate timestamp if not provided
     if timestamp is None:
         timestamp = datetime.datetime.now() - datetime.timedelta(
@@ -541,7 +543,8 @@ def generate_auth_log_entry(timestamp=None, operation=None, auth_type=None,
         },
         "tracing": {
             "correlation_id": correlation_id,
-            "request_id": request_id
+            "request_id": request_id,
+            "session_id": session_id  # Add session_id to tracing information
         },
         "is_anomalous": is_anomalous  # Meta field for labeling
     }
