@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,6 +103,7 @@
   </div>
 
   <div class="main-content">
+    <!-- Main Overview Tab -->
     <div id="main" class="tab-content active">
       <div class="gauge-container">
         <div class="gauge total" style="--value: 100">
@@ -120,27 +122,107 @@
       <iframe src="http://localhost:5601/app/dashboards#/view/overview-dashboard-id?embed=true"></iframe>
     </div>
 
-    {% for section in ['auth', 'search', 'booking', 'payment', 'feedback'] %}
-    <div id="{{ section }}" class="tab-content">
-      <h3>{{ section.capitalize() }} Logs</h3>
+    <!-- Auth Tab -->
+    <div id="auth" class="tab-content">
+      <h3>Authentication Logs</h3>
       <div class="gauge-container">
         <div class="gauge total" style="--value: 100">
-          <div class="label">Total Logs<br>{{ stats.total_logs }}</div>
+          <div class="label">Total Logs<br>{{ api_stats.auth.total_logs }}</div>
         </div>
-        <div class="gauge anomalies" style="--value: {{ (stats.anomalies / stats.total_logs * 100) if stats.total_logs > 0 else 0 }}">
-          <div class="label">Anomalies<br>{{ stats.anomalies }} ({{ stats.anomaly_percent }}%)</div>
+        <div class="gauge anomalies" style="--value: {{ (api_stats.auth.anomalies / api_stats.auth.total_logs * 100) if api_stats.auth.total_logs > 0 else 0 }}">
+          <div class="label">Anomalies<br>{{ api_stats.auth.anomalies }} ({{ api_stats.auth.anomaly_percent }}%)</div>
         </div>
-        <div class="gauge normal" style="--value: {{ stats.normal_avg|float / 2 if stats.normal_avg <= 200 else 100 }}">
-          <div class="label">Normal Avg<br>{{ stats.normal_avg }} ms</div>
+        <div class="gauge normal" style="--value: {{ api_stats.auth.normal_avg|float / 2 if api_stats.auth.normal_avg <= 200 else 100 }}">
+          <div class="label">Normal Avg<br>{{ api_stats.auth.normal_avg }} ms</div>
         </div>
-        <div class="gauge anomalous" style="--value: {{ stats.anomalous_avg|float / 2 if stats.anomalous_avg <= 200 else 100 }}">
-          <div class="label">Anomalous Avg<br>{{ stats.anomalous_avg }} ms</div>
+        <div class="gauge anomalous" style="--value: {{ api_stats.auth.anomalous_avg|float / 2 if api_stats.auth.anomalous_avg <= 200 else 100 }}">
+          <div class="label">Anomalous Avg<br>{{ api_stats.auth.anomalous_avg }} ms</div>
         </div>
       </div>
-      <iframe src="http://localhost:5601/app/dashboards#/view/{{ section }}-dashboard-id?embed=true"></iframe>
+      <iframe src="http://localhost:5601/app/dashboards#/view/auth-dashboard-id?embed=true"></iframe>
     </div>
-    {% endfor %}
 
+    <!-- Search Tab -->
+    <div id="search" class="tab-content">
+      <h3>Search Logs</h3>
+      <div class="gauge-container">
+        <div class="gauge total" style="--value: 100">
+          <div class="label">Total Logs<br>{{ api_stats.search.total_logs }}</div>
+        </div>
+        <div class="gauge anomalies" style="--value: {{ (api_stats.search.anomalies / api_stats.search.total_logs * 100) if api_stats.search.total_logs > 0 else 0 }}">
+          <div class="label">Anomalies<br>{{ api_stats.search.anomalies }} ({{ api_stats.search.anomaly_percent }}%)</div>
+        </div>
+        <div class="gauge normal" style="--value: {{ api_stats.search.normal_avg|float / 2 if api_stats.search.normal_avg <= 200 else 100 }}">
+          <div class="label">Normal Avg<br>{{ api_stats.search.normal_avg }} ms</div>
+        </div>
+        <div class="gauge anomalous" style="--value: {{ api_stats.search.anomalous_avg|float / 2 if api_stats.search.anomalous_avg <= 200 else 100 }}">
+          <div class="label">Anomalous Avg<br>{{ api_stats.search.anomalous_avg }} ms</div>
+        </div>
+      </div>
+      <iframe src="http://localhost:5601/app/dashboards#/view/search-dashboard-id?embed=true"></iframe>
+    </div>
+
+    <!-- Booking Tab -->
+    <div id="booking" class="tab-content">
+      <h3>Booking Logs</h3>
+      <div class="gauge-container">
+        <div class="gauge total" style="--value: 100">
+          <div class="label">Total Logs<br>{{ api_stats.booking.total_logs }}</div>
+        </div>
+        <div class="gauge anomalies" style="--value: {{ (api_stats.booking.anomalies / api_stats.booking.total_logs * 100) if api_stats.booking.total_logs > 0 else 0 }}">
+          <div class="label">Anomalies<br>{{ api_stats.booking.anomalies }} ({{ api_stats.booking.anomaly_percent }}%)</div>
+        </div>
+        <div class="gauge normal" style="--value: {{ api_stats.booking.normal_avg|float / 2 if api_stats.booking.normal_avg <= 200 else 100 }}">
+          <div class="label">Normal Avg<br>{{ api_stats.booking.normal_avg }} ms</div>
+        </div>
+        <div class="gauge anomalous" style="--value: {{ api_stats.booking.anomalous_avg|float / 2 if api_stats.booking.anomalous_avg <= 200 else 100 }}">
+          <div class="label">Anomalous Avg<br>{{ api_stats.booking.anomalous_avg }} ms</div>
+        </div>
+      </div>
+      <iframe src="http://localhost:5601/app/dashboards#/view/booking-dashboard-id?embed=true"></iframe>
+    </div>
+
+    <!-- Payment Tab -->
+    <div id="payment" class="tab-content">
+      <h3>Payment Logs</h3>
+      <div class="gauge-container">
+        <div class="gauge total" style="--value: 100">
+          <div class="label">Total Logs<br>{{ api_stats.payment.total_logs }}</div>
+        </div>
+        <div class="gauge anomalies" style="--value: {{ (api_stats.payment.anomalies / api_stats.payment.total_logs * 100) if api_stats.payment.total_logs > 0 else 0 }}">
+          <div class="label">Anomalies<br>{{ api_stats.payment.anomalies }} ({{ api_stats.payment.anomaly_percent }}%)</div>
+        </div>
+        <div class="gauge normal" style="--value: {{ api_stats.payment.normal_avg|float / 2 if api_stats.payment.normal_avg <= 200 else 100 }}">
+          <div class="label">Normal Avg<br>{{ api_stats.payment.normal_avg }} ms</div>
+        </div>
+        <div class="gauge anomalous" style="--value: {{ api_stats.payment.anomalous_avg|float / 2 if api_stats.payment.anomalous_avg <= 200 else 100 }}">
+          <div class="label">Anomalous Avg<br>{{ api_stats.payment.anomalous_avg }} ms</div>
+        </div>
+      </div>
+      <iframe src="http://localhost:5601/app/dashboards#/view/payment-dashboard-id?embed=true"></iframe>
+    </div>
+
+    <!-- Feedback Tab -->
+    <div id="feedback" class="tab-content">
+      <h3>Feedback Logs</h3>
+      <div class="gauge-container">
+        <div class="gauge total" style="--value: 100">
+          <div class="label">Total Logs<br>{{ api_stats.feedback.total_logs }}</div>
+        </div>
+        <div class="gauge anomalies" style="--value: {{ (api_stats.feedback.anomalies / api_stats.feedback.total_logs * 100) if api_stats.feedback.total_logs > 0 else 0 }}">
+          <div class="label">Anomalies<br>{{ api_stats.feedback.anomalies }} ({{ api_stats.feedback.anomaly_percent }}%)</div>
+        </div>
+        <div class="gauge normal" style="--value: {{ api_stats.feedback.normal_avg|float / 2 if api_stats.feedback.normal_avg <= 200 else 100 }}">
+          <div class="label">Normal Avg<br>{{ api_stats.feedback.normal_avg }} ms</div>
+        </div>
+        <div class="gauge anomalous" style="--value: {{ api_stats.feedback.anomalous_avg|float / 2 if api_stats.feedback.anomalous_avg <= 200 else 100 }}">
+          <div class="label">Anomalous Avg<br>{{ api_stats.feedback.anomalous_avg }} ms</div>
+        </div>
+      </div>
+      <iframe src="http://localhost:5601/app/dashboards#/view/feedback-dashboard-id?embed=true"></iframe>
+    </div>
+
+    <!-- Other tabs -->
     <div id="forecasting" class="tab-content">
       <h3>Forecasting</h3>
       <iframe src="http://localhost:5601/app/dashboards#/view/forecast-dashboard-id?embed=true"></iframe>
@@ -164,7 +246,13 @@
         document.getElementById(tabId).classList.add('active');
       }
       links.forEach(link => link.classList.remove('active'));
+      
+      // Add active class to the Overview link if main tab is shown
+      if (tabId === 'main') {
+        document.querySelector('.sidebar a[onclick="showTab(\'main\')"]').classList.add('active');
+      }
     }
   </script>
 </body>
 </html>
+```

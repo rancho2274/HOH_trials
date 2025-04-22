@@ -18,15 +18,15 @@ def dashboard():
     detector = ResponseTimeAnomalyDetector()
     
     # Define the log file patterns to process
-    log_files = [
-        "auth_interactions.json",
-        "booking_interactions.json",
-        "feedback_interactions.json",
-        "payment_interactions.json",
-        "search_interactions.json"
-    ]
+    log_files = {
+        "auth": "auth_interactions.json",
+        "search": "search_interactions.json",
+        "booking": "booking_interactions.json",
+        "payment": "payment_interactions.json",
+        "feedback": "feedback_interactions.json"
+    }
     
-    # Gather statistics from all log files
+    # Gather overall statistics
     stats = {
         "total_logs": 0,
         "anomalies": 0,
@@ -36,8 +36,17 @@ def dashboard():
         "anomalous_avg": 0
     }
     
+    # Prepare stats for each API
+    api_stats = {
+        "auth": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
+        "search": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
+        "booking": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
+        "payment": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
+        "feedback": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0}
+    }
+    
     # Process each log file
-    for log_file in log_files:
+    for api_name, log_file in log_files.items():
         file_path = os.path.join(travel_app_dir, log_file)
         if os.path.exists(file_path):
             try:
@@ -51,16 +60,34 @@ def dashboard():
                     anomalies = result_df[result_df['predicted_anomaly'] == True]
                     normal = result_df[result_df['predicted_anomaly'] == False]
                     
-                    # Update statistics
+                    # Update overall statistics
                     stats["total_logs"] += len(result_df)
                     stats["anomalies"] += len(anomalies)
                     stats["normal_logs"] += len(normal)
                     
-                    # Update response time averages (weighted by log count)
+                    # Update API-specific statistics
+                    api_stats[api_name]["total_logs"] = len(result_df)
+                    api_stats[api_name]["anomalies"] = len(anomalies)
+                    
+                    # Calculate API-specific anomaly percentage
+                    if len(result_df) > 0:
+                        api_stats[api_name]["anomaly_percent"] = round(len(anomalies) / len(result_df) * 100, 1)
+                    
+                    # Calculate API-specific response time averages
+                    if len(normal) > 0:
+                        api_stats[api_name]["normal_avg"] = round(normal['time_ms'].mean(), 2)
+                    
+                    if len(anomalies) > 0:
+                        api_stats[api_name]["anomalous_avg"] = round(anomalies['time_ms'].mean(), 2)
+                    
+                    # Update overall response time averages (weighted by log count)
                     if len(normal) > 0:
                         normal_avg = normal['time_ms'].mean()
-                        stats["normal_avg"] = round((stats["normal_avg"] * (stats["normal_logs"] - len(normal)) + 
-                                           normal_avg * len(normal)) / stats["normal_logs"], 2)
+                        if stats["normal_logs"] > 0:
+                            stats["normal_avg"] = round((stats["normal_avg"] * (stats["normal_logs"] - len(normal)) + 
+                                               normal_avg * len(normal)) / stats["normal_logs"], 2)
+                        else:
+                            stats["normal_avg"] = round(normal_avg, 2)
                     
                     if len(anomalies) > 0:
                         anomalous_avg = anomalies['time_ms'].mean()
@@ -72,11 +99,11 @@ def dashboard():
             except Exception as e:
                 print(f"Error processing {file_path}: {str(e)}")
     
-    # Calculate anomaly percentage
+    # Calculate overall anomaly percentage
     if stats["total_logs"] > 0:
         stats["anomaly_percent"] = round(stats["anomalies"] / stats["total_logs"] * 100, 1)
     
-    return render_template('dashboard.html', stats=stats)
+    return render_template('dashboard.html', stats=stats, api_stats=api_stats)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5050)
