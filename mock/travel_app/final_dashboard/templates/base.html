@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title or 'API Monitoring Dashboard' }}</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="sidebar">
+    <h1><i class="fas fa-shield-alt"></i> API Monitoring</h1>
+    <a class="nav-link" href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <div class="nav-link" data-toggle onclick="toggleDropdown(this)">
+      <i class="fas fa-heartbeat"></i> Live API Health
+    </div>
+    <div class="dropdown">
+      <a class="nav-link" href="#">System</a>
+      <a class="nav-link" href="#">Authentication API</a>
+      <a class="nav-link" href="#">Search API</a>
+      <a class="nav-link" href="#">Booking API</a>
+      <a class="nav-link" href="#">Payment Gateway</a>
+      <a class="nav-link" href="#">Feedback API</a>
+    </div>
+    <a class="nav-link" href="#"><i class="fas fa-bullseye"></i> Root Prediction</a>
+    <a class="nav-link" href="#"><i class="fas fa-exclamation-circle"></i> Root Cause</a>
+    <a class="nav-link" href="#"><i class="fas fa-bell"></i> Alert</a>
+  </div>
+
+  <div class="content">
+    {% block content %}{% endblock %}
+  </div>
+
+  <script>
+    function toggleDropdown(el) {
+      const dropdown = el.nextElementSibling;
+      dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+      el.classList.toggle('active');
+    }
+  </script>
+</body>
+</html>

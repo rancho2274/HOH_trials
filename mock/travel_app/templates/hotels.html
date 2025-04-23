@@ -14,28 +14,35 @@
         }
         
         .hotel-card button {
-            background-color: #0072CE;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s ease;
-        }
-        
-        .hotel-card button:hover {
-            background-color: #005a9e;
-        }
-        
-        /* Add a subtle indicator for the anomalous hotel */
-        .hotel-card.anomalous button {
-            background-color: #d35400;
-        }
-        
-        .hotel-card.anomalous button:hover {
-            background-color: #a04000;
-        }
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease;
+}
+
+/* First two hotel cards (1 and 2) – green */
+.hotel-card:nth-child(1) button,
+.hotel-card:nth-child(2) button {
+    background-color: #28a745;
+}
+.hotel-card:nth-child(1) button:hover,
+.hotel-card:nth-child(2) button:hover {
+    background-color: #218838;
+}
+
+/* Third hotel card (loop.index == 3) – blue instead of red */
+.hotel-card:nth-child(3) button {
+    background-color: #0072CE;
+}
+.hotel-card:nth-child(3) button:hover {
+    background-color: #005a9e;
+}
+
+/* Optional: leave 4th and others as default blue if needed */
+
     </style>
 </head>
 <body>

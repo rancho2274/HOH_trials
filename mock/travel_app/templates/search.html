@@ -44,8 +44,8 @@
             min-width: 150px;
         }
 
-        .search-bar button {
-            background-color: #0072CE;
+        .search-bar .regular-btn {
+            background-color: #28a745; /* Green for regular search */
             color: white;
             padding: 10px 20px;
             border: none;
@@ -53,6 +53,28 @@
             font-size: 14px;
             cursor: pointer;
         }
+        
+        .search-bar .regular-btn:hover {
+            background-color: #218838;
+        }
+        
+        .search-bar .icon-btn {
+            background-color: #0072CE; /* Blue for icon button */
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .search-bar .icon-btn:hover {
+            background-color: #005a9e;
+        }
+        
 
         .hotels {
             display: grid;

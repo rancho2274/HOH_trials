@@ -1,490 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>AI Monitoring Dashboard</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f5f7fa;
-      color: #00395D;
-    }
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 220px;
-      height: 100vh;
-      background-color: #ffffff;
-      padding-top: 20px;
-      border-right: 1px solid #e0e0e0;
-    }
-    .sidebar h2 {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 22px;
-      color: #00395D;
-    }
-    .sidebar a, .sidebar select {
-      width: 180px;
-      margin: 0 auto 10px;
-      display: block;
-      padding: 10px;
-      color: #999;
-      text-decoration: none;
-      font-weight: 500;
-      border: none;
-      background-color: #f0f0f0;
-      border-radius: 6px;
-      transition: all 0.2s ease-in-out;
-    }
-    .sidebar a.active, .sidebar a:hover, .sidebar select:hover {
-      background-color: #0072CE;
-      color: white;
-    }
-    .main-content {
-      margin-left: 220px;
-      padding: 30px;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .gauge-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      justify-content: space-between;
-      margin-bottom: 30px;
-    }
-    .gauge {
-      width: 160px;
-      height: 80px;
-      border-radius: 80px 80px 0 0;
-      background: conic-gradient(var(--color) 0deg, var(--color) calc(var(--value) * 1.8deg), #e5e5e5 calc(var(--value) * 1.8deg), #e5e5e5 180deg);
-      position: relative;
-    }
-    .gauge .label {
-      position: absolute;
-      width: 100%;
-      bottom: 10px;
-      text-align: center;
-      font-size: 16px;
-      font-weight: bold;
-      color: #00395D;
-    }
-    .gauge.total       { --color: #4ea8de; }
-    .gauge.anomalies   { --color: #ef476f; }
-    .gauge.normal      { --color: #06d6a0; }
-    .gauge.anomalous   { --color: #ffd166; }
-    
-    /* New styles for refresh button and last updated info */
-    .header-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .refresh-btn {
-      background-color: #0072CE;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: background-color 0.2s;
-    }
-    
-    .refresh-btn:hover {
-      background-color: #005a9e;
-    }
-    
-    .refresh-btn i {
-      font-size: 14px;
-    }
-    
-    .last-updated {
-      color: #666;
-      font-size: 14px;
-    }
-    
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .section {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-      margin-bottom: 20px;
-    }
-    
-    .section h3 {
-      margin-top: 0;
-      color: #0072CE;
-    }
-  </style>
-</head>
-<body>
-  <div class="sidebar">
-    <h2>System View</h2>
-    <a href="#" onclick="showTab('main')" class="active">Overview</a>
-    <select onchange="showTab(this.value)">
-      <option disabled selected>Select Logs</option>
-      <option value="auth">Authentication</option>
-      <option value="search">Search</option>
-      <option value="booking">Booking</option>
-      <option value="payment">Payment</option>
-      <option value="feedback">Feedback</option>
-    </select>
-    <a href="#" onclick="showTab('forecasting')">Forecasting</a>
-    <a href="#" onclick="showTab('predicting')">Predicting</a>
-    <a href="#" onclick="showTab('alert')">Alert</a>
-  </div>
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h2>Dashboard</h2>
+  <button class="refresh-btn" onclick="refreshDashboard()">
+    <i class="fas fa-sync-alt"></i> Refresh
+  </button>
+</div>
 
-  <div class="main-content">
-    <!-- Header with refresh button -->
-    <div class="header-actions">
-      <h2>API Monitoring Dashboard</h2>
+<div class="cards">
+  <div class="card">
+    <h4>Total APIs</h4>
+    <h3 id="total-apis">0</h3>
+    <small id="total-apis-note" class="green">+0 this month</small>
+  </div>
+  <div class="card">
+    <h4>Active Issues</h4>
+    <h3 id="active-issues">0</h3>
+    <small id="active-issues-note" class="red">+0 from yesterday</small>
+  </div>
+  <div class="card">
+    <h4>Average Response</h4>
+    <h3 id="avg-response">0ms</h3>
+    <small id="avg-response-note" class="green">0ms improvement</small>
+  </div>
+  <div class="card">
+    <h4>System Health</h4>
+    <h3 id="system-health">0%</h3>
+    <small id="system-health-note" class="red">0% this week</small>
+  </div>
+</div>
+
+<div class="statuses">
+  <div class="status">
+    <h4>Real-time API Status</h4>
+    <div class="status-item"><span>Authentication API</span><span id="auth-status" class="status-green">0ms</span></div>
+    <div class="status-item"><span>Payment Gateway</span><span id="payment-status" class="status-yellow">0ms</span></div>
+    <div class="status-item"><span>User Service</span><span id="user-status" class="status-green">0ms</span></div>
+    <div class="status-item"><span>Order Processing</span><span id="order-status" class="status-red">0ms</span></div>
+  </div>
+  <div class="alert">
+    <h4>Critical Alerts</h4>
+    <div class="alert-item">
       <div>
-        <span class="last-updated">Last updated: {{ stats.updated_timestamp }}</span>
-        <button id="refresh-button" class="refresh-btn" onclick="refreshDashboard()">
-          <i class="fas fa-sync-alt"></i> Refresh Data
-        </button>
+        <div class="severity-high">High Severity</div>
+        <p id="alert-1">No alerts yet</p>
+        <small id="alert-1-time">--</small>
       </div>
     </div>
-    
-    <!-- Main Overview Tab -->
-    <div id="main" class="tab-content active">
-      <div class="gauge-container">
-        <div class="gauge total" style="--value: 100">
-          <div class="label">Total Logs<br>{{ stats.total_logs }}</div>
-        </div>
-        <div class="gauge anomalies" style="--value: {{ (stats.anomalies / stats.total_logs * 100) if stats.total_logs > 0 else 0 }}">
-          <div class="label">Anomalies<br>{{ stats.anomalies }} ({{ stats.anomaly_percent }}%)</div>
-        </div>
-        <div class="gauge normal" style="--value: {{ stats.normal_avg|float / 2 if stats.normal_avg <= 200 else 100 }}">
-          <div class="label">Normal Avg<br>{{ stats.normal_avg }} ms</div>
-        </div>
-        <div class="gauge anomalous" style="--value: {{ stats.anomalous_avg|float / 2 if stats.anomalous_avg <= 200 else 100 }}">
-          <div class="label">Anomalous Avg<br>{{ stats.anomalous_avg }} ms</div>
-        </div>
+    <div class="alert-item">
+      <div>
+        <div class="severity-medium">Medium Severity</div>
+        <p id="alert-2">--</p>
+        <small id="alert-2-time">--</small>
       </div>
-      
-      <!-- Simple display for now -->
-      <div class="section">
-        <h3>Response Time Analysis</h3>
-        <p>The dashboard is currently monitoring {{ stats.total_logs }} logs across all API services.</p>
-        <p>{{ stats.anomalies }} anomalies detected ({{ stats.anomaly_percent }}% of all logs).</p>
-        <p>Average response time for normal requests: {{ stats.normal_avg }} ms</p>
-        <p>Average response time for anomalous requests: {{ stats.anomalous_avg }} ms</p>
-        <p>These response time anomalies could indicate potential issues with servers, database connections, or resource constraints.</p>
-      </div>
-      
-      <!-- If using Kibana, uncomment this -->
-      <!-- <iframe src="http://localhost:5601/app/dashboards#/view/overview-dashboard-id?embed=true"></iframe> -->
-    </div>
-
-    <!-- Auth Tab -->
-    <div id="auth" class="tab-content">
-      <h3>Authentication Logs</h3>
-      <div class="gauge-container">
-        <div class="gauge total" style="--value: 100">
-          <div class="label">Total Logs<br>{{ api_stats.auth.total_logs }}</div>
-        </div>
-        <div class="gauge anomalies" style="--value: {{ (api_stats.auth.anomalies / api_stats.auth.total_logs * 100) if api_stats.auth.total_logs > 0 else 0 }}">
-          <div class="label">Anomalies<br>{{ api_stats.auth.anomalies }} ({{ api_stats.auth.anomaly_percent }}%)</div>
-        </div>
-        <div class="gauge normal" style="--value: {{ api_stats.auth.normal_avg|float / 2 if api_stats.auth.normal_avg <= 200 else 100 }}">
-          <div class="label">Normal Avg<br>{{ api_stats.auth.normal_avg }} ms</div>
-        </div>
-        <div class="gauge anomalous" style="--value: {{ api_stats.auth.anomalous_avg|float / 2 if api_stats.auth.anomalous_avg <= 200 else 100 }}">
-          <div class="label">Anomalous Avg<br>{{ api_stats.auth.anomalous_avg }} ms</div>
-        </div>
-      </div>
-      
-      <div class="section">
-        <h3>Authentication API Analysis</h3>
-        <p>Monitoring login, token validation, and user registration requests.</p>
-        <p>Detected {{ api_stats.auth.anomalies }} anomalies out of {{ api_stats.auth.total_logs }} total authentication logs.</p>
-      </div>
-      
-      <!-- If using Kibana, uncomment this -->
-      <!-- <iframe src="http://localhost:5601/app/dashboards#/view/auth-dashboard-id?embed=true"></iframe> -->
-    </div>
-
-    <!-- Search Tab -->
-    <div id="search" class="tab-content">
-      <h3>Search Logs</h3>
-      <div class="gauge-container">
-        <div class="gauge total" style="--value: 100">
-          <div class="label">Total Logs<br>{{ api_stats.search.total_logs }}</div>
-        </div>
-        <div class="gauge anomalies" style="--value: {{ (api_stats.search.anomalies / api_stats.search.total_logs * 100) if api_stats.search.total_logs > 0 else 0 }}">
-          <div class="label">Anomalies<br>{{ api_stats.search.anomalies }} ({{ api_stats.search.anomaly_percent }}%)</div>
-        </div>
-        <div class="gauge normal" style="--value: {{ api_stats.search.normal_avg|float / 2 if api_stats.search.normal_avg <= 200 else 100 }}">
-          <div class="label">Normal Avg<br>{{ api_stats.search.normal_avg }} ms</div>
-        </div>
-        <div class="gauge anomalous" style="--value: {{ api_stats.search.anomalous_avg|float / 2 if api_stats.search.anomalous_avg <= 200 else 100 }}">
-          <div class="label">Anomalous Avg<br>{{ api_stats.search.anomalous_avg }} ms</div>
-        </div>
-      </div>
-      
-      <div class="section">
-        <h3>Search API Analysis</h3>
-        <p>Monitoring destination searches and hotel lookups.</p>
-        <p>Detected {{ api_stats.search.anomalies }} anomalies out of {{ api_stats.search.total_logs }} total search logs.</p>
-      </div>
-      
-      <!-- If using Kibana, uncomment this -->
-      <!-- <iframe src="http://localhost:5601/app/dashboards#/view/search-dashboard-id?embed=true"></iframe> -->
-    </div>
-
-    <!-- Booking Tab -->
-    <div id="booking" class="tab-content">
-      <h3>Booking Logs</h3>
-      <div class="gauge-container">
-        <div class="gauge total" style="--value: 100">
-          <div class="label">Total Logs<br>{{ api_stats.booking.total_logs }}</div>
-        </div>
-        <div class="gauge anomalies" style="--value: {{ (api_stats.booking.anomalies / api_stats.booking.total_logs * 100) if api_stats.booking.total_logs > 0 else 0 }}">
-          <div class="label">Anomalies<br>{{ api_stats.booking.anomalies }} ({{ api_stats.booking.anomaly_percent }}%)</div>
-        </div>
-        <div class="gauge normal" style="--value: {{ api_stats.booking.normal_avg|float / 2 if api_stats.booking.normal_avg <= 200 else 100 }}">
-          <div class="label">Normal Avg<br>{{ api_stats.booking.normal_avg }} ms</div>
-        </div>
-        <div class="gauge anomalous" style="--value: {{ api_stats.booking.anomalous_avg|float / 2 if api_stats.booking.anomalous_avg <= 200 else 100 }}">
-          <div class="label">Anomalous Avg<br>{{ api_stats.booking.anomalous_avg }} ms</div>
-        </div>
-      </div>
-      
-      <div class="section">
-        <h3>Booking API Analysis</h3>
-        <p>Monitoring hotel bookings and reservation management.</p>
-        <p>Detected {{ api_stats.booking.anomalies }} anomalies out of {{ api_stats.booking.total_logs }} total booking logs.</p>
-      </div>
-      
-      <!-- If using Kibana, uncomment this -->
-      <!-- <iframe src="http://localhost:5601/app/dashboards#/view/booking-dashboard-id?embed=true"></iframe> -->
-    </div>
-
-    <!-- Payment Tab -->
-    <div id="payment" class="tab-content">
-      <h3>Payment Logs</h3>
-      <div class="gauge-container">
-        <div class="gauge total" style="--value: 100">
-          <div class="label">Total Logs<br>{{ api_stats.payment.total_logs }}</div>
-        </div>
-        <div class="gauge anomalies" style="--value: {{ (api_stats.payment.anomalies / api_stats.payment.total_logs * 100) if api_stats.payment.total_logs > 0 else 0 }}">
-          <div class="label">Anomalies<br>{{ api_stats.payment.anomalies }} ({{ api_stats.payment.anomaly_percent }}%)</div>
-        </div>
-        <div class="gauge normal" style="--value: {{ api_stats.payment.normal_avg|float / 2 if api_stats.payment.normal_avg <= 200 else 100 }}">
-          <div class="label">Normal Avg<br>{{ api_stats.payment.normal_avg }} ms</div>
-        </div>
-        <div class="gauge anomalous" style="--value: {{ api_stats.payment.anomalous_avg|float / 2 if api_stats.payment.anomalous_avg <= 200 else 100 }}">
-          <div class="label">Anomalous Avg<br>{{ api_stats.payment.anomalous_avg }} ms</div>
-        </div>
-      </div>
-      
-      <div class="section">
-        <h3>Payment API Analysis</h3>
-        <p>Monitoring payment processing and transaction management.</p>
-        <p>Detected {{ api_stats.payment.anomalies }} anomalies out of {{ api_stats.payment.total_logs }} total payment logs.</p>
-      </div>
-      
-      <!-- If using Kibana, uncomment this -->
-      <!-- <iframe src="http://localhost:5601/app/dashboards#/view/payment-dashboard-id?embed=true"></iframe> -->
-    </div>
-
-    <!-- Feedback Tab -->
-    <div id="feedback" class="tab-content">
-      <h3>Feedback Logs</h3>
-      <div class="gauge-container">
-        <div class="gauge total" style="--value: 100">
-          <div class="label">Total Logs<br>{{ api_stats.feedback.total_logs }}</div>
-        </div>
-        <div class="gauge anomalies" style="--value: {{ (api_stats.feedback.anomalies / api_stats.feedback.total_logs * 100) if api_stats.feedback.total_logs > 0 else 0 }}">
-          <div class="label">Anomalies<br>{{ api_stats.feedback.anomalies }} ({{ api_stats.feedback.anomaly_percent }}%)</div>
-        </div>
-        <div class="gauge normal" style="--value: {{ api_stats.feedback.normal_avg|float / 2 if api_stats.feedback.normal_avg <= 200 else 100 }}">
-          <div class="label">Normal Avg<br>{{ api_stats.feedback.normal_avg }} ms</div>
-        </div>
-        <div class="gauge anomalous" style="--value: {{ api_stats.feedback.anomalous_avg|float / 2 if api_stats.feedback.anomalous_avg <= 200 else 100 }}">
-          <div class="label">Anomalous Avg<br>{{ api_stats.feedback.anomalous_avg }} ms</div>
-        </div>
-      </div>
-      
-      <div class="section">
-        <h3>Feedback API Analysis</h3>
-        <p>Monitoring user reviews and rating submissions.</p>
-        <p>Detected {{ api_stats.feedback.anomalies }} anomalies out of {{ api_stats.feedback.total_logs }} total feedback logs.</p>
-      </div>
-      
-      <!-- If using Kibana, uncomment this -->
-      <!-- <iframe src="http://localhost:5601/app/dashboards#/view/feedback-dashboard-id?embed=true"></iframe> -->
-    </div>
-
-    <!-- Other tabs -->
-    <div id="forecasting" class="tab-content">
-      <h3>Forecasting</h3>
-      <div class="section">
-        <p>Based on current anomaly patterns, we can predict upcoming performance issues.</p>
-        <p>This feature is under development.</p>
-      </div>
-      <!-- If using Kibana, uncomment this -->
-      <!-- <iframe src="http://localhost:5601/app/dashboards#/view/forecast-dashboard-id?embed=true"></iframe> -->
-    </div>
-    
-    <div id="predicting" class="tab-content">
-      <h3>Predicting</h3>
-      <div class="section">
-        <p>Predictive analytics for potential API issues and failures.</p>
-        <p>This feature is under development.</p>
-      </div>
-      <!-- If using Kibana, uncomment this -->
-      <!-- <iframe src="http://localhost:5601/app/dashboards#/view/predicting-dashboard-id?embed=true"></iframe> -->
-    </div>
-    
-    <div id="alert" class="tab-content">
-      <h3>Alert</h3>
-      <div class="section">
-        <p>Configure alert thresholds and notification settings.</p>
-        <p>This feature is under development.</p>
-      </div>
-      <!-- If using Kibana, uncomment this -->
-      <!-- <iframe src="http://localhost:5601/app/dashboards#/view/alert-dashboard-id?embed=true"></iframe> -->
     </div>
   </div>
+</div>
 
-  <script>
-    function showTab(tabId) {
-      const tabs = document.querySelectorAll('.tab-content');
-      const links = document.querySelectorAll('.sidebar a');
-      
-      tabs.forEach(tab => tab.classList.remove('active'));
-      links.forEach(link => link.classList.remove('active'));
-      
-      if (document.getElementById(tabId)) {
-        document.getElementById(tabId).classList.add('active');
-      }
-      
-      // Add active class to the appropriate sidebar link
-      if (tabId === 'main') {
-        document.querySelector('.sidebar a[onclick="showTab(\'main\')"]').classList.add('active');
-      } else if (tabId === 'forecasting') {
-        document.querySelector('.sidebar a[onclick="showTab(\'forecasting\')"]').classList.add('active');
-      } else if (tabId === 'predicting') {
-        document.querySelector('.sidebar a[onclick="showTab(\'predicting\')"]').classList.add('active');
-      } else if (tabId === 'alert') {
-        document.querySelector('.sidebar a[onclick="showTab(\'alert\')"]').classList.add('active');
-      }
-    }
-    
-    function refreshDashboard() {
-      // Show loading state
-      const refreshBtn = document.getElementById('refresh-button');
-      const originalContent = refreshBtn.innerHTML;
-      refreshBtn.innerHTML = '<div class="loading"></div> Refreshing...';
-      refreshBtn.disabled = true;
-      
-      // Make AJAX request to refresh data
-      fetch('/refresh', {
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(response => response.json())
+<script>
+  function refreshDashboard() {
+    fetch('/api/dashboard-data')
+      .then(res => res.json())
       .then(data => {
-        // Update dashboard data
-        updateDashboardData(data);
-        
-        // Restore button state
-        refreshBtn.innerHTML = originalContent;
-        refreshBtn.disabled = false;
-        
-        // Update last updated time
-        document.querySelector('.last-updated').textContent = 'Last updated: ' + data.stats.updated_timestamp;
-      })
-      .catch(error => {
-        console.error('Error refreshing dashboard:', error);
-        refreshBtn.innerHTML = originalContent;
-        refreshBtn.disabled = false;
-        alert('Error refreshing dashboard. Please try again.');
+        document.getElementById('total-apis').textContent = data.total_apis;
+        document.getElementById('total-apis-note').textContent = data.total_apis_note;
+        document.getElementById('active-issues').textContent = data.active_issues;
+        document.getElementById('active-issues-note').textContent = data.active_issues_note;
+        document.getElementById('avg-response').textContent = data.avg_response + 'ms';
+        document.getElementById('avg-response-note').textContent = data.avg_response_note;
+        document.getElementById('system-health').textContent = data.system_health + '%';
+        document.getElementById('system-health-note').textContent = data.system_health_note;
+
+        document.getElementById('auth-status').textContent = data.auth_status + 'ms';
+        document.getElementById('payment-status').textContent = data.payment_status + 'ms';
+        document.getElementById('user-status').textContent = data.user_status + 'ms';
+        document.getElementById('order-status').textContent = data.order_status + 'ms';
+
+        document.getElementById('alert-1').textContent = data.alerts[0].message;
+        document.getElementById('alert-1-time').textContent = data.alerts[0].time;
+        document.getElementById('alert-2').textContent = data.alerts[1].message;
+        document.getElementById('alert-2-time').textContent = data.alerts[1].time;
       });
-    }
-    
-    function updateDashboardData(data) {
-      // Update overall stats
-      const stats = data.stats;
-      const apiStats = data.api_stats;
-      
-      // Update gauges and labels for overall stats
-      updateGauge('main', 'total', 100, stats.total_logs);
-      updateGauge('main', 'anomalies', 
-                 stats.total_logs > 0 ? (stats.anomalies / stats.total_logs * 100) : 0, 
-                 stats.anomalies + ' (' + stats.anomaly_percent + '%)');
-      updateGauge('main', 'normal', 
-                 stats.normal_avg <= 200 ? stats.normal_avg / 2 : 100, 
-                 stats.normal_avg + ' ms');
-      updateGauge('main', 'anomalous', 
-                 stats.anomalous_avg <= 200 ? stats.anomalous_avg / 2 : 100, 
-                 stats.anomalous_avg + ' ms');
-      
-      // Update each API section
-      ['auth', 'search', 'booking', 'payment', 'feedback'].forEach(api => {
-        if (apiStats[api]) {
-          updateGauge(api, 'total', 100, apiStats[api].total_logs);
-          updateGauge(api, 'anomalies', 
-                     apiStats[api].total_logs > 0 ? (apiStats[api].anomalies / apiStats[api].total_logs * 100) : 0,
-                     apiStats[api].anomalies + ' (' + apiStats[api].anomaly_percent + '%)');
-          updateGauge(api, 'normal', 
-                     apiStats[api].normal_avg <= 200 ? apiStats[api].normal_avg / 2 : 100,
-                     apiStats[api].normal_avg + ' ms');
-          updateGauge(api, 'anomalous', 
-                     apiStats[api].anomalous_avg <= 200 ? apiStats[api].anomalous_avg / 2 : 100,
-                     apiStats[api].anomalous_avg + ' ms');
-        }
-      });
-    }
-    
-    function updateGauge(tabId, gaugeClass, value, labelText) {
-      const gauge = document.querySelector(`#${tabId} .gauge.${gaugeClass}`);
-      if (gauge) {
-        gauge.style.setProperty('--value', value);
-        const label = gauge.querySelector('.label');
-        if (label) {
-          // Split the label text at <br> if it exists
-          const parts = label.innerHTML.split('<br>');
-          if (parts.length > 1) {
-            label.innerHTML = parts[0] + '<br>' + labelText;
-          } else {
-            label.innerHTML = labelText;
-          }
-        }
-      }
-    }
-  </script>
-</body>
-</html>
+  }
+
+  // Initial fetch
+  refreshDashboard();
+</script>
+{% endblock %}
