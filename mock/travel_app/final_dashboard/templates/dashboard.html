@@ -9,81 +9,199 @@
 
 <div class="cards">
   <div class="card">
-    <h4>Total APIs</h4>
-    <h3 id="total-apis">0</h3>
-    <small id="total-apis-note" class="green">+0 this month</small>
+    <h4>Total Logs</h4>
+    <h3 id="total-apis">{{ dash_data.total_apis }}</h3>
+    <small id="total-apis-note" class="green">+{{ (dash_data.total_apis // 10) }} this month</small>
   </div>
   <div class="card">
     <h4>Active Issues</h4>
-    <h3 id="active-issues">0</h3>
-    <small id="active-issues-note" class="red">+0 from yesterday</small>
+    <h3 id="active-issues">{{ dash_data.active_issues }}</h3>
+    <small id="active-issues-note" class="red">+{{ dash_data.active_issues }} from yesterday</small>
   </div>
   <div class="card">
     <h4>Average Response</h4>
-    <h3 id="avg-response">0ms</h3>
-    <small id="avg-response-note" class="green">0ms improvement</small>
+    <h3 id="avg-response">{{ dash_data.avg_response|round(2) }}ms</h3>
+    <small id="avg-response-note" class="{% if dash_data.avg_response < 300 %}green{% else %}red{% endif %}">{{ (dash_data.avg_response * 0.1)|round(1) }}ms {% if dash_data.avg_response < 300 %}improvement{% else %}slower{% endif %}</small>
   </div>
   <div class="card">
     <h4>System Health</h4>
-    <h3 id="system-health">0%</h3>
-    <small id="system-health-note" class="red">0% this week</small>
+    <h3 id="system-health">{{ dash_data.system_health|round(1) }}%</h3>
+    <small id="system-health-note" class="{% if stats.anomaly_percent > 0 %}red{% else %}green{% endif %}">{% if stats.anomaly_percent > 0 %}-{% else %}+{% endif %}{{ [stats.anomaly_percent, 10]|min }}% this week</small>
   </div>
 </div>
 
 <div class="statuses">
   <div class="status">
     <h4>Real-time API Status</h4>
-    <div class="status-item"><span>Authentication API</span><span id="auth-status" class="status-green">0ms</span></div>
-    <div class="status-item"><span>Payment Gateway</span><span id="payment-status" class="status-yellow">0ms</span></div>
-    <div class="status-item"><span>User Service</span><span id="user-status" class="status-green">0ms</span></div>
-    <div class="status-item"><span>Order Processing</span><span id="order-status" class="status-red">0ms</span></div>
+    <div class="status-item">
+      <span>Authentication API</span>
+      <span id="auth-status" class="{% if api_stats.auth.anomalies > 0 %}status-red{% else %}status-green{% endif %}">
+        {{ api_stats.auth.anomalous_avg|default(145, true) }}ms
+      </span>
+    </div>
+    <div class="status-item">
+      <span>Payment Gateway</span>
+      <span id="payment-status" class="{% if api_stats.payment.anomalies > 0 %}status-red{% elif api_stats.payment.anomalies == 0 and api_stats.payment.total_logs > 0 %}status-green{% else %}status-yellow{% endif %}">
+        {{ api_stats.payment.anomalous_avg|default(235, true) }}ms
+      </span>
+    </div>
+    <div class="status-item">
+      <span>Search Service</span>
+      <span id="search-status" class="{% if api_stats.search.anomalies > 0 %}status-red{% elif api_stats.search.anomalies == 0 and api_stats.search.total_logs > 0 %}status-green{% else %}status-yellow{% endif %}">
+        {{ api_stats.search.anomalous_avg|default(125, true) }}ms
+      </span>
+    </div>
+    <div class="status-item">
+      <span>Booking Service</span>
+      <span id="booking-status" class="{% if api_stats.booking.anomalies > 0 %}status-red{% elif api_stats.booking.anomalies == 0 and api_stats.booking.total_logs > 0 %}status-green{% else %}status-yellow{% endif %}">
+        {{ api_stats.booking.anomalous_avg|default(410, true) }}ms
+      </span>
+    </div>
   </div>
   <div class="alert">
     <h4>Critical Alerts</h4>
-    <div class="alert-item">
-      <div>
-        <div class="severity-high">High Severity</div>
-        <p id="alert-1">No alerts yet</p>
-        <small id="alert-1-time">--</small>
+    {% if stats.anomalies > 0 %}
+      {% set alert_count = 0 %}
+      {% for api_name, api_stat in api_stats.items() %}
+        {% if api_stat.anomalies > 0 and alert_count < 2 %}
+          <div class="alert-item">
+            <div>
+              <div class="severity-high">High Severity</div>
+              <p id="alert-{{ loop.index }}">{{ api_name|capitalize }} API Response Time Spike: {{ api_stat.anomalous_avg }}ms</p>
+              <small id="alert-{{ loop.index }}-time">{{ loop.index * 5 }} minutes ago</small>
+            </div>
+          </div>
+          {% set alert_count = alert_count + 1 %}
+        {% endif %}
+      {% endfor %}
+      
+      {% if alert_count == 0 %}
+        <div class="alert-item">
+          <div>
+            <div class="severity-medium">Medium Severity</div>
+            <p id="alert-1">No critical issues detected</p>
+            <small id="alert-1-time">Just now</small>
+          </div>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="alert-item">
+        <div>
+          <div class="severity-medium">Medium Severity</div>
+          <p id="alert-1">No critical issues detected</p>
+          <small id="alert-1-time">Just now</small>
+        </div>
       </div>
-    </div>
-    <div class="alert-item">
-      <div>
-        <div class="severity-medium">Medium Severity</div>
-        <p id="alert-2">--</p>
-        <small id="alert-2-time">--</small>
+      <div class="alert-item">
+        <div>
+          <div class="severity-medium">Medium Severity</div>
+          <p id="alert-2">All systems operational</p>
+          <small id="alert-2-time">5 minutes ago</small>
+        </div>
       </div>
-    </div>
+    {% endif %}
   </div>
 </div>
 
 <script>
   function refreshDashboard() {
-    fetch('/api/dashboard-data')
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('total-apis').textContent = data.total_apis;
-        document.getElementById('total-apis-note').textContent = data.total_apis_note;
-        document.getElementById('active-issues').textContent = data.active_issues;
-        document.getElementById('active-issues-note').textContent = data.active_issues_note;
-        document.getElementById('avg-response').textContent = data.avg_response + 'ms';
-        document.getElementById('avg-response-note').textContent = data.avg_response_note;
-        document.getElementById('system-health').textContent = data.system_health + '%';
-        document.getElementById('system-health-note').textContent = data.system_health_note;
-
-        document.getElementById('auth-status').textContent = data.auth_status + 'ms';
-        document.getElementById('payment-status').textContent = data.payment_status + 'ms';
-        document.getElementById('user-status').textContent = data.user_status + 'ms';
-        document.getElementById('order-status').textContent = data.order_status + 'ms';
-
-        document.getElementById('alert-1').textContent = data.alerts[0].message;
-        document.getElementById('alert-1-time').textContent = data.alerts[0].time;
-        document.getElementById('alert-2').textContent = data.alerts[1].message;
-        document.getElementById('alert-2-time').textContent = data.alerts[1].time;
-      });
+    // Show a loading indicator or message
+    document.getElementById('total-apis').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    document.getElementById('active-issues').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    document.getElementById('avg-response').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    document.getElementById('system-health').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    // Make an AJAX request to the refresh endpoint
+    fetch('/refresh', {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      // Update the dashboard with the new data
+      document.getElementById('total-apis').textContent = data.stats.total_logs;
+      document.getElementById('total-apis-note').textContent = '+' + Math.floor(data.stats.total_logs / 10) + ' this month';
+      
+      document.getElementById('active-issues').textContent = data.stats.anomalies;
+      document.getElementById('active-issues-note').textContent = '+' + data.stats.anomalies + ' from yesterday';
+      
+      document.getElementById('avg-response').textContent = data.stats.anomalous_avg.toFixed(2) + 'ms';
+      const responseNote = (data.stats.anomalous_avg * 0.1).toFixed(1) + 'ms ' + 
+                           (data.stats.anomalous_avg < 300 ? 'improvement' : 'slower');
+      document.getElementById('avg-response-note').textContent = responseNote;
+      document.getElementById('avg-response-note').className = data.stats.anomalous_avg < 300 ? 'green' : 'red';
+      
+      const systemHealth = (100 - data.stats.anomaly_percent).toFixed(1);
+      document.getElementById('system-health').textContent = systemHealth + '%';
+      const healthNote = (data.stats.anomaly_percent > 0 ? '-' : '+') + 
+                        Math.min(data.stats.anomaly_percent, 10).toFixed(1) + '% this week';
+      document.getElementById('system-health-note').textContent = healthNote;
+      document.getElementById('system-health-note').className = data.stats.anomaly_percent > 0 ? 'red' : 'green';
+      
+      // Update API statuses
+      updateApiStatus('auth', data.api_stats.auth);
+      updateApiStatus('payment', data.api_stats.payment);
+      updateApiStatus('search', data.api_stats.search);
+      updateApiStatus('booking', data.api_stats.booking);
+      
+      // Update alerts based on anomalies
+      updateAlerts(data.stats, data.api_stats);
+      
+      console.log('Dashboard refreshed with new data:', data);
+    })
+    .catch(error => {
+      console.error('Error refreshing dashboard:', error);
+      // Reset the display on error
+      location.reload();
+    });
   }
-
-  // Initial fetch
-  refreshDashboard();
+  
+  function updateApiStatus(apiName, apiStats) {
+    const statusElement = document.getElementById(apiName + '-status');
+    if (statusElement) {
+      statusElement.textContent = (apiStats.anomalous_avg || 
+                                  (apiName === 'auth' ? 145 : 
+                                   apiName === 'payment' ? 235 : 
+                                   apiName === 'search' ? 125 : 410)) + 'ms';
+      
+      if (apiStats.anomalies > 0) {
+        statusElement.className = 'status-red';
+      } else if (apiStats.anomalies === 0 && apiStats.total_logs > 0) {
+        statusElement.className = 'status-green';
+      } else {
+        statusElement.className = 'status-yellow';
+      }
+    }
+  }
+  
+  function updateAlerts(stats, apiStats) {
+    // Find APIs with anomalies
+    const alertApis = Object.entries(apiStats)
+      .filter(([_, stat]) => stat.anomalies > 0)
+      .map(([name, stat]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        response: stat.anomalous_avg
+      }));
+    
+    const alertElements = [
+      { message: document.getElementById('alert-1'), time: document.getElementById('alert-1-time') },
+      { message: document.getElementById('alert-2'), time: document.getElementById('alert-2-time') }
+    ];
+    
+    if (alertApis.length > 0) {
+      // Update with real anomalies
+      alertApis.slice(0, 2).forEach((api, index) => {
+        alertElements[index].message.textContent = `${api.name} API Response Time Spike: ${api.response}ms`;
+        alertElements[index].time.textContent = `${(index + 1) * 5} minutes ago`;
+      });
+    } else {
+      // No anomalies, show default messages
+      alertElements[0].message.textContent = 'No critical issues detected';
+      alertElements[0].time.textContent = 'Just now';
+      alertElements[1].message.textContent = 'All systems operational';
+      alertElements[1].time.textContent = '5 minutes ago';
+    }
+  }
 </script>
 {% endblock %}
