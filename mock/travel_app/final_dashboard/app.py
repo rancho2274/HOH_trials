@@ -200,21 +200,22 @@ class ResponseTimeAnomalyDetector:
         
         return result_df
 
-def add_response_anomaly_to_logs(input_file, result_df, output_folder=None):
+def add_response_anomaly_to_logs(input_file, result_df, output_folder, api_name):
     """
-    Creates a copy of the log file with response_anomaly flags added and saves it
+    Creates a log file with response_anomaly flags in the combine_logs folder
     
     Args:
         input_file: Path to the original log file
         result_df: DataFrame with anomaly detection results
-        output_folder: Path to the folder where output files will be stored (if None, original file is updated)
+        output_folder: Path to the combine_logs folder
+        api_name: Name of the API (auth, search, etc.)
         
     Returns:
-        Path to the created/updated file
+        Path to the created output file
     """
     if result_df.empty:
         print(f"No anomaly results for {input_file}. Skipping...")
-        return input_file
+        return None
         
     # Load the original logs
     try:
@@ -233,7 +234,7 @@ def add_response_anomaly_to_logs(input_file, result_df, output_folder=None):
                             print(f"Warning: Could not parse line as JSON: {line[:50]}...")
     except Exception as e:
         print(f"Error loading logs from {input_file}: {str(e)}")
-        return input_file
+        return None
     
     # Create a dictionary from result_df for fast lookup
     anomaly_map = {}
@@ -243,35 +244,59 @@ def add_response_anomaly_to_logs(input_file, result_df, output_folder=None):
             timestamp = timestamp.isoformat()
         anomaly_map[timestamp] = row['predicted_anomaly']
     
+    # Track statistics for discrepancies
+    total_logs = len(logs)
+    response_anomaly_count = 0
+    original_anomaly_count = 0
+    discrepancy_count = 0
+    
     # Update each log entry with anomaly information
     for log in logs:
         timestamp = log.get('timestamp')
+        original_anomalous = log.get('is_anomalous', False)
+        
+        # Count original anomalies
+        if original_anomalous:
+            original_anomaly_count += 1
         
         # Add the anomaly flag
         if timestamp in anomaly_map:
-            log['response_anomaly'] = bool(anomaly_map[timestamp])
+            response_anomaly = bool(anomaly_map[timestamp])
+            log['response_anomaly'] = response_anomaly
         else:
             # If not found in results, assume not anomalous
             log['response_anomaly'] = False
-    
-    # Determine output file path
-    if output_folder:
-        # Create output folder if it doesn't exist
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
         
-        # Get just the filename without path
-        file_name = os.path.basename(input_file)
-        output_file = os.path.join(output_folder, file_name)
-    else:
-        # Overwrite original file
-        output_file = input_file
+        # Count response anomalies and discrepancies
+        if log['response_anomaly']:
+            response_anomaly_count += 1
+            
+        if original_anomalous != log['response_anomaly']:
+            discrepancy_count += 1
     
-    # Write the updated logs back to the file
+    # Create the output file name according to the format: {api_name}_interactions_with_anomalies.json
+    output_file = os.path.join(output_folder, f"{api_name}_interactions_with_anomalies.json")
+    
+    # Write logs to the output file in NDJSON format (each log entry on its own line with a blank line between)
     with open(output_file, 'w') as f:
-        json.dump(logs, f, indent=2)
+        for i, log in enumerate(logs):
+            f.write(json.dumps(log))
+            if i < len(logs) - 1:
+                f.write('\n\n')  # Add empty line between log entries
     
-    print(f"Updated logs with response_anomaly flags: {output_file}")
+    print(f"Updated logs with response_anomaly flags saved to: {output_file}")
+    
+    # Print analytics about anomalies
+    print(f"\nAnalytics for {api_name} logs:")
+    print(f"  Total logs: {total_logs}")
+    percentage_original = (original_anomaly_count / total_logs * 100) if total_logs > 0 else 0
+    percentage_response = (response_anomaly_count / total_logs * 100) if total_logs > 0 else 0
+    percentage_discrepancy = (discrepancy_count / total_logs * 100) if total_logs > 0 else 0
+    
+    print(f"  Original anomalies: {original_anomaly_count} ({percentage_original:.2f}%)")
+    print(f"  Response time anomalies: {response_anomaly_count} ({percentage_response:.2f}%)")
+    print(f"  Discrepancies: {discrepancy_count} ({percentage_discrepancy:.2f}%)")
+    
     return output_file
 
 def process_log_files():
@@ -297,6 +322,12 @@ def process_log_files():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     travel_app_dir = os.path.dirname(current_dir)  # Go up one level to reach travel_app
     
+    # Ensure combine_logs directory exists
+    combine_logs_dir = os.path.join(travel_app_dir, "combine_logs")
+    if not os.path.exists(combine_logs_dir):
+        os.makedirs(combine_logs_dir)
+        print(f"Created combine_logs directory: {combine_logs_dir}")
+    
     # Gather overall statistics
     stats = {
         "total_logs": 0,
@@ -317,24 +348,36 @@ def process_log_files():
         "feedback": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0}
     }
     
+    # Debug info
+    print("\n==== Starting Log Processing ====")
+    print(f"Looking for logs in: {travel_app_dir}")
+    print(f"Saving processed logs to: {combine_logs_dir}")
+    
     # Process each log file
     for api_name, log_file in log_files.items():
         file_path = os.path.join(travel_app_dir, log_file)
+        print(f"\nChecking for file: {file_path}")
+        
         if os.path.exists(file_path):
+            print(f"  File exists! Processing {api_name} logs...")
             try:
                 # Load logs
                 logs = detector.load_logs(file_path)
+                print(f"  Loaded {len(logs)} log entries for {api_name}")
+                
                 if logs:
                     # Process logs and get results
                     result_df = detector.detect_anomalies(logs)
                     
-                    # Update logs with response_anomaly flags
-                    add_response_anomaly_to_logs(file_path, result_df)
+                    # Update logs with response_anomaly flags and save to combine_logs directory
+                    add_response_anomaly_to_logs(file_path, result_df, combine_logs_dir, api_name)
                     
                     if not result_df.empty:
                         # Count anomalies
                         anomalies = result_df[result_df['predicted_anomaly'] == True]
                         normal = result_df[result_df['predicted_anomaly'] == False]
+                        
+                        print(f"  {api_name} stats: {len(result_df)} total logs, {len(anomalies)} anomalies")
                         
                         # Update overall statistics
                         stats["total_logs"] += len(result_df)
@@ -359,8 +402,11 @@ def process_log_files():
                         # Update overall response time averages (weighted by log count)
                         if len(normal) > 0:
                             normal_avg = normal['time_ms'].mean()
-                            stats["normal_avg"] = round((stats["normal_avg"] * (stats["normal_logs"] - len(normal)) + 
+                            if stats["normal_logs"] > 0:
+                                stats["normal_avg"] = round((stats["normal_avg"] * (stats["normal_logs"] - len(normal)) + 
                                               normal_avg * len(normal)) / stats["normal_logs"], 2)
+                            else:
+                                stats["normal_avg"] = round(normal_avg, 2)
                         
                         if len(anomalies) > 0:
                             anomalous_avg = anomalies['time_ms'].mean()
@@ -369,23 +415,48 @@ def process_log_files():
                                                 anomalous_avg * len(anomalies)) / stats["anomalies"], 2)
                             else:
                                 stats["anomalous_avg"] = round(anomalous_avg, 2)
+                    else:
+                        print(f"  No valid data found in {api_name} logs after processing")
+                        
+                else:
+                    print(f"  No logs found in {api_name} file")
             except Exception as e:
-                print(f"Error processing {file_path}: {str(e)}")
+                print(f"  Error processing {file_path}: {str(e)}")
                 import traceback
                 traceback.print_exc()
+        else:
+            print(f"  File not found: {file_path}")
     
     # Calculate overall anomaly percentage
     if stats["total_logs"] > 0:
         stats["anomaly_percent"] = round(stats["anomalies"] / stats["total_logs"] * 100, 1)
     
+    # Print overall stats for debugging
+    print("\n==== Overall Statistics ====")
+    print(f"Total logs: {stats['total_logs']}")
+    print(f"Anomalies: {stats['anomalies']} ({stats['anomaly_percent']}%)")
+    print(f"Normal logs: {stats['normal_logs']}")
+    print(f"Normal average response time: {stats['normal_avg']} ms")
+    print(f"Anomalous average response time: {stats['anomalous_avg']} ms")
+    
     # Save stats to a file for future reference
     stats_file = os.path.join(current_dir, 'static', 'dashboard_stats.json')
-    with open(stats_file, 'w') as f:
-        combined_stats = {
-            "overall": stats,
-            "api_stats": api_stats
-        }
-        json.dump(combined_stats, f, indent=2)
+    try:
+        # Ensure the static directory exists
+        static_dir = os.path.join(current_dir, 'static')
+        if not os.path.exists(static_dir):
+            os.makedirs(static_dir)
+            
+        # Write stats to file
+        with open(stats_file, 'w') as f:
+            combined_stats = {
+                "overall": stats,
+                "api_stats": api_stats
+            }
+            json.dump(combined_stats, f, indent=2)
+            print(f"Stats saved to {stats_file}")
+    except Exception as e:
+        print(f"Error saving stats to {stats_file}: {str(e)}")
     
     return stats, api_stats
 
@@ -393,6 +464,11 @@ def process_log_files():
 def dashboard():
     # Process log files and get statistics
     stats, api_stats = process_log_files()
+    
+    # Print stats being sent to template (for debugging)
+    print("\n==== Sending to Dashboard Template ====")
+    print(f"Stats: {stats}")
+    print(f"API Stats: {api_stats}")
     
     return render_template('dashboard.html', stats=stats, api_stats=api_stats)
 
