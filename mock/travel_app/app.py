@@ -19,6 +19,7 @@ def get_or_create_session_id():
     if 'session_id' not in session:
         session['session_id'] = f"session-{uuid.uuid4().hex[:12]}"
     return session['session_id']
+
 # Single-line JSON writer function
 # Define a consistent function for writing logs in JSON array format
 def append_log_to_text_file(log_entry, file_path):
@@ -48,6 +49,7 @@ def append_log_to_text_file(log_entry, file_path):
         print(f"ERROR appending log to {file_path}: {str(e)}")
         print(traceback.format_exc())
         return False
+
 def append_log_to_json_array(log_entry, file_path):
     """
     Appends a single log entry to a JSON array file.
@@ -225,7 +227,7 @@ def login():
                 operation="login" if action == "login" else "signin",
                 auth_type="form_login",
                 is_anomalous=is_anomalous,
-                
+                session_id=session_id
             )
             
             # Try to write directly with our specialized function
@@ -259,7 +261,7 @@ def search():
         search_log = generate_search_log_entry(
             timestamp=datetime.now(),
             search_type="initial_search",
-            is_anomalous=is_icon_search ,
+            is_anomalous=is_icon_search,
             session_id=session_id  # Icon search is anomalous
         )
         
@@ -506,7 +508,28 @@ def thankyou():
         print(f"Exception in thankyou route: {str(e)}")
         print(traceback.format_exc())
         return render_template('thankyou.html')
+
+@app.route('/logout')
+def logout():
+    # Get current session ID before clearing it
+    session_id = get_or_create_session_id()
     
+    # Create a logout auth log
+    auth_log = generate_auth_log_entry(
+        timestamp=datetime.now(),
+        operation="logout",
+        auth_type="form_logout",
+        is_anomalous=False,
+        session_id=session_id
+    )
+    
+    # Write the logout log
+    write_auth_log(auth_log)
+    
+    # Clear the session ID
+    session.pop('session_id', None)
+    
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     # Print working directory for debugging
