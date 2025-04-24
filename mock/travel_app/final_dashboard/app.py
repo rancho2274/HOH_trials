@@ -379,11 +379,6 @@ def process_log_files():
                         
                         print(f"  {api_name} stats: {len(result_df)} total logs, {len(anomalies)} anomalies")
                         
-                        # Update overall statistics
-                        stats["total_logs"] += len(result_df)
-                        stats["anomalies"] += len(anomalies)
-                        stats["normal_logs"] += len(normal)
-                        
                         # Update API-specific statistics
                         api_stats[api_name]["total_logs"] = len(result_df)
                         api_stats[api_name]["anomalies"] = len(anomalies)
@@ -392,29 +387,42 @@ def process_log_files():
                         if len(result_df) > 0:
                             api_stats[api_name]["anomaly_percent"] = round(len(anomalies) / len(result_df) * 100, 1)
                         
-                        # Calculate API-specific response time averages
+                        # FIXED: Calculate API-specific response time averages
                         if len(normal) > 0:
+                            # Simple mean of time_ms column for normal logs
                             api_stats[api_name]["normal_avg"] = round(normal['time_ms'].mean(), 2)
                         
                         if len(anomalies) > 0:
+                            # Simple mean of time_ms column for anomalous logs
                             api_stats[api_name]["anomalous_avg"] = round(anomalies['time_ms'].mean(), 2)
                         
-                        # Update overall response time averages (weighted by log count)
+                        # Update overall stats
+                        stats["total_logs"] += len(result_df)
+                        stats["anomalies"] += len(anomalies)
+                        stats["normal_logs"] += len(normal)
+                        
+                        # FIXED: Calculate overall normal and anomalous response time averages
                         if len(normal) > 0:
-                            normal_avg = normal['time_ms'].mean()
-                            if stats["normal_logs"] > 0:
-                                stats["normal_avg"] = round((stats["normal_avg"] * (stats["normal_logs"] - len(normal)) + 
-                                              normal_avg * len(normal)) / stats["normal_logs"], 2)
+                            normal_sum = normal['time_ms'].sum()
+                            # For the first API being processed
+                            if api_name == "auth" or stats["normal_avg"] == 0:
+                                stats["normal_avg"] = round(normal_sum / len(normal), 2)
                             else:
-                                stats["normal_avg"] = round(normal_avg, 2)
+                                # Calculate weighted average for subsequent APIs
+                                previous_total = stats["normal_avg"] * (stats["normal_logs"] - len(normal))
+                                new_avg = (previous_total + normal_sum) / stats["normal_logs"]
+                                stats["normal_avg"] = round(new_avg, 2)
                         
                         if len(anomalies) > 0:
-                            anomalous_avg = anomalies['time_ms'].mean()
-                            if stats["anomalies"] > 0:
-                                stats["anomalous_avg"] = round((stats["anomalous_avg"] * (stats["anomalies"] - len(anomalies)) + 
-                                                anomalous_avg * len(anomalies)) / stats["anomalies"], 2)
+                            anomalies_sum = anomalies['time_ms'].sum()
+                            # For the first API being processed
+                            if api_name == "auth" or stats["anomalous_avg"] == 0:
+                                stats["anomalous_avg"] = round(anomalies_sum / len(anomalies), 2)
                             else:
-                                stats["anomalous_avg"] = round(anomalous_avg, 2)
+                                # Calculate weighted average for subsequent APIs
+                                previous_total = stats["anomalous_avg"] * (stats["anomalies"] - len(anomalies))
+                                new_avg = (previous_total + anomalies_sum) / stats["anomalies"]
+                                stats["anomalous_avg"] = round(new_avg, 2)
                     else:
                         print(f"  No valid data found in {api_name} logs after processing")
                         
@@ -464,13 +472,43 @@ def process_log_files():
 def dashboard():
     # Process log files and get statistics
     stats, api_stats = process_log_files()
-    
-    # Print stats being sent to template (for debugging)
-    print("\n==== Sending to Dashboard Template ====")
-    print(f"Stats: {stats}")
-    print(f"API Stats: {api_stats}")
-    
     return render_template('dashboard.html', stats=stats, api_stats=api_stats)
+
+@app.route('/api/system')
+def system_api():
+    # Process log files and get statistics
+    stats, api_stats = process_log_files()
+    return render_template('api_health.html', api_name="System", stats=stats)
+
+@app.route('/api/auth')
+def auth_api():
+    # Process log files and get statistics
+    stats, api_stats = process_log_files()
+    return render_template('api_health.html', api_name="Authentication", stats=api_stats['auth'])
+
+@app.route('/api/search')
+def search_api():
+    # Process log files and get statistics
+    stats, api_stats = process_log_files()
+    return render_template('api_health.html', api_name="Search", stats=api_stats['search'])
+
+@app.route('/api/booking')
+def booking_api():
+    # Process log files and get statistics
+    stats, api_stats = process_log_files()
+    return render_template('api_health.html', api_name="Booking", stats=api_stats['booking'])
+
+@app.route('/api/payment')
+def payment_api():
+    # Process log files and get statistics
+    stats, api_stats = process_log_files()
+    return render_template('api_health.html', api_name="Payment", stats=api_stats['payment'])
+
+@app.route('/api/feedback')
+def feedback_api():
+    # Process log files and get statistics
+    stats, api_stats = process_log_files()
+    return render_template('api_health.html', api_name="Feedback", stats=api_stats['feedback'])
 
 @app.route('/refresh')
 def refresh():
@@ -486,36 +524,6 @@ def refresh():
     
     # Otherwise, refresh the page
     return redirect(url_for('dashboard'))
-
-@app.route('/auth')
-def auth_page():
-    stats, api_stats = process_log_files()
-    return render_template('auth.html', stats=stats, api_stats=api_stats)
-
-@app.route('/search')
-def search_page():
-    stats, api_stats = process_log_files()
-    return render_template('srch.html', stats=stats, api_stats=api_stats)
-
-@app.route('/booking')
-def booking_page():
-    stats, api_stats = process_log_files()
-    return render_template('book.html', stats=stats, api_stats=api_stats)
-
-@app.route('/payment')
-def payment_page():
-    stats, api_stats = process_log_files()
-    return render_template('pay.html', stats=stats, api_stats=api_stats)
-
-@app.route('/feedback')
-def feedback_page():
-    stats, api_stats = process_log_files()
-    return render_template('fedbk.html', stats=stats, api_stats=api_stats)
-
-@app.route('/system')
-def system_page():
-    stats, api_stats = process_log_files()
-    return render_template('sys.html', stats=stats, api_stats=api_stats)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5050)

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h2>Live API Health: {{ api_name }}</h2>
+  <button class="refresh-btn" onclick="location.href='{{ url_for('refresh') }}'">
+    <i class="fas fa-sync-alt"></i> Refresh
+  </button>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <h4>Total Logs</h4>
+    <h3>{{ stats.total_logs|default('0') }}</h3>
+    <small class="green">+0 this month</small>
+  </div>
+  <div class="card">
+    <h4>Active Issues</h4>
+    <h3>{{ stats.anomalies|default('0') }}</h3>
+    <small class="red">+0 from yesterday</small>
+  </div>
+  <div class="card">
+    <h4>System Health</h4>
+    <h3>{{ (100 - stats.anomaly_percent|default(0))|round }}%</h3>
+    <small class="{% if stats.anomaly_percent > 5 %}red{% else %}green{% endif %}">+0% this week</small>
+  </div>
+</div>
+
+<!-- Response time cards -->
+<div class="response-time-container" style="display: flex; gap: 20px; margin-top: 30px;">
+  <div class="card" style="flex: 1;">
+    <h4 style="color: #0072CE;">Normal Response Time</h4>
+    <h3 style="font-size: 28px; color: #003366;">{{ stats.normal_avg|default('0') }} ms</h3>
+    <small style="color: #28a745;">Average for normal operations</small>
+  </div>
+  
+  <div class="card" style="flex: 1;">
+    <h4 style="color: #0072CE;">Anomalous Response Time</h4>
+    <h3 style="font-size: 28px; color: #003366;">{{ stats.anomalous_avg|default('0') }} ms</h3>
+    <small style="color: #dc3545;">Average for anomalous operations</small>
+  </div>
+</div>
+{% endblock %}

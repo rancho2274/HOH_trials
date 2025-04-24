@@ -1,91 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="header">
-  <h2>Live API Health: Authentication</h2>
-  <button class="refresh-btn" onclick="window.location.href = '{{ url_for('refresh') }}'">
-    <i class="fas fa-sync-alt"></i> Refresh Data
+  <h2>Live API Health: {{ api_name }}</h2>
+  <button class="refresh-btn" onclick="refreshDashboard()">
+    <i class="fas fa-sync-alt"></i> Refresh
   </button>
 </div>
 
 <div class="cards">
   <div class="card">
     <h4>Total Logs</h4>
-    <h3 id="total-logs">{{ api_stats.auth.total_logs }}</h3>
-    <small id="total-logs-note" class="green">Last updated: {{ stats.updated_timestamp }}</small>
+    <h3 id="total-logs">{{ stats.total_logs|default('0') }}</h3>
+    <small id="total-logs-note" class="green">+0 this month</small>
   </div>
   <div class="card">
-    <h4>Anomalies</h4>
-    <h3 id="anomalies">{{ api_stats.auth.anomalies }} ({{ api_stats.auth.anomaly_percent }}%)</h3>
-    <small id="anomalies-note" class="{% if api_stats.auth.anomaly_percent > 10 %}red{% else %}green{% endif %}">
-      Response time anomalies
-    </small>
+    <h4>Active Issues</h4>
+    <h3 id="active-issues">{{ stats.anomalies|default('0') }}</h3>
+    <small id="active-issues-note" class="red">+0 from yesterday</small>
   </div>
   <div class="card">
-    <h4>Normal Response Time</h4>
-    <h3 id="avg-response">{{ api_stats.auth.normal_avg }} ms</h3>
-    <small id="avg-response-note" class="green">Average for normal operations</small>
+    <h4>Average Response</h4>
+    <h3 id="avg-response">{{ stats.normal_avg|default('0') }}ms</h3>
+    <small id="avg-response-note" class="green">0.0ms improvement</small>
   </div>
   <div class="card">
-    <h4>Anomalous Response Time</h4>
-    <h3 id="anomalous-response">{{ api_stats.auth.anomalous_avg }} ms</h3>
-    <small id="anomalous-response-note" class="red">Average for anomalous operations</small>
+    <h4>System Health</h4>
+    <h3 id="system-health">{{ (100 - stats.anomaly_percent|default(0))|round }}%</h3>
+    <small id="system-health-note" class="{% if stats.anomaly_percent > 5 %}red{% else %}green{% endif %}">+0% this week</small>
   </div>
 </div>
 
-<div class="api-details">
-  <div class="detail-section">
-    <h3>Authentication API Analysis</h3>
-    <p>This page shows the results of response time anomaly detection for the Authentication API. 
-    The system has analyzed {{ api_stats.auth.total_logs }} log entries and detected {{ api_stats.auth.anomalies }} 
-    anomalies ({{ api_stats.auth.anomaly_percent }}% of all operations).</p>
-    
-    <h4>Findings:</h4>
-    <ul>
-      <li>Normal authentication operations take an average of {{ api_stats.auth.normal_avg }} ms to complete</li>
-      <li>Anomalous operations take an average of {{ api_stats.auth.anomalous_avg }} ms to complete</li>
-      {% if api_stats.auth.normal_avg > 0 and api_stats.auth.anomalous_avg > 0 %}
-      <li>Anomalous operations are {{ (api_stats.auth.anomalous_avg / api_stats.auth.normal_avg)|round(1) }}x slower than normal operations</li>
-      {% endif %}
-    </ul>
-    
-    <h4>Actions:</h4>
-    <p>The system has marked anomalous operations in the combined logs directory. You can review these logs 
-    to identify patterns and root causes of slow authentication operations.</p>
-    
-    <div class="note-box">
-      <p><strong>Note:</strong> To refresh the anomaly detection results, click the "Refresh Data" button in the top right corner. 
-      This will process the latest log data and update the analysis.</p>
-    </div>
-  </div>
-</div>
-
-<style>
-.api-details {
-  margin-top: 30px;
-}
-
-.detail-section {
-  background: #f9fafe;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-}
-
-.detail-section h3 {
-  color: #0072CE;
-  margin-top: 0;
-}
-
-.detail-section ul {
-  margin-bottom: 20px;
-}
-
-.note-box {
-  background: #f0f7ff;
-  padding: 15px;
-  border-left: 4px solid #0072CE;
-  margin-top: 20px;
-  border-radius: 4px;
-}
-</style>
+<script>
+  function refreshDashboard() {
+    window.location.reload();
+  }
+</script>
 {% endblock %}

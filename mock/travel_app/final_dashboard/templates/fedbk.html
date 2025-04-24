@@ -10,92 +10,48 @@
 <div class="cards">
   <div class="card">
     <h4>Total Logs</h4>
-    <h3 id="total-apis">{{ api_stats.feedback.total_logs }}</h3>
-    <small id="total-apis-note" class="green">+{{ (api_stats.feedback.total_logs // 5)|default(0) }} this month</small>
+    <h3 id="total-logs">0</h3>
+    <small id="total-logs-note" class="green">+0 this month</small>
   </div>
   <div class="card">
     <h4>Active Issues</h4>
-    <h3 id="active-issues">{{ api_stats.feedback.anomalies }}</h3>
-    <small id="active-issues-note" class="red">+{{ api_stats.feedback.anomalies }} from yesterday</small>
+    <h3 id="active-issues">0</h3>
+    <small id="active-issues-note" class="red">+0 from yesterday</small>
   </div>
   <div class="card">
     <h4>Average Response</h4>
-    <h3 id="avg-response">{{ api_stats.feedback.anomalous_avg|default(0)|round(2) }}ms</h3>
-    <small id="avg-response-note" class="{% if api_stats.feedback.anomalous_avg < 300 %}green{% else %}red{% endif %}">{{ (api_stats.feedback.anomalous_avg * 0.1)|default(0)|round(1) }}ms {% if api_stats.feedback.anomalous_avg < 300 %}improvement{% else %}slower{% endif %}</small>
+    <h3 id="avg-response">0ms</h3>
+    <small id="avg-response-note" class="green">0ms improvement</small>
   </div>
   <div class="card">
-    <h4>API Health</h4>
-    <h3 id="system-health">{{ (100 - (api_stats.feedback.anomaly_percent|default(0)))|round(1) }}%</h3>
-    <small id="system-health-note" class="{% if api_stats.feedback.anomaly_percent > 0 %}red{% else %}green{% endif %}">{% if api_stats.feedback.anomaly_percent > 0 %}-{% else %}+{% endif %}{{ [api_stats.feedback.anomaly_percent|default(0), 10]|min }}% this week</small>
-  </div>
-</div>
-
-<div style="margin-top: 40px;">
-  <h4 style="margin-bottom: 10px;">Feedback API - Response Analysis</h4>
-  
-  <div class="statuses">
-    <div class="status">
-      <h4>Feedback Operations</h4>
-      <div class="status-item">
-        <span>Submit Review</span>
-        <span class="{% if api_stats.feedback.anomalies > 0 %}status-red{% else %}status-green{% endif %}">
-          {{ api_stats.feedback.anomalous_avg|default(205, true) }}ms
-        </span>
-      </div>
-      <div class="status-item">
-        <span>Update Review</span>
-        <span class="{% if api_stats.feedback.anomalies > 0 %}status-yellow{% else %}status-green{% endif %}">
-          {{ (api_stats.feedback.anomalous_avg * 0.85)|default(174, true)|round }}ms
-        </span>
-      </div>
-      <div class="status-item">
-        <span>Get Reviews</span>
-        <span class="status-green">
-          {{ (api_stats.feedback.normal_avg * 0.7)|default(130, true)|round }}ms
-        </span>
-      </div>
-    </div>
-    
-    <div class="alert">
-      <h4>Feedback API Alerts</h4>
-      {% if api_stats.feedback.anomalies > 0 %}
-        <div class="alert-item">
-          <div>
-            <div class="severity-high">High Severity</div>
-            <p>Feedback API Response Time Spike: {{ api_stats.feedback.anomalous_avg }}ms</p>
-            <small>5 minutes ago</small>
-          </div>
-        </div>
-        <div class="alert-item">
-          <div>
-            <div class="severity-medium">Medium Severity</div>
-            <p>Review submission delays detected</p>
-            <small>15 minutes ago</small>
-          </div>
-        </div>
-      {% else %}
-        <div class="alert-item">
-          <div>
-            <div class="severity-medium">Medium Severity</div>
-            <p>No critical issues detected</p>
-            <small>Just now</small>
-          </div>
-        </div>
-        <div class="alert-item">
-          <div>
-            <div class="severity-medium">Medium Severity</div>
-            <p>Feedback service operating normally</p>
-            <small>5 minutes ago</small>
-          </div>
-        </div>
-      {% endif %}
-    </div>
+    <h4>System Health</h4>
+    <h3 id="system-health">100%</h3>
+    <small id="system-health-note" class="green">+0% this week</small>
   </div>
 </div>
 
 <script>
   function refreshDashboard() {
-    window.location.reload();
+    fetch('/refresh')
+      .then(res => res.json())
+      .then(data => {
+        // Get feedback API specific stats
+        const feedbackStats = data.api_stats.feedback;
+        
+        // Update the dashboard metrics
+        document.getElementById('total-logs').textContent = feedbackStats.total_logs || 0;
+        document.getElementById('active-issues').textContent = feedbackStats.anomalies || 0;
+        document.getElementById('avg-response').textContent = (feedbackStats.normal_avg || 0) + 'ms';
+        document.getElementById('system-health').textContent = feedbackStats.anomaly_percent 
+          ? (100 - feedbackStats.anomaly_percent) + '%' 
+          : '100%';
+      })
+      .catch(err => {
+        console.error("Error refreshing dashboard:", err);
+      });
   }
+
+  // Initial refresh on page load
+  document.addEventListener('DOMContentLoaded', refreshDashboard);
 </script>
 {% endblock %}

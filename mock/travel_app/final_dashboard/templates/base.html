@@ -9,19 +9,17 @@
 <body>
   <div class="sidebar">
     <h1><i class="fas fa-shield-alt"></i> API Monitoring</h1>
-    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('dashboard') }}">
-      <i class="fas fa-tachometer-alt"></i> Dashboard
-    </a>
+    <a class="nav-link" href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
     <div class="nav-link" data-toggle onclick="toggleDropdown(this)">
       <i class="fas fa-heartbeat"></i> Live API Health
     </div>
-    <div class="dropdown" id="api-dropdown" style="display: {% if request.path != '/' %}flex{% else %}none{% endif %};">
-      <a class="nav-link {% if request.path == '/system' %}active{% endif %}" href="{{ url_for('system_page') }}">System</a>
-      <a class="nav-link {% if request.path == '/auth' %}active{% endif %}" href="{{ url_for('auth_page') }}">Authentication API</a>
-      <a class="nav-link {% if request.path == '/search' %}active{% endif %}" href="{{ url_for('search_page') }}">Search API</a>
-      <a class="nav-link {% if request.path == '/booking' %}active{% endif %}" href="{{ url_for('booking_page') }}">Booking API</a>
-      <a class="nav-link {% if request.path == '/payment' %}active{% endif %}" href="{{ url_for('payment_page') }}">Payment Gateway</a>
-      <a class="nav-link {% if request.path == '/feedback' %}active{% endif %}" href="{{ url_for('feedback_page') }}">Feedback API</a>
+    <div class="dropdown">
+      <a class="nav-link" href="{{ url_for('system_api') }}">System</a>
+      <a class="nav-link" href="{{ url_for('auth_api') }}">Authentication API</a>
+      <a class="nav-link" href="{{ url_for('search_api') }}">Search API</a>
+      <a class="nav-link" href="{{ url_for('booking_api') }}">Booking API</a>
+      <a class="nav-link" href="{{ url_for('payment_api') }}">Payment Gateway</a>
+      <a class="nav-link" href="{{ url_for('feedback_api') }}">Feedback API</a>
     </div>
     <a class="nav-link" href="#"><i class="fas fa-bullseye"></i> Root Prediction</a>
     <a class="nav-link" href="#"><i class="fas fa-exclamation-circle"></i> Root Cause</a>
@@ -34,21 +32,10 @@
 
   <script>
     function toggleDropdown(el) {
-      const dropdown = document.getElementById('api-dropdown');
+      const dropdown = el.nextElementSibling;
       dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
       el.classList.toggle('active');
     }
-    
-    // Auto-open dropdown if we're on an API page
-    document.addEventListener('DOMContentLoaded', function() {
-      if (window.location.pathname !== '/') {
-        const apiPages = ['/system', '/auth', '/search', '/booking', '/payment', '/feedback'];
-        if (apiPages.includes(window.location.pathname)) {
-          document.getElementById('api-dropdown').style.display = 'flex';
-          document.querySelector('.nav-link[data-toggle]').classList.add('active');
-        }
-      }
-    });
   </script>
 </body>
 </html>
