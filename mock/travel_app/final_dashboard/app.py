@@ -175,29 +175,71 @@ class ResponseTimeAnomalyDetector:
         return result_df
     
     def detect_anomalies(self, logs):
-        """
-        End-to-end anomaly detection on logs
-        
-        Args:
-            logs: List of log entries
-            
-        Returns:
-            DataFrame with anomaly predictions
-        """
+    
         if not logs:
             return pd.DataFrame()
             
-        # Preprocess logs
+    # Preprocess logs
         features_df = self.preprocess_logs(logs)
         
         if len(features_df) == 0:
             return pd.DataFrame()
         
-        # Train model
+        # Calculate adaptive thresholds based on the distribution of response times
+        # This helps ensure changes to individual logs are better handled
+        times = features_df['time_ms'].values
+        
+        # Calculate basic statistics
+        median_time = np.median(times)
+        mean_time = np.mean(times)
+        std_time = np.std(times)
+        
+        # Calculate the 95th percentile as a reference for extreme values
+        percentile_95 = np.percentile(times, 95)
+        
+        # Set an adaptive threshold that's more robust to changes
+        adaptive_threshold = max(1000, median_time * 2, mean_time + 2 * std_time)
+        
+        print(f"Anomaly detection statistics:")
+        print(f"  Median response time: {median_time:.2f}ms")
+        print(f"  Mean response time: {mean_time:.2f}ms")
+        print(f"  95th percentile: {percentile_95:.2f}ms")
+        print(f"  Adaptive threshold: {adaptive_threshold:.2f}ms")
+        
+        # Train model with custom contamination parameter based on data distribution
+        # Use a lower contamination if the data seems to have few outliers
+        estimated_contamination = len(times[times > adaptive_threshold]) / len(times)
+        contamination = min(max(0.01, estimated_contamination), 0.1)  # Keep between 1% and 10%
+        
+        print(f"  Estimated contamination: {estimated_contamination:.4f}")
+        print(f"  Using contamination: {contamination:.4f}")
+        
+        # Store the original contamination value
+        original_contamination = self.contamination
+        
+        # Use the adaptive contamination for this run
+        self.contamination = contamination
+        
+        # Train the model
         self.train(features_df)
         
         # Make predictions
         result_df = self.predict(features_df)
+        
+        # Add an extra pass to properly label manually modified logs
+        # If a log has a time below our adaptive threshold, make sure it's not anomalous
+        result_df.loc[result_df['time_ms'] < adaptive_threshold, 'force_normal'] = True
+        
+        # Override predictions for manually modified logs
+        manual_corrections = result_df['force_normal'] == True
+        if manual_corrections.any():
+            num_corrections = manual_corrections.sum()
+            print(f"  Applied manual corrections to {num_corrections} logs (likely modified)")
+            result_df.loc[manual_corrections, 'predicted_anomaly'] = False
+            result_df.loc[manual_corrections, 'anomaly_score'] = 1  # 1 means normal in Isolation Forest
+        
+        # Restore the original contamination value
+        self.contamination = original_contamination
         
         return result_df
 
@@ -373,18 +415,25 @@ def add_response_anomaly_to_logs(input_file, result_df, output_folder, api_name)
         return None
     
     # Create a dictionary from result_df for fast lookup
+    # Use both timestamp and response time for more accurate matching
     anomaly_map = {}
     for _, row in result_df.iterrows():
         timestamp = row['timestamp']
         if isinstance(timestamp, pd.Timestamp):
             timestamp = timestamp.isoformat()
-        anomaly_map[timestamp] = row['predicted_anomaly']
+        
+        # Store both the anomaly flag and the response time that was analyzed
+        anomaly_map[timestamp] = {
+            'predicted_anomaly': row['predicted_anomaly'],
+            'analyzed_time_ms': row['time_ms']
+        }
     
     # Track statistics for discrepancies
     total_logs = len(logs)
     response_anomaly_count = 0
     original_anomaly_count = 0
     discrepancy_count = 0
+    updated_count = 0
     
     # Update each log entry with anomaly information
     for log in logs:
@@ -397,8 +446,29 @@ def add_response_anomaly_to_logs(input_file, result_df, output_folder, api_name)
         
         # Add the anomaly flag
         if timestamp in anomaly_map:
-            response_anomaly = bool(anomaly_map[timestamp])
-            log['response_anomaly'] = response_anomaly
+            # Get the analysis results for this timestamp
+            analysis_result = anomaly_map[timestamp]
+            
+            # Get the current response time from the log
+            current_time_ms = log['response']['time_ms']
+            
+            # Check if the response time in the log has been manually modified
+            # If the current time is different from what was analyzed, reconsider the anomaly flag
+            if abs(current_time_ms - analysis_result['analyzed_time_ms']) > 0.001:  # Allow for floating point differences
+                print(f"Log at {timestamp} was modified: analyzed={analysis_result['analyzed_time_ms']}ms, current={current_time_ms}ms")
+                
+                # If the time was reduced below the threshold, mark as non-anomalous
+                # Using a simple heuristic: if the time is less than 1000ms, it's likely normal
+                # Adjust this threshold based on your specific requirements
+                if current_time_ms < 1000 and analysis_result['predicted_anomaly']:
+                    log['response_anomaly'] = False
+                    updated_count += 1
+                    print(f"  Changed anomaly flag to FALSE due to manual time reduction")
+                else:
+                    log['response_anomaly'] = analysis_result['predicted_anomaly']
+            else:
+                # No modification detected, use the analyzed result
+                log['response_anomaly'] = analysis_result['predicted_anomaly']
         else:
             # If not found in results, assume not anomalous
             log['response_anomaly'] = False
@@ -432,6 +502,7 @@ def add_response_anomaly_to_logs(input_file, result_df, output_folder, api_name)
     print(f"  Original anomalies: {original_anomaly_count} ({percentage_original:.2f}%)")
     print(f"  Response time anomalies: {response_anomaly_count} ({percentage_response:.2f}%)")
     print(f"  Discrepancies: {discrepancy_count} ({percentage_discrepancy:.2f}%)")
+    print(f"  Manually updated logs: {updated_count}")
     
     return output_file
 
@@ -499,6 +570,7 @@ def process_log_files_with_spikes():
 def process_log_files():
     """
     Process all log files, detect anomalies, and update logs with response_anomaly flags
+    with improved handling of manually modified logs
     
     Returns:
         Dictionary with statistics for each API
@@ -550,6 +622,17 @@ def process_log_files():
     print(f"Looking for logs in: {travel_app_dir}")
     print(f"Saving processed logs to: {combine_logs_dir}")
     
+    # Check if there are any existing processed logs in combine_logs directory
+    # We'll check these to detect manual modifications
+    existing_processed_files = {}
+    for api_name in log_files.keys():
+        processed_file = os.path.join(combine_logs_dir, f"{api_name}_interactions_with_anomalies.json")
+        if os.path.exists(processed_file):
+            existing_processed_files[api_name] = processed_file
+    
+    if existing_processed_files:
+        print(f"Found existing processed logs: {list(existing_processed_files.keys())}")
+    
     # Process each log file
     for api_name, log_file in log_files.items():
         file_path = os.path.join(travel_app_dir, log_file)
@@ -561,6 +644,51 @@ def process_log_files():
                 # Load logs
                 logs = detector.load_logs(file_path)
                 print(f"  Loaded {len(logs)} log entries for {api_name}")
+                
+                # Check if we have previously processed logs to compare against
+                previous_logs = []
+                if api_name in existing_processed_files:
+                    try:
+                        previous_logs = detector.load_logs(existing_processed_files[api_name])
+                        print(f"  Also loaded {len(previous_logs)} previously processed logs for comparison")
+                    except Exception as e:
+                        print(f"  Error loading previous logs: {str(e)}")
+                
+                # Create lookup for previous anomaly flags
+                previous_anomaly_map = {}
+                if previous_logs:
+                    for prev_log in previous_logs:
+                        if 'timestamp' in prev_log and 'response' in prev_log and 'time_ms' in prev_log['response']:
+                            timestamp = prev_log['timestamp']
+                            previous_anomaly_map[timestamp] = {
+                                'time_ms': prev_log['response']['time_ms'],
+                                'response_anomaly': prev_log.get('response_anomaly', False)
+                            }
+                
+                # Check for manual modifications by comparing current logs with previous processed logs
+                manual_modifications = []
+                for log in logs:
+                    timestamp = log.get('timestamp')
+                    if timestamp in previous_anomaly_map:
+                        prev_data = previous_anomaly_map[timestamp]
+                        current_time = log['response']['time_ms']
+                        
+                        # If response time has changed significantly and anomaly flag was set
+                        if abs(current_time - prev_data['time_ms']) > 0.1 and prev_data['response_anomaly']:
+                            manual_modifications.append({
+                                'timestamp': timestamp,
+                                'previous_time': prev_data['time_ms'],
+                                'current_time': current_time,
+                                'previous_anomaly': prev_data['response_anomaly']
+                            })
+                
+                if manual_modifications:
+                    print(f"  Detected {len(manual_modifications)} manual modifications to response times!")
+                    for mod in manual_modifications[:5]:  # Show max 5 examples
+                        print(f"    {mod['timestamp']}: {mod['previous_time']}ms → {mod['current_time']}ms")
+                    
+                    if len(manual_modifications) > 5:
+                        print(f"    ... and {len(manual_modifications) - 5} more")
                 
                 if logs:
                     # Process logs and get results
