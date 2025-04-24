@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,66 +5,32 @@
   <title>{{ title or 'API Monitoring Dashboard' }}</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  
-  <!-- Kibana-related styles -->
-  <style>
-    .kibana-container {
-      margin-top: 30px;
-      margin-bottom: 30px;
-    }
-    
-    .kibana-frame {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      height: 620px;
-    }
-    
-    .kibana-frame iframe {
-      border: none;
-      overflow: hidden;
-    }
-    
-    .kibana-loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 600px;
-      background-color: #f9fafe;
-      font-size: 18px;
-      color: #6B7280;
-    }
-    
-    .kibana-loading i {
-      margin-right: 10px;
-      animation: spin 2s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
 </head>
 <body>
   <div class="sidebar">
     <h1><i class="fas fa-shield-alt"></i> API Monitoring</h1>
-    <a class="nav-link" href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a class="nav-link {% if request.path == url_for('dashboard') %}active{% endif %}" href="{{ url_for('dashboard') }}">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
     <div class="nav-link" data-toggle onclick="toggleDropdown(this)">
       <i class="fas fa-heartbeat"></i> Live API Health
     </div>
     <div class="dropdown">
-      <a class="nav-link" href="{{ url_for('system_api') }}">System</a>
-      <a class="nav-link" href="{{ url_for('auth_api') }}">Authentication API</a>
-      <a class="nav-link" href="{{ url_for('search_api') }}">Search API</a>
-      <a class="nav-link" href="{{ url_for('booking_api') }}">Booking API</a>
-      <a class="nav-link" href="{{ url_for('payment_api') }}">Payment Gateway</a>
-      <a class="nav-link" href="{{ url_for('feedback_api') }}">Feedback API</a>
+      <a class="nav-link {% if request.path == url_for('system_api') %}active{% endif %}" href="{{ url_for('system_api') }}">System</a>
+      <a class="nav-link {% if request.path == url_for('auth_api') %}active{% endif %}" href="{{ url_for('auth_api') }}">Authentication API</a>
+      <a class="nav-link {% if request.path == url_for('search_api') %}active{% endif %}" href="{{ url_for('search_api') }}">Search API</a>
+      <a class="nav-link {% if request.path == url_for('booking_api') %}active{% endif %}" href="{{ url_for('booking_api') }}">Booking API</a>
+      <a class="nav-link {% if request.path == url_for('payment_api') %}active{% endif %}" href="{{ url_for('payment_api') }}">Payment Gateway</a>
+      <a class="nav-link {% if request.path == url_for('feedback_api') %}active{% endif %}" href="{{ url_for('feedback_api') }}">Feedback API</a>
     </div>
     <a class="nav-link" href="#"><i class="fas fa-bullseye"></i> Root Prediction</a>
     <a class="nav-link" href="#"><i class="fas fa-exclamation-circle"></i> Root Cause</a>
-    <a class="nav-link" href="#"><i class="fas fa-bell"></i> Alert</a>
+    <a class="nav-link {% if request.path == url_for('alerts') %}active{% endif %}" href="{{ url_for('alerts') }}">
+      <i class="fas fa-bell"></i> Alerts
+      {% if alerts_count and alerts_count > 0 %}
+      <span class="badge">{{ alerts_count }}</span>
+      {% endif %}
+    </a>
   </div>
 
   <div class="content">
@@ -79,23 +44,16 @@
       el.classList.toggle('active');
     }
     
-    // Function to handle Kibana iframe loading
-    function initKibanaDashboard() {
-      const kibanaFrames = document.querySelectorAll('.kibana-frame iframe');
-      kibanaFrames.forEach(frame => {
-        const loadingDiv = frame.previousElementSibling;
-        if (loadingDiv && loadingDiv.classList.contains('kibana-loading')) {
-          frame.onload = function() {
-            loadingDiv.style.display = 'none';
-            frame.style.display = 'block';
-          };
-        }
-      });
-    }
-    
-    // Initialize Kibana dashboards when DOM is loaded
-    document.addEventListener('DOMContentLoaded', initKibanaDashboard);
+    // If we're on a page in the dropdown, show the dropdown
+    document.addEventListener('DOMContentLoaded', function() {
+      const activeInDropdown = document.querySelector('.dropdown .active');
+      if (activeInDropdown) {
+        const dropdown = activeInDropdown.parentElement;
+        const toggle = dropdown.previousElementSibling;
+        dropdown.style.display = 'flex';
+        toggle.classList.add('active');
+      }
+    });
   </script>
 </body>
 </html>
-```

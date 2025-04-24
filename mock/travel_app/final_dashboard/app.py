@@ -331,15 +331,7 @@ def detect_spikes(logs, threshold_multiplier=3.0, min_threshold=1000):
     }
 
 def generate_alerts(spike_data):
-    """
-    Generate alerts from spike data
-    
-    Args:
-        spike_data: Dictionary with spike information
-        
-    Returns:
-        List of alert dictionaries
-    """
+   
     alerts = []
     
     # Process all spikes
@@ -361,20 +353,41 @@ def generate_alerts(spike_data):
         except:
             formatted_time = spike["timestamp"]
         
+        # Create more descriptive details for each alert
+        api_type = spike["api"].upper()
+        response_time = spike["response_time"]
+        threshold = spike.get("threshold", 0)
+        
+        if severity == "CRITICAL":
+            details = f"Response time of {response_time:.0f}ms is {times_avg:.1f}x higher than normal ({threshold:.0f}ms). This indicates a severe performance degradation that requires immediate attention."
+        elif severity == "HIGH":
+            details = f"Response time of {response_time:.0f}ms significantly exceeds the normal threshold of {threshold:.0f}ms. Users may be experiencing delays."
+        else:
+            details = f"Response time of {response_time:.0f}ms is higher than the expected threshold of {threshold:.0f}ms. This may indicate an emerging issue."
+        
+        # Add operation type if available
+        operation = spike.get("operation")
+        if operation:
+            details += f" The affected operation is '{operation}'."
+        
         # Create alert
         alert = {
             "severity": severity,
-            "api": spike["api"].upper(),
-            "message": f"{severity}: {spike['api'].upper()} API response time spike detected",
-            "details": f"Response time of {spike['response_time']:.0f}ms is {times_avg:.1f}x higher than normal",
-            "timestamp": formatted_time
+            "api": api_type,
+            "message": f"{severity}: {api_type} API response time spike detected",
+            "details": details,
+            "timestamp": formatted_time,
+            "response_time": response_time,
+            "threshold": threshold,
+            "times_avg": times_avg,
+            "operation": operation
         }
         
         alerts.append(alert)
     
-    # Sort alerts by severity
+    # Sort alerts by severity and time
     severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2}
-    alerts.sort(key=lambda x: severity_order.get(x["severity"], 3))
+    alerts.sort(key=lambda x: (severity_order.get(x["severity"], 3), -x["response_time"]))
     
     return alerts
 
@@ -773,7 +786,26 @@ def process_log_files():
     print(f"Anomalous average response time: {stats['anomalous_avg']} ms")
     
     return stats, api_stats
-
+@app.route('/alerts')
+def alerts():
+    """
+    Display detailed alerts page with filtering and management options
+    """
+    # Process log files and get statistics with spike detection
+    combined_stats = process_log_files_with_spikes()
+    
+    # Get all alerts
+    alerts = combined_stats.get('alerts', [])
+    
+    # Count critical alerts
+    critical_count = sum(1 for alert in alerts if alert['severity'] == 'CRITICAL')
+    
+    # Pass all required variables to the template
+    return render_template('alerts.html', 
+                          alerts=alerts,
+                          critical_count=critical_count,
+                          stats=combined_stats['overall'], 
+                          api_stats=combined_stats['api_stats'])
 @app.route('/')
 def dashboard():
     # Process log files and get statistics with spike detection
@@ -789,7 +821,19 @@ def dashboard():
                           has_alerts=combined_stats.get('has_alerts', False))
 
 
-
+@app.context_processor
+def inject_alerts_count():
+    """
+    Inject the alerts count into all templates
+    """
+    try:
+        # Get alert count from the latest data
+        combined_stats = process_log_files_with_spikes()
+        alerts = combined_stats.get('alerts', [])
+        return {'alerts_count': len(alerts)}
+    except Exception as e:
+        print(f"Error getting alerts count for context processor: {str(e)}")
+        return {'alerts_count': 0}
 @app.route('/refresh')
 def refresh():
     # Process log files and get updated statistics with spike detection

@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h2>API Alert Center</h2>
+  <!-- <button class="refresh-btn" onclick="refreshAlerts()">
+    <i class="fas fa-sync-alt"></i> Refresh
+  </button> -->
+</div>
+
+<div class="alert-statistics">
+  <div class="cards">
+    <div class="card">
+      <h4>Total Alerts</h4>
+      <h3>{{ alerts|length }}</h3>
+      <small class="{% if alerts|length > 0 %}red{% else %}green{% endif %}">
+        {{ '+' + (alerts|length|string) if alerts|length > 0 else 'No' }} active issues
+      </small>
+    </div>
+    <div class="card">
+      <h4>Critical Alerts</h4>
+      <h3>{{ critical_count }}</h3>
+      <small class="{% if critical_count > 0 %}red{% else %}green{% endif %}">
+        {{ '+' + (critical_count|string) if critical_count > 0 else 'No' }} critical issues
+      </small>
+    </div>
+    <div class="card">
+      <h4>System Health</h4>
+      <h3>{{ (100 - alerts|length * 5)|round|int if alerts else 100 }}%</h3>
+      <small class="{% if alerts %}red{% else %}green{% endif %}">
+        {% if alerts %}-{{ alerts|length * 5 }}% this hour{% else %}Healthy{% endif %}
+      </small>
+    </div>
+  </div>
+</div>
+
+<div class="alert-filters">
+  <div class="filter-group">
+    <label>Filter by API:</label>
+    <select id="api-filter" onchange="filterAlerts()">
+      <option value="all">All APIs</option>
+      <option value="auth">Authentication</option>
+      <option value="search">Search</option>
+      <option value="booking">Booking</option>
+      <option value="payment">Payment</option>
+      <option value="feedback">Feedback</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Filter by Severity:</label>
+    <select id="severity-filter" onchange="filterAlerts()">
+      <option value="all">All Severities</option>
+      <option value="CRITICAL">Critical</option>
+      <option value="HIGH">High</option>
+      <option value="MEDIUM">Medium</option>
+    </select>
+  </div>
+</div>
+
+<div class="alerts-container">
+  {% if alerts %}
+    {% for alert in alerts %}
+      <div class="alert-card" data-api="{{ alert.api|lower }}" data-severity="{{ alert.severity }}">
+        <div class="alert-header severity-{{ alert.severity|lower }}">
+          <div class="alert-severity">
+            {% if alert.severity == 'CRITICAL' %}
+              <i class="fas fa-exclamation-circle"></i>
+            {% elif alert.severity == 'HIGH' %}
+              <i class="fas fa-exclamation-triangle"></i>
+            {% else %}
+              <i class="fas fa-info-circle"></i>
+            {% endif %}
+            {{ alert.severity }}
+          </div>
+          <div class="alert-timestamp">
+            <i class="fas fa-clock"></i> {{ alert.timestamp }}
+          </div>
+        </div>
+        <div class="alert-body">
+          <h3 class="alert-title">{{ alert.message }}</h3>
+          <p class="alert-details">{{ alert.details }}</p>
+          <div class="alert-meta">
+            <span class="alert-api">
+              <i class="fas fa-server"></i> {{ alert.api }} API
+            </span>
+            <span class="alert-response-time">
+              <i class="fas fa-tachometer-alt"></i> {{ alert.response_time|round|int }}ms
+            </span>
+          </div>
+        </div>
+        <div class="alert-actions">
+          <button class="action-btn investigate-btn" onclick="investigateAlert('{{ alert.api|lower }}', '{{ alert.timestamp }}')">
+            <i class="fas fa-search"></i> Investigate
+          </button>
+          <button class="action-btn acknowledge-btn" onclick="acknowledgeAlert('{{ loop.index }}')">
+            <i class="fas fa-check"></i> Acknowledge
+          </button>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="no-alerts">
+      <i class="fas fa-check-circle"></i>
+      <h3>No alerts at this time</h3>
+      <p>All systems are running normally</p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .alert-statistics {
+    margin-bottom: 20px;
+  }
+  
+  .alert-filters {
+    background-color: #f9fafe;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .filter-group label {
+    font-weight: 500;
+    color: #003366;
+  }
+  
+  .filter-group select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background-color: white;
+  }
+  
+  .alerts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .alert-card {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .alert-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .alert-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+  }
+  
+  .severity-critical {
+    background-color: #e53e3e;
+  }
+  
+  .severity-high {
+    background-color: #ed8936;
+  }
+  
+  .severity-medium {
+    background-color: #4299e1;
+  }
+  
+  .alert-severity {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .alert-timestamp {
+    font-size: 14px;
+  }
+  
+  .alert-body {
+    padding: 15px;
+    flex-grow: 1;
+  }
+  
+  .alert-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #003366;
+    font-size: 18px;
+  }
+  
+  .alert-details {
+    color: #4b5563;
+    margin-bottom: 15px;
+  }
+  
+  .alert-meta {
+    display: flex;
+    justify-content: space-between;
+    color: #6b7280;
+    font-size: 14px;
+  }
+  
+  .alert-actions {
+    display: flex;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .action-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background-color 0.2s;
+  }
+  
+  .investigate-btn {
+    color: #3b82f6;
+  }
+  
+  .investigate-btn:hover {
+    background-color: #eff6ff;
+  }
+  
+  .acknowledge-btn {
+    color: #10b981;
+    border-left: 1px solid #e5e7eb;
+  }
+  
+  .acknowledge-btn:hover {
+    background-color: #ecfdf5;
+  }
+  
+  .no-alerts {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  .no-alerts i {
+    font-size: 48px;
+    color: #10b981;
+    margin-bottom: 15px;
+  }
+  
+  .no-alerts h3 {
+    color: #003366;
+    margin-bottom: 10px;
+  }
+  
+  .no-alerts p {
+    color: #6b7280;
+  }
+  
+  .hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  function refreshAlerts() {
+    location.reload();
+  }
+  
+  function filterAlerts() {
+    const apiFilter = document.getElementById('api-filter').value;
+    const severityFilter = document.getElementById('severity-filter').value;
+    
+    const alertCards = document.querySelectorAll('.alert-card');
+    
+    alertCards.forEach(card => {
+      const cardApi = card.dataset.api;
+      const cardSeverity = card.dataset.severity;
+      
+      const apiMatch = apiFilter === 'all' || cardApi === apiFilter;
+      const severityMatch = severityFilter === 'all' || cardSeverity === severityFilter;
+      
+      if (apiMatch && severityMatch) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+  }
+  
+  function investigateAlert(api, timestamp) {
+    // Redirect to the API health page for the specific API
+    window.location.href = `/api/${api}`;
+  }
+  
+  function acknowledgeAlert(alertId) {
+    // In a real app, this would make an API call to acknowledge the alert
+    // For now, we'll just hide the alert card
+    const alertCard = document.querySelectorAll('.alert-card')[alertId - 1];
+    
+    if (alertCard) {
+      // Add a visual feedback before hiding
+      alertCard.style.opacity = '0.5';
+      alertCard.style.transform = 'scale(0.98)';
+      
+      setTimeout(() => {
+        alertCard.style.display = 'none';
+      }, 500);
+      
+      // In a real app, update the alert count
+      const totalElement = document.querySelector('.card:first-child h3');
+      if (totalElement) {
+        const currentTotal = parseInt(totalElement.textContent);
+        if (!isNaN(currentTotal) && currentTotal > 0) {
+          totalElement.textContent = (currentTotal - 1).toString();
+        }
+      }
+    }
+  }
+</script>
+{% endblock %}

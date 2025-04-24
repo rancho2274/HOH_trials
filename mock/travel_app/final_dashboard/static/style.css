@@ -110,3 +110,63 @@ h3 {
 
 small.green { color: #16a34a; }
 small.red { color: #dc2626; }
+
+/* Add these styles to the static/style.css file */
+
+/* Alert badge for the sidebar */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e53e3e;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 12px;
+  padding: 2px 8px;
+  margin-left: 8px;
+  min-width: 20px;
+  height: 20px;
+}
+
+.nav-link.active .badge {
+  background-color: white;
+  color: #e53e3e;
+}
+
+/* Animation for alerts */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Alerts page styles for the alert cards */
+.alert-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.alert-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Styles for different severity levels */
+.severity-critical .alert-severity {
+  color: white;
+  font-weight: bold;
+}
+
+.severity-high .alert-severity {
+  color: white;
+  font-weight: bold;
+}
+
+.severity-medium .alert-severity {
+  color: white;
+  font-weight: bold;
+}
