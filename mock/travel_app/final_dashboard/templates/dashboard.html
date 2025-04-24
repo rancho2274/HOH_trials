@@ -2,256 +2,557 @@
 {% block content %}
 <div class="header">
   <h2>Dashboard</h2>
-  <button class="refresh-btn" id="refresh-button" onclick="refreshDashboard()">
+  <button class="refresh-btn" onclick="refreshDashboard()">
     <i class="fas fa-sync-alt"></i> Refresh
   </button>
 </div>
 
+<!-- Response Time Spike Alerts Section -->
+<div id="alerts-container" class="{% if has_alerts %}active{% endif %}" style="margin-bottom: 20px;">
+  <div class="alerts-wrapper">
+    <div class="alerts-header">
+      <h3><i class="fas fa-exclamation-triangle"></i> Response Time Spike Alerts</h3>
+      <button id="close-alerts" class="close-btn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="alerts-content">
+      <div id="alerts-list">
+        {% if alerts %}
+          {% for alert in alerts[:5] %}
+            <div class="alert-item alert-{{ alert.severity|lower }}">
+              <div class="alert-icon">
+                {% if alert.severity == 'CRITICAL' %}
+                  <i class="fas fa-exclamation-circle"></i>
+                {% elif alert.severity == 'HIGH' %}
+                  <i class="fas fa-exclamation-triangle"></i>
+                {% else %}
+                  <i class="fas fa-info-circle"></i>
+                {% endif %}
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">{{ alert.message }}</div>
+                <div class="alert-details">{{ alert.details }}</div>
+                <div class="alert-meta">
+                  <span><i class="fas fa-clock"></i> {{ alert.timestamp }}</span>
+                  <span><i class="fas fa-server"></i> {{ alert.api }}</span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+          
+          {% if alerts|length > 5 %}
+            <div class="alert-more">
+              <button id="show-all-alerts" class="show-more-btn">
+                Show {{ alerts|length - 5 }} more alerts...
+              </button>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="alert-empty">
+            No alerts at this time
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Response Time Chart Section -->
+<!-- <div id="chart-container" style="margin-bottom: 20px;">
+  <div class="chart-wrapper">
+    <h3>Response Time Monitoring</h3>
+    <div class="chart-area">
+      <canvas id="responseTimeChart"></canvas>
+    </div>
+  </div>
+</div> -->
+
 <div class="cards">
   <div class="card">
-    <h4>Total Logs</h4>
-    <h3 id="total-logs">{{ stats.total_logs }}</h3>
-    <small id="total-logs-note" class="green">Last updated: {{ stats.updated_timestamp }}</small>
+    <h4>Total APIs</h4>
+    <h3 id="total-apis">5</h3>
+    <small id="total-apis-note" class="green">+0 this month</small>
   </div>
   <div class="card">
-    <h4>Anomalies</h4>
-    <h3 id="anomalies">{{ stats.anomalies }} ({{ stats.anomaly_percent }}%)</h3>
-    <small id="anomalies-note" class="red">Detected response time issues</small>
+    <h4>Active Issues</h4>
+    <h3 id="active-issues">{{ alerts|length if alerts else 0 }}</h3>
+    <small id="active-issues-note" class="red">+{{ alerts|length if alerts else 0 }} from yesterday</small>
   </div>
   <div class="card">
-    <h4>Normal Response Time</h4>
-    <h3 id="avg-response">{{ stats.normal_avg }} ms</h3>
-    <small id="avg-response-note" class="green">Average for normal operations</small>
+    <h4>Average Response</h4>
+    <h3 id="avg-response">{{ stats.normal_avg|round|int if stats.normal_avg else 0 }}ms</h3>
+    <small id="avg-response-note" class="green">{{ stats.normal_avg|round|int if stats.normal_avg else 0 }}ms typical</small>
   </div>
   <div class="card">
-    <h4>Anomalous Response Time</h4>
-    <h3 id="anomalous-response">{{ stats.anomalous_avg }} ms</h3>
-    <small id="anomalous-response-note" class="red">Average for anomalous operations</small>
+    <h4>System Health</h4>
+    <h3 id="system-health">{{ (100 - alerts|length * 10)|round|int if alerts else 100 }}%</h3>
+    <small id="system-health-note" class="{% if alerts %}red{% else %}green{% endif %}">{% if alerts %}-{{ alerts|length * 10 }}% this hour{% else %}No issues{% endif %}</small>
   </div>
 </div>
 
 <div class="statuses">
   <div class="status">
-    <h4>API Status</h4>
-    <div class="status-item">
-      <span>Authentication API</span>
-      <span id="auth-status" class="{% if api_stats.auth.anomaly_percent > 20 %}status-red{% elif api_stats.auth.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
-        {{ api_stats.auth.total_logs }} logs, {{ api_stats.auth.anomaly_percent }}% anomalous
-      </span>
-    </div>
-    <div class="status-item">
-      <span>Search API</span>
-      <span id="search-status" class="{% if api_stats.search.anomaly_percent > 20 %}status-red{% elif api_stats.search.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
-        {{ api_stats.search.total_logs }} logs, {{ api_stats.search.anomaly_percent }}% anomalous
-      </span>
-    </div>
-    <div class="status-item">
-      <span>Booking API</span>
-      <span id="booking-status" class="{% if api_stats.booking.anomaly_percent > 20 %}status-red{% elif api_stats.booking.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
-        {{ api_stats.booking.total_logs }} logs, {{ api_stats.booking.anomaly_percent }}% anomalous
-      </span>
-    </div>
-    <div class="status-item">
-      <span>Payment API</span>
-      <span id="payment-status" class="{% if api_stats.payment.anomaly_percent > 20 %}status-red{% elif api_stats.payment.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
-        {{ api_stats.payment.total_logs }} logs, {{ api_stats.payment.anomaly_percent }}% anomalous
-      </span>
-    </div>
-    <div class="status-item">
-      <span>Feedback API</span>
-      <span id="feedback-status" class="{% if api_stats.feedback.anomaly_percent > 20 %}status-red{% elif api_stats.feedback.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
-        {{ api_stats.feedback.total_logs }} logs, {{ api_stats.feedback.anomaly_percent }}% anomalous
-      </span>
-    </div>
+    <h4>Real-time API Status</h4>
+    {% for api_name, api_data in api_stats.items() %}
+      <div class="status-item">
+        <span>{{ api_name|capitalize }} API</span>
+        <span class="status-{% if api_name in api_spikes and api_spikes[api_name]|length > 0 %}red{% else %}green{% endif %}">
+          {{ api_data.normal_avg|round|int if api_data.normal_avg else 0 }}ms
+        </span>
+      </div>
+    {% endfor %}
   </div>
   <div class="alert">
-    <h4>Response Time Information</h4>
-    <div class="alert-item">
-      <div>
-        <div class="severity-high">High Severity</div>
-        <p id="alert-1">
-          {% if stats.anomalies > 0 %}
-          {{ stats.anomalies }} response time anomalies detected across {{ stats.total_logs }} logs
-          {% else %}
-          No response time anomalies detected
-          {% endif %}
-        </p>
-        <small id="alert-1-time">{{ stats.updated_timestamp }}</small>
+    <h4>Critical Alerts</h4>
+    {% if alerts %}
+      {% for alert in alerts[:2] %}
+        <div class="alert-item">
+          <div>
+            <div class="severity-{% if alert.severity == 'CRITICAL' %}high{% else %}medium{% endif %}">
+              {{ alert.severity }} Alert
+            </div>
+            <p>{{ alert.message }}</p>
+            <small>{{ alert.timestamp }}</small>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert-item">
+        <div>
+          <p>No critical alerts at this time</p>
+          <small>System is running normally</small>
+        </div>
       </div>
-    </div>
-    <div class="alert-item">
-      <div>
-        <div class="severity-medium">Insights</div>
-        <p id="alert-2">
-          {% if stats.anomalous_avg > 0 and stats.normal_avg > 0 %}
-          Anomalous responses are {{ (stats.anomalous_avg / stats.normal_avg)|round(1) }}x slower than normal responses
-          {% else %}
-          Insufficient data to compare normal and anomalous response times
-          {% endif %}
-        </p>
-        <small id="alert-2-time">{{ stats.updated_timestamp }}</small>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="loading-indicator" id="loading-indicator" style="display: none; text-align: center; margin-top: 20px;">
-  <p>Processing logs and detecting anomalies... please wait.</p>
-  <div class="spinner" style="margin: 10px auto; width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #0072CE; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-</div>
-
-<div class="api-summary">
-  <h3>API Anomaly Analysis Summary</h3>
-  <p>The dashboard has analyzed log files from all APIs and detected response time anomalies based on statistical analysis. 
-  Below is a summary of the findings:</p>
-  
-  <table class="api-table">
-    <thead>
-      <tr>
-        <th>API</th>
-        <th>Total Logs</th>
-        <th>Anomalies</th>
-        <th>Anomaly %</th>
-        <th>Normal Avg (ms)</th>
-        <th>Anomalous Avg (ms)</th>
-        <th>Ratio</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Authentication</td>
-        <td>{{ api_stats.auth.total_logs }}</td>
-        <td>{{ api_stats.auth.anomalies }}</td>
-        <td>{{ api_stats.auth.anomaly_percent }}%</td>
-        <td>{{ api_stats.auth.normal_avg }}</td>
-        <td>{{ api_stats.auth.anomalous_avg }}</td>
-        <td>{% if api_stats.auth.normal_avg > 0 and api_stats.auth.anomalous_avg > 0 %}{{ (api_stats.auth.anomalous_avg / api_stats.auth.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
-      </tr>
-      <tr>
-        <td>Search</td>
-        <td>{{ api_stats.search.total_logs }}</td>
-        <td>{{ api_stats.search.anomalies }}</td>
-        <td>{{ api_stats.search.anomaly_percent }}%</td>
-        <td>{{ api_stats.search.normal_avg }}</td>
-        <td>{{ api_stats.search.anomalous_avg }}</td>
-        <td>{% if api_stats.search.normal_avg > 0 and api_stats.search.anomalous_avg > 0 %}{{ (api_stats.search.anomalous_avg / api_stats.search.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
-      </tr>
-      <tr>
-        <td>Booking</td>
-        <td>{{ api_stats.booking.total_logs }}</td>
-        <td>{{ api_stats.booking.anomalies }}</td>
-        <td>{{ api_stats.booking.anomaly_percent }}%</td>
-        <td>{{ api_stats.booking.normal_avg }}</td>
-        <td>{{ api_stats.booking.anomalous_avg }}</td>
-        <td>{% if api_stats.booking.normal_avg > 0 and api_stats.booking.anomalous_avg > 0 %}{{ (api_stats.booking.anomalous_avg / api_stats.booking.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
-      </tr>
-      <tr>
-        <td>Payment</td>
-        <td>{{ api_stats.payment.total_logs }}</td>
-        <td>{{ api_stats.payment.anomalies }}</td>
-        <td>{{ api_stats.payment.anomaly_percent }}%</td>
-        <td>{{ api_stats.payment.normal_avg }}</td>
-        <td>{{ api_stats.payment.anomalous_avg }}</td>
-        <td>{% if api_stats.payment.normal_avg > 0 and api_stats.payment.anomalous_avg > 0 %}{{ (api_stats.payment.anomalous_avg / api_stats.payment.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
-      </tr>
-      <tr>
-        <td>Feedback</td>
-        <td>{{ api_stats.feedback.total_logs }}</td>
-        <td>{{ api_stats.feedback.anomalies }}</td>
-        <td>{{ api_stats.feedback.anomaly_percent }}%</td>
-        <td>{{ api_stats.feedback.normal_avg }}</td>
-        <td>{{ api_stats.feedback.anomalous_avg }}</td>
-        <td>{% if api_stats.feedback.normal_avg > 0 and api_stats.feedback.anomalous_avg > 0 %}{{ (api_stats.feedback.anomalous_avg / api_stats.feedback.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  <div class="note-box">
-    <p><strong>Note:</strong> All logs with detected anomalies have been marked with a <code>response_anomaly</code> flag in the combine_logs directory.
-    You can click on any API in the sidebar menu to see more detailed information about that specific API.</p>
+    {% endif %}
   </div>
 </div>
 
 <style>
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.api-summary {
-  margin-top: 30px;
-  background: #f9fafe;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-}
-
-.api-summary h3 {
-  color: #0072CE;
-  margin-top: 0;
-}
-
-.api-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-}
-
-.api-table th, .api-table td {
-  border: 1px solid #e2e8f0;
-  padding: 10px;
-  text-align: center;
-}
-
-.api-table th {
-  background-color: #f1f5f9;
-  font-weight: bold;
-}
-
-.api-table tr:nth-child(even) {
-  background-color: #f8fafc;
-}
-
-.note-box {
-  background: #f0f7ff;
-  padding: 15px;
-  border-left: 4px solid #0072CE;
-  margin-top: 20px;
-  border-radius: 4px;
-}
-
-code {
-  background: #f1f5f9;
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-family: monospace;
-}
-</style>
-
-<script>
-  function refreshDashboard() {
-    // Show loading indicator
-    document.getElementById('loading-indicator').style.display = 'block';
-    document.getElementById('refresh-button').disabled = true;
-    
-    // Use window.location instead of fetch to avoid AJAX errors
-    window.location.href = '/refresh';
+  /* Alerts Container */
+  #alerts-container {
+    display: none;
+    margin-bottom: 20px;
+    animation: slideDown 0.3s ease-out;
   }
   
-  function updateApiStatus(apiName, apiStats) {
-    const statusElement = document.getElementById(apiName + '-status');
+  #alerts-container.active {
+    display: block;
+  }
+  
+  .alerts-wrapper {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .alerts-header {
+    background-color: #00395D;
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .alerts-header h3 {
+    margin: 0;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .alerts-header h3 i {
+    margin-right: 8px;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .alerts-content {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  /* Alert Items */
+  .alert-item {
+    display: flex;
+    padding: 12px 15px;
+    border-bottom: 1px solid #edf2f7;
+  }
+  
+  .alert-icon {
+    margin-right: 12px;
+    font-size: 18px;
+    padding-top: 2px;
+  }
+  
+  .alert-content {
+    flex: 1;
+  }
+  
+  .alert-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  
+  .alert-details {
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+  
+  .alert-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 12px;
+    color: #64748b;
+  }
+  
+  /* Severity Styles */
+  .alert-critical {
+    border-left: 4px solid #e53e3e;
+    background-color: rgba(229, 62, 62, 0.05);
+  }
+  
+  .alert-critical .alert-icon {
+    color: #e53e3e;
+  }
+  
+  .alert-high {
+    border-left: 4px solid #ed8936;
+    background-color: rgba(237, 137, 54, 0.05);
+  }
+  
+  .alert-high .alert-icon {
+    color: #ed8936;
+  }
+  
+  .alert-medium {
+    border-left: 4px solid #4299e1;
+    background-color: rgba(66, 153, 225, 0.05);
+  }
+  
+  .alert-medium .alert-icon {
+    color: #4299e1;
+  }
+  
+  /* Empty State */
+  .alert-empty {
+    padding: 20px;
+    text-align: center;
+    color: #64748b;
+  }
+  
+  /* Show More Button */
+  .alert-more {
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .show-more-btn {
+    background-color: #f1f5f9;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .show-more-btn:hover {
+    background-color: #e2e8f0;
+  }
+  
+  /* Chart Container */
+  .chart-wrapper {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  .chart-wrapper h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #00395D;
+    font-size: 16px;
+  }
+  
+  .chart-area {
+    height: 250px;
+  }
+  
+  /* Animation */
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(229, 62, 62, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0); }
+  }
+  
+  .pulse {
+    animation: pulse 2s infinite;
+  }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+<script>
+  // Initialize chart
+  let responseTimeChart;
+  let alertCheckInterval;
+  const apiColors = {
+    'auth': '#0072CE',
+    'search': '#16A34A',
+    'booking': '#CA8A04',
+    'payment': '#E11D48',
+    'feedback': '#6366F1'
+  };
+  
+  // Setup alert controls
+  document.addEventListener('DOMContentLoaded', function() {
+    // Close alerts button
+    document.getElementById('close-alerts').addEventListener('click', function() {
+      document.getElementById('alerts-container').classList.remove('active');
+    });
     
-    // Update text
-    statusElement.textContent = apiStats.total_logs + ' logs, ' + apiStats.anomaly_percent + '% anomalous';
-    
-    // Update status color
-    if (apiStats.anomaly_percent > 20) {
-      statusElement.className = 'status-red';
-    } else if (apiStats.anomaly_percent > 10) {
-      statusElement.className = 'status-yellow';
-    } else {
-      statusElement.className = 'status-green';
+    // Show all alerts button
+    const showAllBtn = document.getElementById('show-all-alerts');
+    if (showAllBtn) {
+      showAllBtn.addEventListener('click', function() {
+        // Load full alerts view or expand current view
+        // This would typically show a modal with all alerts
+        alert('This would show a full alerts view in a production system');
+      });
     }
+    
+    // Initialize response time chart
+    initResponseTimeChart();
+    
+    // Start periodic spike check
+    startSpikeCheck();
+  });
+  
+  function initResponseTimeChart() {
+    const ctx = document.getElementById('responseTimeChart').getContext('2d');
+    
+    // Extract spike data from template
+    const spikeData = {
+      {% for api, spikes in api_spikes.items() %}
+        '{{ api }}': [
+          {% for spike in spikes %}
+            {
+              x: '{{ spike.timestamp }}',
+              y: {{ spike.response_time }},
+              threshold: {{ spike.threshold }},
+              times_avg: {{ spike.times_avg }}
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ]{% if not loop.last %},{% endif %}
+      {% endfor %}
+    };
+    
+    // Create datasets for each API
+    const datasets = [];
+    for (const [api, data] of Object.entries(spikeData)) {
+      if (data.length > 0) {
+        datasets.push({
+          label: api.toUpperCase(),
+          data: data.map(d => ({ x: new Date(d.x), y: d.y })),
+          borderColor: apiColors[api] || '#6B7280',
+          backgroundColor: apiColors[api] || '#6B7280',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.2
+        });
+      }
+    }
+    
+    // Create chart with available data
+    responseTimeChart = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: datasets
+      },
+      options: {
+        animation: false,
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'minute',
+              displayFormats: {
+                minute: 'HH:mm:ss'
+              }
+            },
+            title: {
+              display: true,
+              text: 'Time'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Response Time (ms)'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const data = context.raw;
+                return `${context.dataset.label}: ${data.y}ms`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  function startSpikeCheck() {
+    // Check for spikes every 30 seconds
+    alertCheckInterval = setInterval(checkForSpikes, 30000);
+    
+    // Do an initial check
+    checkForSpikes();
+  }
+  
+  function checkForSpikes() {
+    fetch('/api/check_spikes')
+      .then(response => response.json())
+      .then(data => {
+        if (data.has_alerts) {
+          // Show alerts container
+          const alertsContainer = document.getElementById('alerts-container');
+          alertsContainer.classList.add('active');
+          
+          // Add pulse effect if there are critical alerts
+          const criticalAlerts = data.alerts.filter(a => a.severity === 'CRITICAL');
+          if (criticalAlerts.length > 0) {
+            alertsContainer.classList.add('pulse');
+          } else {
+            alertsContainer.classList.remove('pulse');
+          }
+          
+          // Update alerts list
+          updateAlertsList(data.alerts);
+          
+          // Update chart with new spike data
+          updateResponseTimeChart(data.api_spikes);
+          
+          // Update dashboard stats
+          document.getElementById('active-issues').textContent = data.alerts.length;
+          document.getElementById('active-issues-note').textContent = `+${data.alerts.length} from yesterday`;
+          document.getElementById('system-health').textContent = `${(100 - data.alerts.length * 10)}%`;
+          document.getElementById('system-health-note').textContent = `-${data.alerts.length * 10}% this hour`;
+          document.getElementById('system-health-note').className = 'red';
+        }
+      })
+      .catch(error => console.error('Error checking for spikes:', error));
+  }
+  
+  function updateAlertsList(alerts) {
+    const alertsList = document.getElementById('alerts-list');
+    if (!alertsList) return;
+    
+    // Only show the first 5 alerts in the panel
+    const displayAlerts = alerts.slice(0, 5);
+    
+    // Clear current alerts
+    alertsList.innerHTML = '';
+    
+    if (displayAlerts.length === 0) {
+      alertsList.innerHTML = '<div class="alert-empty">No alerts at this time</div>';
+      return;
+    }
+    
+    // Add each alert
+    displayAlerts.forEach(alert => {
+      const alertItem = document.createElement('div');
+      alertItem.className = `alert-item alert-${alert.severity.toLowerCase()}`;
+      
+      let iconClass = 'info-circle';
+      if (alert.severity === 'CRITICAL') iconClass = 'exclamation-circle';
+      else if (alert.severity === 'HIGH') iconClass = 'exclamation-triangle';
+      
+      alertItem.innerHTML = `
+        <div class="alert-icon">
+          <i class="fas fa-${iconClass}"></i>
+        </div>
+        <div class="alert-content">
+          <div class="alert-title">${alert.message}</div>
+          <div class="alert-details">${alert.details}</div>
+          <div class="alert-meta">
+            <span><i class="fas fa-clock"></i> ${alert.timestamp}</span>
+            <span><i class="fas fa-server"></i> ${alert.api}</span>
+          </div>
+        </div>
+      `;
+      
+      alertsList.appendChild(alertItem);
+    });
+    
+    // Add "Show more" button if needed
+    if (alerts.length > 5) {
+      const moreButton = document.createElement('div');
+      moreButton.className = 'alert-more';
+      moreButton.innerHTML = `
+        <button id="show-all-alerts" class="show-more-btn">
+          Show ${alerts.length - 5} more alerts...
+        </button>
+      `;
+      alertsList.appendChild(moreButton);
+      
+      // Add event listener to the new button
+      document.getElementById('show-all-alerts').addEventListener('click', function() {
+        alert('This would show a full alerts view in a production system');
+      });
+    }
+  }
+  
+  function updateResponseTimeChart(apiSpikes) {
+    if (!responseTimeChart) return;
+    
+    // Create datasets for each API
+    const datasets = [];
+    for (const [api, spikes] of Object.entries(apiSpikes)) {
+      if (spikes && spikes.length > 0) {
+        datasets.push({
+          label: api.toUpperCase(),
+          data: spikes.map(spike => ({
+            x: new Date(spike.timestamp),
+            y: spike.response_time
+          })),
+          borderColor: apiColors[api] || '#6B7280',
+          backgroundColor: apiColors[api] || '#6B7280',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.2
+        });
+      }
+    }
+    
+    // Update chart data
+    responseTimeChart.data.datasets = datasets;
+    responseTimeChart.update();
+  }
+  
+  function refreshDashboard() {
+    location.reload();
   }
 </script>
 {% endblock %}

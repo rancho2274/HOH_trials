@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from search_api_generator import generate_search_log_entry
 from booking_api_generator import generate_booking_log_entry
 from payment_api_generator import generate_payment_log_entry
@@ -6,6 +6,7 @@ from feedback_api_generator import generate_feedback_log_entry
 from auth_api_generator import generate_auth_log_entry
 import secrets
 import uuid
+import random
 
 import json
 import os
@@ -207,7 +208,6 @@ def write_search_log(log_entry):
     return json_success
 
 
-
 @app.route('/', methods=['GET', 'POST'])
 def login():
     # Handle login form submission
@@ -349,6 +349,44 @@ def hotels_by_location(location):
 
     hotels = hotels_data.get(location, [])
     return render_template("hotels.html", location = location.title(), hotels=hotels, checkin=checkin, checkout=checkout, guests=guests)
+
+# NEW ENDPOINT: Generate a high response time log for the View More button
+@app.route('/generate_spike', methods=['POST'])
+def generate_spike():
+    """
+    Special route to generate high response time logs for demonstrating spike detection
+    """
+    session_id = get_or_create_session_id()
+    
+    # Extract form data
+    hotel_name = request.form.get('hotel_name', 'Unknown Hotel')
+    location = request.form.get('location', 'unknown')
+    checkin = request.form.get('checkin')
+    checkout = request.form.get('checkout')
+    guests = request.form.get('guests')
+    
+    # Generate a search log with very high response time (>3000ms)
+    search_log = generate_search_log_entry(
+        timestamp=datetime.now(),
+        search_type="hotel_details_search",
+        is_anomalous=True,  # Mark as anomalous
+        session_id=session_id
+    )
+    
+    # Force high response time for this log
+    search_log['response']['time_ms'] = random.randint(3000, 5000)  # Between 3-5 seconds
+    
+    # Save the search log with high response time
+    write_search_log(search_log)
+    
+    print(f"Generated high response time log ({search_log['response']['time_ms']} ms) for hotel: {hotel_name}")
+    
+    # Redirect to the hotels page with the same parameters
+    return redirect(url_for('hotels_by_location', 
+                           location=location,
+                           checkin=checkin,
+                           checkout=checkout,
+                           guests=guests))
 
 @app.route('/book', methods=['POST'])
 def book():

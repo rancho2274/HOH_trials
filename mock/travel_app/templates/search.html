@@ -295,5 +295,81 @@
         });
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all "View more" buttons in hotel cards
+        const viewButtons = document.querySelectorAll('.hotel-card button');
+        
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Prevent the default action temporarily
+                e.preventDefault();
+                
+                const hotelCard = this.closest('.hotel-card');
+                const hotelName = hotelCard.querySelector('h3').textContent;
+                const location = hotelCard.querySelector('p').textContent.toLowerCase();
+                
+                // Create a form to submit
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/generate_spike'; // New endpoint we'll create
+                
+                // Add the hotel name
+                const hotelInput = document.createElement('input');
+                hotelInput.type = 'hidden';
+                hotelInput.name = 'hotel_name';
+                hotelInput.value = hotelName;
+                form.appendChild(hotelInput);
+                
+                // Add location
+                const locationInput = document.createElement('input');
+                locationInput.type = 'hidden';
+                locationInput.name = 'location';
+                locationInput.value = location;
+                form.appendChild(locationInput);
+                
+                // Add high_response flag
+                const highResponseInput = document.createElement('input');
+                highResponseInput.type = 'hidden';
+                highResponseInput.name = 'high_response';
+                highResponseInput.value = 'true';
+                form.appendChild(highResponseInput);
+                
+                // Add dates and guests if available
+                const checkin = document.getElementById('checkin')?.value;
+                const checkout = document.getElementById('checkout')?.value;
+                const guests = document.getElementById('guests')?.value;
+                
+                if (checkin) {
+                    const checkinInput = document.createElement('input');
+                    checkinInput.type = 'hidden';
+                    checkinInput.name = 'checkin';
+                    checkinInput.value = checkin;
+                    form.appendChild(checkinInput);
+                }
+                
+                if (checkout) {
+                    const checkoutInput = document.createElement('input');
+                    checkoutInput.type = 'hidden';
+                    checkoutInput.name = 'checkout';
+                    checkoutInput.value = checkout;
+                    form.appendChild(checkoutInput);
+                }
+                
+                if (guests) {
+                    const guestsInput = document.createElement('input');
+                    guestsInput.type = 'hidden';
+                    guestsInput.name = 'guests';
+                    guestsInput.value = guests;
+                    form.appendChild(guestsInput);
+                }
+                
+                // Add the form to the body and submit it
+                document.body.appendChild(form);
+                form.submit();
+            });
+        });
+    });
+</script>
 </body>
 </html>`

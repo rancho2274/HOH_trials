@@ -5,6 +5,7 @@ import json
 import time
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
@@ -200,6 +201,141 @@ class ResponseTimeAnomalyDetector:
         
         return result_df
 
+def detect_spikes(logs, threshold_multiplier=3.0, min_threshold=1000):
+    """
+    Simple function to detect response time spikes in logs
+    
+    Args:
+        logs: List of log entries
+        threshold_multiplier: Multiple of average response time to consider a spike
+        min_threshold: Minimum response time to be considered a spike (ms)
+        
+    Returns:
+        Dictionary with spike information
+    """
+    if not logs:
+        return {"spikes": [], "api_spikes": {}}
+    
+    # Extract response times by API
+    api_response_times = {
+        "auth": [],
+        "search": [],
+        "booking": [],
+        "payment": [],
+        "feedback": []
+    }
+    
+    # Process each log
+    for log in logs:
+        if 'response' in log and 'time_ms' in log['response']:
+            time_ms = log['response']['time_ms']
+            
+            # Determine API type
+            api_type = "unknown"
+            if 'auth_service' in log:
+                api_type = "auth"
+            elif 'search_service' in log:
+                api_type = "search"
+            elif 'booking_service' in log:
+                api_type = "booking"
+            elif 'payment_service' in log:
+                api_type = "payment"
+            elif 'feedback_service' in log:
+                api_type = "feedback"
+            
+            # Add to the appropriate API list
+            if api_type in api_response_times:
+                api_response_times[api_type].append({
+                    "timestamp": log.get("timestamp"),
+                    "response_time": time_ms,
+                    "api": api_type
+                })
+    
+    # Detect spikes for each API
+    all_spikes = []
+    api_spikes = {}
+    
+    for api, data in api_response_times.items():
+        if not data:
+            api_spikes[api] = []
+            continue
+        
+        # Get response times
+        times = [entry["response_time"] for entry in data]
+        
+        # Calculate average
+        avg_time = sum(times) / len(times)
+        
+        # Set threshold
+        threshold = max(min_threshold, avg_time * threshold_multiplier)
+        
+        # Find spikes
+        spikes = []
+        for entry in data:
+            if entry["response_time"] >= threshold:
+                # Add additional spike info
+                spike = entry.copy()
+                spike["threshold"] = threshold
+                spike["times_avg"] = entry["response_time"] / avg_time
+                spikes.append(spike)
+        
+        # Store spikes for this API
+        api_spikes[api] = spikes
+        all_spikes.extend(spikes)
+    
+    return {
+        "spikes": all_spikes,
+        "api_spikes": api_spikes
+    }
+
+def generate_alerts(spike_data):
+    """
+    Generate alerts from spike data
+    
+    Args:
+        spike_data: Dictionary with spike information
+        
+    Returns:
+        List of alert dictionaries
+    """
+    alerts = []
+    
+    # Process all spikes
+    for spike in spike_data["spikes"]:
+        # Determine severity based on how many times above threshold
+        times_avg = spike.get("times_avg", 0)
+        
+        if times_avg >= 5.0:
+            severity = "CRITICAL"
+        elif times_avg >= 3.0:
+            severity = "HIGH"
+        else:
+            severity = "MEDIUM"
+        
+        # Format timestamp for display
+        try:
+            dt = datetime.fromisoformat(spike["timestamp"].replace('Z', '+00:00'))
+            formatted_time = dt.strftime("%Y-%m-%d %H:%M:%S")
+        except:
+            formatted_time = spike["timestamp"]
+        
+        # Create alert
+        alert = {
+            "severity": severity,
+            "api": spike["api"].upper(),
+            "message": f"{severity}: {spike['api'].upper()} API response time spike detected",
+            "details": f"Response time of {spike['response_time']:.0f}ms is {times_avg:.1f}x higher than normal",
+            "timestamp": formatted_time
+        }
+        
+        alerts.append(alert)
+    
+    # Sort alerts by severity
+    severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2}
+    alerts.sort(key=lambda x: severity_order.get(x["severity"], 3))
+    
+    return alerts
+
 def add_response_anomaly_to_logs(input_file, result_df, output_folder, api_name):
     """
     Creates a log file with response_anomaly flags in the combine_logs folder
@@ -299,6 +435,67 @@ def add_response_anomaly_to_logs(input_file, result_df, output_folder, api_name)
     
     return output_file
 
+def process_log_files_with_spikes():
+    """
+    Process all log files, detect anomalies, and identify spikes
+    
+    Returns:
+        Dictionary with statistics for each API and spike information
+    """
+    # Get regular statistics
+    stats, api_stats = process_log_files()
+    
+    # Get the travel_app directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    travel_app_dir = os.path.dirname(current_dir)  # Go up one level to reach travel_app
+    
+    # Load all logs for spike detection
+    all_logs = []
+    log_files = {
+        "auth": "auth_interactions.json",
+        "search": "search_interactions.json",
+        "booking": "booking_interactions.json",
+        "payment": "payment_interactions.json",
+        "feedback": "feedback_interactions.json"
+    }
+    
+    for api_name, log_file in log_files.items():
+        file_path = os.path.join(travel_app_dir, log_file)
+        if os.path.exists(file_path):
+            try:
+                with open(file_path, 'r') as f:
+                    content = f.read().strip()
+                    if content.startswith('[') and content.endswith(']'):
+                        logs = json.loads(content)
+                    else:
+                        # Handle newline-delimited JSON
+                        logs = []
+                        for line in content.split('\n\n'):
+                            if line.strip():
+                                try:
+                                    logs.append(json.loads(line.strip()))
+                                except json.JSONDecodeError:
+                                    pass
+                all_logs.extend(logs)
+            except Exception as e:
+                print(f"Error loading {file_path}: {str(e)}")
+    
+    # Detect spikes
+    spike_info = detect_spikes(all_logs)
+    
+    # Generate alerts from spikes
+    alerts = generate_alerts(spike_info)
+    
+    # Return combined information
+    return {
+        "overall": stats,
+        "api_stats": api_stats,
+        "spikes": spike_info["spikes"],
+        "api_spikes": spike_info["api_spikes"],
+        "alerts": alerts,
+        "has_alerts": len(alerts) > 0
+    }
+
 def process_log_files():
     """
     Process all log files, detect anomalies, and update logs with response_anomaly flags
@@ -387,7 +584,7 @@ def process_log_files():
                         if len(result_df) > 0:
                             api_stats[api_name]["anomaly_percent"] = round(len(anomalies) / len(result_df) * 100, 1)
                         
-                        # FIXED: Calculate API-specific response time averages
+                        # Calculate API-specific response time averages
                         if len(normal) > 0:
                             # Simple mean of time_ms column for normal logs
                             api_stats[api_name]["normal_avg"] = round(normal['time_ms'].mean(), 2)
@@ -401,7 +598,7 @@ def process_log_files():
                         stats["anomalies"] += len(anomalies)
                         stats["normal_logs"] += len(normal)
                         
-                        # FIXED: Calculate overall normal and anomalous response time averages
+                        # Calculate overall normal and anomalous response time averages
                         if len(normal) > 0:
                             normal_sum = normal['time_ms'].sum()
                             # For the first API being processed
@@ -447,83 +644,80 @@ def process_log_files():
     print(f"Normal average response time: {stats['normal_avg']} ms")
     print(f"Anomalous average response time: {stats['anomalous_avg']} ms")
     
-    # Save stats to a file for future reference
-    stats_file = os.path.join(current_dir, 'static', 'dashboard_stats.json')
-    try:
-        # Ensure the static directory exists
-        static_dir = os.path.join(current_dir, 'static')
-        if not os.path.exists(static_dir):
-            os.makedirs(static_dir)
-            
-        # Write stats to file
-        with open(stats_file, 'w') as f:
-            combined_stats = {
-                "overall": stats,
-                "api_stats": api_stats
-            }
-            json.dump(combined_stats, f, indent=2)
-            print(f"Stats saved to {stats_file}")
-    except Exception as e:
-        print(f"Error saving stats to {stats_file}: {str(e)}")
-    
     return stats, api_stats
 
 @app.route('/')
 def dashboard():
-    # Process log files and get statistics
-    stats, api_stats = process_log_files()
-    return render_template('dashboard.html', stats=stats, api_stats=api_stats)
+    # Process log files and get statistics with spike detection
+    combined_stats = process_log_files_with_spikes()
+    
+    # Pass all required variables to the template
+    return render_template('dashboard.html', 
+                          stats=combined_stats['overall'], 
+                          api_stats=combined_stats['api_stats'],
+                          spikes=combined_stats.get('spikes', []),
+                          api_spikes=combined_stats.get('api_spikes', {}),
+                          alerts=combined_stats.get('alerts', []),
+                          has_alerts=combined_stats.get('has_alerts', False))
 
 @app.route('/api/system')
 def system_api():
     # Process log files and get statistics
-    stats, api_stats = process_log_files()
-    return render_template('api_health.html', api_name="System", stats=stats)
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', api_name="System", stats=combined_stats['overall'])
 
 @app.route('/api/auth')
 def auth_api():
     # Process log files and get statistics
-    stats, api_stats = process_log_files()
-    return render_template('api_health.html', api_name="Authentication", stats=api_stats['auth'])
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', api_name="Authentication", stats=combined_stats['api_stats']['auth'])
 
 @app.route('/api/search')
 def search_api():
     # Process log files and get statistics
-    stats, api_stats = process_log_files()
-    return render_template('api_health.html', api_name="Search", stats=api_stats['search'])
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', api_name="Search", stats=combined_stats['api_stats']['search'])
 
 @app.route('/api/booking')
 def booking_api():
     # Process log files and get statistics
-    stats, api_stats = process_log_files()
-    return render_template('api_health.html', api_name="Booking", stats=api_stats['booking'])
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', api_name="Booking", stats=combined_stats['api_stats']['booking'])
 
 @app.route('/api/payment')
 def payment_api():
     # Process log files and get statistics
-    stats, api_stats = process_log_files()
-    return render_template('api_health.html', api_name="Payment", stats=api_stats['payment'])
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', api_name="Payment", stats=combined_stats['api_stats']['payment'])
 
 @app.route('/api/feedback')
 def feedback_api():
     # Process log files and get statistics
-    stats, api_stats = process_log_files()
-    return render_template('api_health.html', api_name="Feedback", stats=api_stats['feedback'])
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', api_name="Feedback", stats=combined_stats['api_stats']['feedback'])
 
 @app.route('/refresh')
 def refresh():
-    # Process log files and get updated statistics
-    stats, api_stats = process_log_files()
+    # Process log files and get updated statistics with spike detection
+    combined_stats = process_log_files_with_spikes()
     
     # If an AJAX request, return JSON
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({
-            "stats": stats,
-            "api_stats": api_stats
-        })
+        return jsonify(combined_stats)
     
     # Otherwise, refresh the page
     return redirect(url_for('dashboard'))
+
+@app.route('/api/check_spikes')
+def check_spikes():
+    """API endpoint to check for new spikes"""
+    combined_stats = process_log_files_with_spikes()
+    return jsonify({
+        "spikes": combined_stats.get('spikes', []),
+        "api_spikes": combined_stats.get('api_spikes', {}),
+        "alerts": combined_stats.get('alerts', []),
+        "has_alerts": combined_stats.get('has_alerts', False)
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5050)
