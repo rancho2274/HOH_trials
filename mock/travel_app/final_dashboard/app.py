@@ -788,41 +788,7 @@ def dashboard():
                           alerts=combined_stats.get('alerts', []),
                           has_alerts=combined_stats.get('has_alerts', False))
 
-@app.route('/api/system')
-def system_api():
-    # Process log files and get statistics
-    combined_stats = process_log_files_with_spikes()
-    return render_template('api_health.html', api_name="System", stats=combined_stats['overall'])
 
-@app.route('/api/auth')
-def auth_api():
-    # Process log files and get statistics
-    combined_stats = process_log_files_with_spikes()
-    return render_template('api_health.html', api_name="Authentication", stats=combined_stats['api_stats']['auth'])
-
-@app.route('/api/search')
-def search_api():
-    # Process log files and get statistics
-    combined_stats = process_log_files_with_spikes()
-    return render_template('api_health.html', api_name="Search", stats=combined_stats['api_stats']['search'])
-
-@app.route('/api/booking')
-def booking_api():
-    # Process log files and get statistics
-    combined_stats = process_log_files_with_spikes()
-    return render_template('api_health.html', api_name="Booking", stats=combined_stats['api_stats']['booking'])
-
-@app.route('/api/payment')
-def payment_api():
-    # Process log files and get statistics
-    combined_stats = process_log_files_with_spikes()
-    return render_template('api_health.html', api_name="Payment", stats=combined_stats['api_stats']['payment'])
-
-@app.route('/api/feedback')
-def feedback_api():
-    # Process log files and get statistics
-    combined_stats = process_log_files_with_spikes()
-    return render_template('api_health.html', api_name="Feedback", stats=combined_stats['api_stats']['feedback'])
 
 @app.route('/refresh')
 def refresh():
@@ -846,6 +812,83 @@ def check_spikes():
         "alerts": combined_stats.get('alerts', []),
         "has_alerts": combined_stats.get('has_alerts', False)
     })
+    
+# Add these routes to your app.py file
+
+@app.route('/kibana_config')
+def kibana_config():
+    """Return Kibana configuration settings as JSON"""
+    # Define dashboard IDs for each API
+    # You would replace these with actual dashboard IDs from your Kibana setup
+    kibana_dashboards = {
+        "system": "system-overview-dashboard",
+        "auth": "auth-api-dashboard",
+        "search": "search-api-dashboard",
+        "booking": "booking-api-dashboard",
+        "payment": "payment-api-dashboard",
+        "feedback": "feedback-api-dashboard"
+    }
+    
+    # Return configuration as JSON
+    return jsonify({
+        "kibana_url": "http://localhost:5601",
+        "dashboards": kibana_dashboards
+    })
+
+# Modify your existing route handlers to pass Kibana dashboard IDs to templates
+@app.route('/api/system')
+def system_api():
+    # Process log files and get statistics
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', 
+                          api_name="System", 
+                          stats=combined_stats['overall'],
+                          kibana_dashboard_id="system-overview-dashboard")
+
+@app.route('/api/auth')
+def auth_api():
+    # Process log files and get statistics
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', 
+                          api_name="Authentication", 
+                          stats=combined_stats['api_stats']['auth'],
+                          kibana_dashboard_id="auth-api-dashboard")
+
+@app.route('/api/search')
+def search_api():
+    # Process log files and get statistics
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', 
+                          api_name="Search", 
+                          stats=combined_stats['api_stats']['search'],
+                          kibana_dashboard_id="search-api-dashboard")
+
+@app.route('/api/booking')
+def booking_api():
+    # Process log files and get statistics
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', 
+                          api_name="Booking", 
+                          stats=combined_stats['api_stats']['booking'],
+                          kibana_dashboard_id="booking-api-dashboard")
+
+@app.route('/api/payment')
+def payment_api():
+    # Process log files and get statistics
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', 
+                          api_name="Payment", 
+                          stats=combined_stats['api_stats']['payment'],
+                          kibana_dashboard_id="payment-api-dashboard")
+
+@app.route('/api/feedback')
+def feedback_api():
+    # Process log files and get statistics
+    combined_stats = process_log_files_with_spikes()
+    return render_template('api_health.html', 
+                          api_name="Feedback", 
+                          stats=combined_stats['api_stats']['feedback'],
+                          kibana_dashboard_id="feedback-api-dashboard")
 
 if __name__ == '__main__':
     app.run(debug=True, port=5050)

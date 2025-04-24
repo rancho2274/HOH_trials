@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block content %}
 <div class="header">
@@ -37,6 +38,17 @@
     <h4 style="color: #0072CE;">Anomalous Response Time</h4>
     <h3 style="font-size: 28px; color: #003366;">{{ stats.anomalous_avg|default('0') }} ms</h3>
     <small style="color: #dc3545;">Average for anomalous operations</small>
+  </div>
+</div>
+
+<!-- Kibana Dashboard Section -->
+<div class="kibana-container">
+  <h3 style="margin-top: 30px; margin-bottom: 15px; color: #0072CE;">Live Kibana Dashboard</h3>
+  <div class="kibana-frame">
+    <div class="kibana-loading">
+      <i class="fas fa-spinner"></i> Loading Kibana Dashboard...
+    </div>
+    <iframe src="http://localhost:5601/app/dashboards#/view/{{ api_name|lower }}-dashboard" height="600" width="100%" frameborder="0" style="display: none;"></iframe>
   </div>
 </div>
 {% endblock %}
