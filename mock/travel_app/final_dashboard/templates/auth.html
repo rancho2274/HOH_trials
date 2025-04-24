@@ -2,100 +2,90 @@
 {% block content %}
 <div class="header">
   <h2>Live API Health: Authentication</h2>
-  <button class="refresh-btn" onclick="refreshDashboard()">
-    <i class="fas fa-sync-alt"></i> Refresh
+  <button class="refresh-btn" onclick="window.location.href = '{{ url_for('refresh') }}'">
+    <i class="fas fa-sync-alt"></i> Refresh Data
   </button>
 </div>
 
 <div class="cards">
   <div class="card">
     <h4>Total Logs</h4>
-    <h3 id="total-apis">{{ api_stats.auth.total_logs }}</h3>
-    <small id="total-apis-note" class="green">+{{ (api_stats.auth.total_logs // 5)|default(0) }} this month</small>
+    <h3 id="total-logs">{{ api_stats.auth.total_logs }}</h3>
+    <small id="total-logs-note" class="green">Last updated: {{ stats.updated_timestamp }}</small>
   </div>
   <div class="card">
-    <h4>Active Issues</h4>
-    <h3 id="active-issues">{{ api_stats.auth.anomalies }}</h3>
-    <small id="active-issues-note" class="red">+{{ api_stats.auth.anomalies }} from yesterday</small>
+    <h4>Anomalies</h4>
+    <h3 id="anomalies">{{ api_stats.auth.anomalies }} ({{ api_stats.auth.anomaly_percent }}%)</h3>
+    <small id="anomalies-note" class="{% if api_stats.auth.anomaly_percent > 10 %}red{% else %}green{% endif %}">
+      Response time anomalies
+    </small>
   </div>
   <div class="card">
-    <h4>Average Response</h4>
-    <h3 id="avg-response">{{ api_stats.auth.anomalous_avg|default(0)|round(2) }}ms</h3>
-    <small id="avg-response-note" class="{% if api_stats.auth.anomalous_avg < 300 %}green{% else %}red{% endif %}">{{ (api_stats.auth.anomalous_avg * 0.1)|default(0)|round(1) }}ms {% if api_stats.auth.anomalous_avg < 300 %}improvement{% else %}slower{% endif %}</small>
+    <h4>Normal Response Time</h4>
+    <h3 id="avg-response">{{ api_stats.auth.normal_avg }} ms</h3>
+    <small id="avg-response-note" class="green">Average for normal operations</small>
   </div>
   <div class="card">
-    <h4>API Health</h4>
-    <h3 id="system-health">{{ (100 - (api_stats.auth.anomaly_percent|default(0)))|round(1) }}%</h3>
-    <small id="system-health-note" class="{% if api_stats.auth.anomaly_percent > 0 %}red{% else %}green{% endif %}">{% if api_stats.auth.anomaly_percent > 0 %}-{% else %}+{% endif %}{{ [api_stats.auth.anomaly_percent|default(0), 10]|min }}% this week</small>
+    <h4>Anomalous Response Time</h4>
+    <h3 id="anomalous-response">{{ api_stats.auth.anomalous_avg }} ms</h3>
+    <small id="anomalous-response-note" class="red">Average for anomalous operations</small>
   </div>
 </div>
 
-<div style="margin-top: 40px;">
-  <h4 style="margin-bottom: 10px;">Authentication API - Response Time Analysis</h4>
-  
-  <div class="statuses">
-    <div class="status">
-      <h4>Authentication Operations</h4>
-      <div class="status-item">
-        <span>Login Operation</span>
-        <span class="{% if api_stats.auth.anomalies > 0 %}status-red{% else %}status-green{% endif %}">
-          {{ api_stats.auth.anomalous_avg|default(143, true) }}ms
-        </span>
-      </div>
-      <div class="status-item">
-        <span>Token Validation</span>
-        <span class="{% if api_stats.auth.anomalies > 0 %}status-yellow{% else %}status-green{% endif %}">
-          {{ (api_stats.auth.anomalous_avg * 0.7)|default(98, true)|round }}ms
-        </span>
-      </div>
-      <div class="status-item">
-        <span>Password Reset</span>
-        <span class="status-green">
-          {{ (api_stats.auth.normal_avg * 1.2)|default(120, true)|round }}ms
-        </span>
-      </div>
-    </div>
+<div class="api-details">
+  <div class="detail-section">
+    <h3>Authentication API Analysis</h3>
+    <p>This page shows the results of response time anomaly detection for the Authentication API. 
+    The system has analyzed {{ api_stats.auth.total_logs }} log entries and detected {{ api_stats.auth.anomalies }} 
+    anomalies ({{ api_stats.auth.anomaly_percent }}% of all operations).</p>
     
-    <div class="alert">
-      <h4>Auth API Alerts</h4>
-      {% if api_stats.auth.anomalies > 0 %}
-        <div class="alert-item">
-          <div>
-            <div class="severity-high">High Severity</div>
-            <p>Authentication API Response Time Spike: {{ api_stats.auth.anomalous_avg }}ms</p>
-            <small>5 minutes ago</small>
-          </div>
-        </div>
-        <div class="alert-item">
-          <div>
-            <div class="severity-medium">Medium Severity</div>
-            <p>Potential rate limiting detected</p>
-            <small>15 minutes ago</small>
-          </div>
-        </div>
-      {% else %}
-        <div class="alert-item">
-          <div>
-            <div class="severity-medium">Medium Severity</div>
-            <p>No critical issues detected</p>
-            <small>Just now</small>
-          </div>
-        </div>
-        <div class="alert-item">
-          <div>
-            <div class="severity-medium">Medium Severity</div>
-            <p>Feedback service operating normally</p>
-            <small>5 minutes ago</small>
-          </div>
-        </div>
+    <h4>Findings:</h4>
+    <ul>
+      <li>Normal authentication operations take an average of {{ api_stats.auth.normal_avg }} ms to complete</li>
+      <li>Anomalous operations take an average of {{ api_stats.auth.anomalous_avg }} ms to complete</li>
+      {% if api_stats.auth.normal_avg > 0 and api_stats.auth.anomalous_avg > 0 %}
+      <li>Anomalous operations are {{ (api_stats.auth.anomalous_avg / api_stats.auth.normal_avg)|round(1) }}x slower than normal operations</li>
       {% endif %}
+    </ul>
+    
+    <h4>Actions:</h4>
+    <p>The system has marked anomalous operations in the combined logs directory. You can review these logs 
+    to identify patterns and root causes of slow authentication operations.</p>
+    
+    <div class="note-box">
+      <p><strong>Note:</strong> To refresh the anomaly detection results, click the "Refresh Data" button in the top right corner. 
+      This will process the latest log data and update the analysis.</p>
     </div>
   </div>
 </div>
 
-<script>
-  function refreshDashboard() {
-    window.location.reload();
-  }
-</script>
+<style>
+.api-details {
+  margin-top: 30px;
+}
+
+.detail-section {
+  background: #f9fafe;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.detail-section h3 {
+  color: #0072CE;
+  margin-top: 0;
+}
+
+.detail-section ul {
+  margin-bottom: 20px;
+}
+
+.note-box {
+  background: #f0f7ff;
+  padding: 15px;
+  border-left: 4px solid #0072CE;
+  margin-top: 20px;
+  border-radius: 4px;
+}
+</style>
 {% endblock %}

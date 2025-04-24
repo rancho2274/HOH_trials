@@ -2,7 +2,7 @@
 {% block content %}
 <div class="header">
   <h2>Dashboard</h2>
-  <button class="refresh-btn" onclick="refreshDashboard()">
+  <button class="refresh-btn" id="refresh-button" onclick="refreshDashboard()">
     <i class="fas fa-sync-alt"></i> Refresh
   </button>
 </div>
@@ -10,197 +10,247 @@
 <div class="cards">
   <div class="card">
     <h4>Total Logs</h4>
-    <h3 id="total-apis">{{ dash_data.total_apis }}</h3>
-    <small id="total-apis-note" class="green">+{{ (dash_data.total_apis // 10) }} this month</small>
+    <h3 id="total-logs">{{ stats.total_logs }}</h3>
+    <small id="total-logs-note" class="green">Last updated: {{ stats.updated_timestamp }}</small>
   </div>
   <div class="card">
-    <h4>Active Issues</h4>
-    <h3 id="active-issues">{{ dash_data.active_issues }}</h3>
-    <small id="active-issues-note" class="red">+{{ dash_data.active_issues }} from yesterday</small>
+    <h4>Anomalies</h4>
+    <h3 id="anomalies">{{ stats.anomalies }} ({{ stats.anomaly_percent }}%)</h3>
+    <small id="anomalies-note" class="red">Detected response time issues</small>
   </div>
   <div class="card">
-    <h4>Average Response</h4>
-    <h3 id="avg-response">{{ dash_data.avg_response|round(2) }}ms</h3>
-    <small id="avg-response-note" class="{% if dash_data.avg_response < 300 %}green{% else %}red{% endif %}">{{ (dash_data.avg_response * 0.1)|round(1) }}ms {% if dash_data.avg_response < 300 %}improvement{% else %}slower{% endif %}</small>
+    <h4>Normal Response Time</h4>
+    <h3 id="avg-response">{{ stats.normal_avg }} ms</h3>
+    <small id="avg-response-note" class="green">Average for normal operations</small>
   </div>
   <div class="card">
-    <h4>System Health</h4>
-    <h3 id="system-health">{{ dash_data.system_health|round(1) }}%</h3>
-    <small id="system-health-note" class="{% if stats.anomaly_percent > 0 %}red{% else %}green{% endif %}">{% if stats.anomaly_percent > 0 %}-{% else %}+{% endif %}{{ [stats.anomaly_percent, 10]|min }}% this week</small>
+    <h4>Anomalous Response Time</h4>
+    <h3 id="anomalous-response">{{ stats.anomalous_avg }} ms</h3>
+    <small id="anomalous-response-note" class="red">Average for anomalous operations</small>
   </div>
 </div>
 
 <div class="statuses">
   <div class="status">
-    <h4>Real-time API Status</h4>
+    <h4>API Status</h4>
     <div class="status-item">
       <span>Authentication API</span>
-      <span id="auth-status" class="{% if api_stats.auth.anomalies > 0 %}status-red{% else %}status-green{% endif %}">
-        {{ api_stats.auth.anomalous_avg|default(145, true) }}ms
+      <span id="auth-status" class="{% if api_stats.auth.anomaly_percent > 20 %}status-red{% elif api_stats.auth.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
+        {{ api_stats.auth.total_logs }} logs, {{ api_stats.auth.anomaly_percent }}% anomalous
       </span>
     </div>
     <div class="status-item">
-      <span>Payment Gateway</span>
-      <span id="payment-status" class="{% if api_stats.payment.anomalies > 0 %}status-red{% elif api_stats.payment.anomalies == 0 and api_stats.payment.total_logs > 0 %}status-green{% else %}status-yellow{% endif %}">
-        {{ api_stats.payment.anomalous_avg|default(235, true) }}ms
+      <span>Search API</span>
+      <span id="search-status" class="{% if api_stats.search.anomaly_percent > 20 %}status-red{% elif api_stats.search.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
+        {{ api_stats.search.total_logs }} logs, {{ api_stats.search.anomaly_percent }}% anomalous
       </span>
     </div>
     <div class="status-item">
-      <span>Search Service</span>
-      <span id="search-status" class="{% if api_stats.search.anomalies > 0 %}status-red{% elif api_stats.search.anomalies == 0 and api_stats.search.total_logs > 0 %}status-green{% else %}status-yellow{% endif %}">
-        {{ api_stats.search.anomalous_avg|default(125, true) }}ms
+      <span>Booking API</span>
+      <span id="booking-status" class="{% if api_stats.booking.anomaly_percent > 20 %}status-red{% elif api_stats.booking.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
+        {{ api_stats.booking.total_logs }} logs, {{ api_stats.booking.anomaly_percent }}% anomalous
       </span>
     </div>
     <div class="status-item">
-      <span>Booking Service</span>
-      <span id="booking-status" class="{% if api_stats.booking.anomalies > 0 %}status-red{% elif api_stats.booking.anomalies == 0 and api_stats.booking.total_logs > 0 %}status-green{% else %}status-yellow{% endif %}">
-        {{ api_stats.booking.anomalous_avg|default(410, true) }}ms
+      <span>Payment API</span>
+      <span id="payment-status" class="{% if api_stats.payment.anomaly_percent > 20 %}status-red{% elif api_stats.payment.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
+        {{ api_stats.payment.total_logs }} logs, {{ api_stats.payment.anomaly_percent }}% anomalous
+      </span>
+    </div>
+    <div class="status-item">
+      <span>Feedback API</span>
+      <span id="feedback-status" class="{% if api_stats.feedback.anomaly_percent > 20 %}status-red{% elif api_stats.feedback.anomaly_percent > 10 %}status-yellow{% else %}status-green{% endif %}">
+        {{ api_stats.feedback.total_logs }} logs, {{ api_stats.feedback.anomaly_percent }}% anomalous
       </span>
     </div>
   </div>
   <div class="alert">
-    <h4>Critical Alerts</h4>
-    {% if stats.anomalies > 0 %}
-      {% set alert_count = 0 %}
-      {% for api_name, api_stat in api_stats.items() %}
-        {% if api_stat.anomalies > 0 and alert_count < 2 %}
-          <div class="alert-item">
-            <div>
-              <div class="severity-high">High Severity</div>
-              <p id="alert-{{ loop.index }}">{{ api_name|capitalize }} API Response Time Spike: {{ api_stat.anomalous_avg }}ms</p>
-              <small id="alert-{{ loop.index }}-time">{{ loop.index * 5 }} minutes ago</small>
-            </div>
-          </div>
-          {% set alert_count = alert_count + 1 %}
-        {% endif %}
-      {% endfor %}
-      
-      {% if alert_count == 0 %}
-        <div class="alert-item">
-          <div>
-            <div class="severity-medium">Medium Severity</div>
-            <p id="alert-1">No critical issues detected</p>
-            <small id="alert-1-time">Just now</small>
-          </div>
-        </div>
-      {% endif %}
-    {% else %}
-      <div class="alert-item">
-        <div>
-          <div class="severity-medium">Medium Severity</div>
-          <p id="alert-1">No critical issues detected</p>
-          <small id="alert-1-time">Just now</small>
-        </div>
+    <h4>Response Time Information</h4>
+    <div class="alert-item">
+      <div>
+        <div class="severity-high">High Severity</div>
+        <p id="alert-1">
+          {% if stats.anomalies > 0 %}
+          {{ stats.anomalies }} response time anomalies detected across {{ stats.total_logs }} logs
+          {% else %}
+          No response time anomalies detected
+          {% endif %}
+        </p>
+        <small id="alert-1-time">{{ stats.updated_timestamp }}</small>
       </div>
-      <div class="alert-item">
-        <div>
-          <div class="severity-medium">Medium Severity</div>
-          <p id="alert-2">All systems operational</p>
-          <small id="alert-2-time">5 minutes ago</small>
-        </div>
+    </div>
+    <div class="alert-item">
+      <div>
+        <div class="severity-medium">Insights</div>
+        <p id="alert-2">
+          {% if stats.anomalous_avg > 0 and stats.normal_avg > 0 %}
+          Anomalous responses are {{ (stats.anomalous_avg / stats.normal_avg)|round(1) }}x slower than normal responses
+          {% else %}
+          Insufficient data to compare normal and anomalous response times
+          {% endif %}
+        </p>
+        <small id="alert-2-time">{{ stats.updated_timestamp }}</small>
       </div>
-    {% endif %}
+    </div>
   </div>
 </div>
 
+<div class="loading-indicator" id="loading-indicator" style="display: none; text-align: center; margin-top: 20px;">
+  <p>Processing logs and detecting anomalies... please wait.</p>
+  <div class="spinner" style="margin: 10px auto; width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #0072CE; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+</div>
+
+<div class="api-summary">
+  <h3>API Anomaly Analysis Summary</h3>
+  <p>The dashboard has analyzed log files from all APIs and detected response time anomalies based on statistical analysis. 
+  Below is a summary of the findings:</p>
+  
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th>API</th>
+        <th>Total Logs</th>
+        <th>Anomalies</th>
+        <th>Anomaly %</th>
+        <th>Normal Avg (ms)</th>
+        <th>Anomalous Avg (ms)</th>
+        <th>Ratio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Authentication</td>
+        <td>{{ api_stats.auth.total_logs }}</td>
+        <td>{{ api_stats.auth.anomalies }}</td>
+        <td>{{ api_stats.auth.anomaly_percent }}%</td>
+        <td>{{ api_stats.auth.normal_avg }}</td>
+        <td>{{ api_stats.auth.anomalous_avg }}</td>
+        <td>{% if api_stats.auth.normal_avg > 0 and api_stats.auth.anomalous_avg > 0 %}{{ (api_stats.auth.anomalous_avg / api_stats.auth.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
+      </tr>
+      <tr>
+        <td>Search</td>
+        <td>{{ api_stats.search.total_logs }}</td>
+        <td>{{ api_stats.search.anomalies }}</td>
+        <td>{{ api_stats.search.anomaly_percent }}%</td>
+        <td>{{ api_stats.search.normal_avg }}</td>
+        <td>{{ api_stats.search.anomalous_avg }}</td>
+        <td>{% if api_stats.search.normal_avg > 0 and api_stats.search.anomalous_avg > 0 %}{{ (api_stats.search.anomalous_avg / api_stats.search.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
+      </tr>
+      <tr>
+        <td>Booking</td>
+        <td>{{ api_stats.booking.total_logs }}</td>
+        <td>{{ api_stats.booking.anomalies }}</td>
+        <td>{{ api_stats.booking.anomaly_percent }}%</td>
+        <td>{{ api_stats.booking.normal_avg }}</td>
+        <td>{{ api_stats.booking.anomalous_avg }}</td>
+        <td>{% if api_stats.booking.normal_avg > 0 and api_stats.booking.anomalous_avg > 0 %}{{ (api_stats.booking.anomalous_avg / api_stats.booking.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
+      </tr>
+      <tr>
+        <td>Payment</td>
+        <td>{{ api_stats.payment.total_logs }}</td>
+        <td>{{ api_stats.payment.anomalies }}</td>
+        <td>{{ api_stats.payment.anomaly_percent }}%</td>
+        <td>{{ api_stats.payment.normal_avg }}</td>
+        <td>{{ api_stats.payment.anomalous_avg }}</td>
+        <td>{% if api_stats.payment.normal_avg > 0 and api_stats.payment.anomalous_avg > 0 %}{{ (api_stats.payment.anomalous_avg / api_stats.payment.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
+      </tr>
+      <tr>
+        <td>Feedback</td>
+        <td>{{ api_stats.feedback.total_logs }}</td>
+        <td>{{ api_stats.feedback.anomalies }}</td>
+        <td>{{ api_stats.feedback.anomaly_percent }}%</td>
+        <td>{{ api_stats.feedback.normal_avg }}</td>
+        <td>{{ api_stats.feedback.anomalous_avg }}</td>
+        <td>{% if api_stats.feedback.normal_avg > 0 and api_stats.feedback.anomalous_avg > 0 %}{{ (api_stats.feedback.anomalous_avg / api_stats.feedback.normal_avg)|round(1) }}x{% else %}-{% endif %}</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div class="note-box">
+    <p><strong>Note:</strong> All logs with detected anomalies have been marked with a <code>response_anomaly</code> flag in the combine_logs directory.
+    You can click on any API in the sidebar menu to see more detailed information about that specific API.</p>
+  </div>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.api-summary {
+  margin-top: 30px;
+  background: #f9fafe;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.api-summary h3 {
+  color: #0072CE;
+  margin-top: 0;
+}
+
+.api-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.api-table th, .api-table td {
+  border: 1px solid #e2e8f0;
+  padding: 10px;
+  text-align: center;
+}
+
+.api-table th {
+  background-color: #f1f5f9;
+  font-weight: bold;
+}
+
+.api-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.note-box {
+  background: #f0f7ff;
+  padding: 15px;
+  border-left: 4px solid #0072CE;
+  margin-top: 20px;
+  border-radius: 4px;
+}
+
+code {
+  background: #f1f5f9;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+</style>
+
 <script>
   function refreshDashboard() {
-    // Show a loading indicator or message
-    document.getElementById('total-apis').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    document.getElementById('active-issues').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    document.getElementById('avg-response').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    document.getElementById('system-health').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    // Show loading indicator
+    document.getElementById('loading-indicator').style.display = 'block';
+    document.getElementById('refresh-button').disabled = true;
     
-    // Make an AJAX request to the refresh endpoint
-    fetch('/refresh', {
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(res => res.json())
-    .then(data => {
-      // Update the dashboard with the new data
-      document.getElementById('total-apis').textContent = data.stats.total_logs;
-      document.getElementById('total-apis-note').textContent = '+' + Math.floor(data.stats.total_logs / 10) + ' this month';
-      
-      document.getElementById('active-issues').textContent = data.stats.anomalies;
-      document.getElementById('active-issues-note').textContent = '+' + data.stats.anomalies + ' from yesterday';
-      
-      document.getElementById('avg-response').textContent = data.stats.anomalous_avg.toFixed(2) + 'ms';
-      const responseNote = (data.stats.anomalous_avg * 0.1).toFixed(1) + 'ms ' + 
-                           (data.stats.anomalous_avg < 300 ? 'improvement' : 'slower');
-      document.getElementById('avg-response-note').textContent = responseNote;
-      document.getElementById('avg-response-note').className = data.stats.anomalous_avg < 300 ? 'green' : 'red';
-      
-      const systemHealth = (100 - data.stats.anomaly_percent).toFixed(1);
-      document.getElementById('system-health').textContent = systemHealth + '%';
-      const healthNote = (data.stats.anomaly_percent > 0 ? '-' : '+') + 
-                        Math.min(data.stats.anomaly_percent, 10).toFixed(1) + '% this week';
-      document.getElementById('system-health-note').textContent = healthNote;
-      document.getElementById('system-health-note').className = data.stats.anomaly_percent > 0 ? 'red' : 'green';
-      
-      // Update API statuses
-      updateApiStatus('auth', data.api_stats.auth);
-      updateApiStatus('payment', data.api_stats.payment);
-      updateApiStatus('search', data.api_stats.search);
-      updateApiStatus('booking', data.api_stats.booking);
-      
-      // Update alerts based on anomalies
-      updateAlerts(data.stats, data.api_stats);
-      
-      console.log('Dashboard refreshed with new data:', data);
-    })
-    .catch(error => {
-      console.error('Error refreshing dashboard:', error);
-      // Reset the display on error
-      location.reload();
-    });
+    // Use window.location instead of fetch to avoid AJAX errors
+    window.location.href = '/refresh';
   }
   
   function updateApiStatus(apiName, apiStats) {
     const statusElement = document.getElementById(apiName + '-status');
-    if (statusElement) {
-      statusElement.textContent = (apiStats.anomalous_avg || 
-                                  (apiName === 'auth' ? 145 : 
-                                   apiName === 'payment' ? 235 : 
-                                   apiName === 'search' ? 125 : 410)) + 'ms';
-      
-      if (apiStats.anomalies > 0) {
-        statusElement.className = 'status-red';
-      } else if (apiStats.anomalies === 0 && apiStats.total_logs > 0) {
-        statusElement.className = 'status-green';
-      } else {
-        statusElement.className = 'status-yellow';
-      }
-    }
-  }
-  
-  function updateAlerts(stats, apiStats) {
-    // Find APIs with anomalies
-    const alertApis = Object.entries(apiStats)
-      .filter(([_, stat]) => stat.anomalies > 0)
-      .map(([name, stat]) => ({
-        name: name.charAt(0).toUpperCase() + name.slice(1),
-        response: stat.anomalous_avg
-      }));
     
-    const alertElements = [
-      { message: document.getElementById('alert-1'), time: document.getElementById('alert-1-time') },
-      { message: document.getElementById('alert-2'), time: document.getElementById('alert-2-time') }
-    ];
+    // Update text
+    statusElement.textContent = apiStats.total_logs + ' logs, ' + apiStats.anomaly_percent + '% anomalous';
     
-    if (alertApis.length > 0) {
-      // Update with real anomalies
-      alertApis.slice(0, 2).forEach((api, index) => {
-        alertElements[index].message.textContent = `${api.name} API Response Time Spike: ${api.response}ms`;
-        alertElements[index].time.textContent = `${(index + 1) * 5} minutes ago`;
-      });
+    // Update status color
+    if (apiStats.anomaly_percent > 20) {
+      statusElement.className = 'status-red';
+    } else if (apiStats.anomaly_percent > 10) {
+      statusElement.className = 'status-yellow';
     } else {
-      // No anomalies, show default messages
-      alertElements[0].message.textContent = 'No critical issues detected';
-      alertElements[0].time.textContent = 'Just now';
-      alertElements[1].message.textContent = 'All systems operational';
-      alertElements[1].time.textContent = '5 minutes ago';
+      statusElement.className = 'status-green';
     }
   }
 </script>
