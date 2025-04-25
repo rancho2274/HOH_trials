@@ -16,7 +16,7 @@
   </div>
   <div class="card">
     <h4>Active Issues</h4>
-    <h3>{{ stats.anomalies|default('0') }}</h3>
+    <h3>{{ stats.response_anomalies|default(stats.anomalies|default('0')) }}</h3>
     <small class="red">+0 from yesterday</small>
   </div>
   <div class="card">
@@ -51,4 +51,112 @@
     <iframe src="http://localhost:5601/app/dashboards#/view/{{ api_name|lower }}-dashboard" height="600" width="100%" frameborder="0" style="display: none;"></iframe>
   </div>
 </div>
+<!-- Error Rate Chart -->
+<div class="error-rate-container" style="margin-top: 30px;">
+  <div class="chart-wrapper" style="background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+    <h3 style="margin-top: 0; margin-bottom: 15px; color: #00395D; font-size: 16px;">Error Rate Over Time</h3>
+    <div class="chart-area" style="height: 250px; position: relative;">
+      <canvas id="errorRateChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+<script>
+  // Initialize error rate chart
+  let errorRateChart;
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    // Fetch error rate data
+    fetch('/api/error_rates')
+      .then(response => response.json())
+      .then(data => {
+        initErrorRateChart(data);
+      })
+      .catch(error => {
+        console.error('Error fetching error rate data:', error);
+      });
+  });
+  
+  function initErrorRateChart(data) {
+    const ctx = document.getElementById('errorRateChart').getContext('2d');
+    
+    // Get API data based on current page
+    const apiName = '{{ api_name|lower }}';
+    let chartData;
+    
+    if (apiName.includes('system')) {
+      chartData = data.historical.system;
+    } else if (apiName.includes('auth')) {
+      chartData = data.historical.auth;
+    } else if (apiName.includes('search')) {
+      chartData = data.historical.search;
+    } else if (apiName.includes('book')) {
+      chartData = data.historical.booking;
+    } else if (apiName.includes('payment')) {
+      chartData = data.historical.payment;
+    } else if (apiName.includes('feedback')) {
+      chartData = data.historical.feedback;
+    } else {
+      chartData = data.historical.system; // default to system
+    }
+    
+    // Create chart if we have data
+    if (chartData && chartData.timestamps && chartData.timestamps.length > 0) {
+      errorRateChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: chartData.timestamps,
+          datasets: [{
+            label: 'Error Rate (%)',
+            data: chartData.error_rates,
+            borderColor: '#dc3545',
+            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Error Rate (%)'
+              },
+              max: 100
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Time'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Error Rate: ${context.parsed.y.toFixed(2)}%`;
+                }
+              }
+            }
+          }
+        }
+      });
+    } else {
+      // Display message if no data
+      ctx.font = '14px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No error rate data available', ctx.canvas.width/2, ctx.canvas.height/2);
+    }
+  }
+</script>
 {% endblock %}

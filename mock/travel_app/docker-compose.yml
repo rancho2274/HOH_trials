@@ -1,5 +1,13 @@
-version: "7.9"
+# version: "7.9"
 services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.17.2
+    user: root
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./combine_logs:/usr/share/logs:ro
+    depends_on:
+      - elasticsearch
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
