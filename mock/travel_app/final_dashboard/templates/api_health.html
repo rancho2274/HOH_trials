@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% block content %}
 <div class="header">
@@ -11,13 +10,14 @@
 <div class="cards">
   <div class="card">
     <h4>Total Logs</h4>
-    <h3>{{ stats.total_logs|default('0') }}</h3>
-    <small class="green">+0 this month</small>
+    <h3 id="total-logs">{{ stats.total_logs|default('0') }}</h3>
+    <small id="total-logs-note" class="green">+0 this month</small>
   </div>
   <div class="card">
     <h4>Active Issues</h4>
-    <h3>{{ stats.response_anomalies|default(stats.anomalies|default('0')) }}</h3>
-    <small class="red">+0 from yesterday</small>
+    <!-- Changed to use active_issues parameter directly -->
+    <h3>{{ active_issues }}</h3>
+    <small id="active-issues-note" class="red">+0 from yesterday</small>
   </div>
   <div class="card">
     <h4>System Health</h4>
@@ -51,6 +51,7 @@
     <iframe src="http://localhost:5601/app/dashboards#/view/{{ api_name|lower }}-dashboard" height="600" width="100%" frameborder="0" style="display: none;"></iframe>
   </div>
 </div>
+
 <!-- Error Rate Chart -->
 <div class="error-rate-container" style="margin-top: 30px;">
   <div class="chart-wrapper" style="background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">

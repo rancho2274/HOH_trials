@@ -55,6 +55,8 @@
   </div>
 </div>
 
+<!-- Only including the cards section that needs to be modified -->
+
 <div class="cards">
   <div class="card">
     <h4>Total APIs</h4>
@@ -67,9 +69,12 @@
     <small id="active-issues-note" class="red">+{{ alerts|length if alerts else 0 }} from yesterday</small>
   </div>
   <div class="card">
-    <h4>Response Time Anamolies</h4>
-    <h3 id="avg-response">{{ stats.normal_avg|round|int if stats.normal_avg else 0 }}ms</h3>
-    <small id="avg-response-note" class="green">{{ stats.normal_avg|round|int if stats.normal_avg else 0 }}ms typical</small>
+    <h4>Response Time Anomalies</h4>
+    <!-- Changed to show the count of response anomalies instead of average time -->
+    <h3 id="avg-response">{{ response_anomaly_count }}</h3>
+    <small id="avg-response-note" class="{% if response_anomaly_count > 0 %}red{% else %}green{% endif %}">
+      {{ '+' + response_anomaly_count|string if response_anomaly_count > 0 else 'No' }} response anomalies
+    </small>
   </div>
   <div class="card">
     <h4>System Health</h4>

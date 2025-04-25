@@ -427,9 +427,10 @@ def generate_alerts(spike_data):
         times_avg = spike.get("times_avg", 0)
         
         
-        if times_avg >= 8.0:
+        if times_avg >= 10.0:
             severity = "CRITICAL"
-        
+        elif times_avg >= 6.0:
+            severity = "HIGH"
         else:
             severity = "MEDIUM"
         
@@ -661,12 +662,7 @@ def send_alert_email(alert):
         print(f"Failed to send email: {str(e)}")
         return False
 def process_log_files_with_spikes():
-    """
-    Process all log files, detect anomalies, and identify spikes
-    
-    Returns:
-        Dictionary with statistics for each API and spike information
-    """
+   
     # Get regular statistics
     stats, api_stats = process_log_files()
     
@@ -719,7 +715,8 @@ def process_log_files_with_spikes():
         "api_spikes": spike_info["api_spikes"],
         "alerts": alerts,
         "has_alerts": len(alerts) > 0,
-        "active_issues": stats.get("response_anomalies", 0) 
+        # Changed from response_anomalies to original_anomalies
+        "active_issues": stats.get("original_anomalies", 0) 
     }
 
 def process_log_files():
@@ -1226,7 +1223,8 @@ def kibana_config():
 def system_api():
     # Process log files and get statistics
     combined_stats = process_log_files_with_spikes()
-    active_issues = combined_stats['overall'].get('response_anomalies', 0)
+    # Change from response_anomalies to original_anomalies
+    active_issues = combined_stats['overall'].get('original_anomalies', 0)
     return render_template('api_health.html', 
                           api_name="System", 
                           stats=combined_stats['overall'],
@@ -1242,7 +1240,7 @@ def auth_api():
     # Add debug print
     print(f"DEBUG - Auth API route - original_anomalies: {stats.get('original_anomalies', 0)}")
     
-    # Make sure active_issues parameter is explicitly passed
+    # This is already correct, using original_anomalies
     active_issues = stats.get('original_anomalies', 0)
     print(f"DEBUG - Auth API - active_issues to be displayed: {active_issues}")
     
@@ -1256,7 +1254,8 @@ def auth_api():
 def search_api():
     # Process log files and get statistics
     combined_stats = process_log_files_with_spikes()
-    active_issues = combined_stats['api_stats']['search'].get('response_anomalies', 0)
+    # Change from response_anomalies to original_anomalies
+    active_issues = combined_stats['api_stats']['search'].get('original_anomalies', 0)
     return render_template('api_health.html', 
                           api_name="Search", 
                           stats=combined_stats['api_stats']['search'],
@@ -1267,18 +1266,19 @@ def search_api():
 def booking_api():
     # Process log files and get statistics
     combined_stats = process_log_files_with_spikes()
-    active_issues = combined_stats['api_stats']['booking'].get('response_anomalies', 0)
+    # Change from response_anomalies to original_anomalies
+    active_issues = combined_stats['api_stats']['booking'].get('original_anomalies', 0)
     return render_template('api_health.html', 
                           api_name="Booking", 
                           stats=combined_stats['api_stats']['booking'],
                           active_issues=active_issues,
                           kibana_dashboard_id="booking-api-dashboard")
-
 @app.route('/api/payment')
 def payment_api():
     # Process log files and get statistics
     combined_stats = process_log_files_with_spikes()
-    active_issues = combined_stats['api_stats']['payment'].get('response_anomalies', 0)
+    # Change from response_anomalies to original_anomalies
+    active_issues = combined_stats['api_stats']['payment'].get('original_anomalies', 0)
     return render_template('api_health.html', 
                           api_name="Payment", 
                           stats=combined_stats['api_stats']['payment'],
@@ -1289,7 +1289,8 @@ def payment_api():
 def feedback_api():
     # Process log files and get statistics
     combined_stats = process_log_files_with_spikes()
-    active_issues = combined_stats['api_stats']['feedback'].get('response_anomalies', 0)
+    # Change from response_anomalies to original_anomalies
+    active_issues = combined_stats['api_stats']['feedback'].get('original_anomalies', 0)
     return render_template('api_health.html', 
                           api_name="Feedback", 
                           stats=combined_stats['api_stats']['feedback'],

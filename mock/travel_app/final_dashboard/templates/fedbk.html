@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% block content %}
 <div class="header">
@@ -16,7 +15,8 @@
   </div>
   <div class="card">
     <h4>Active Issues</h4>
-    <h3 id="active-issues">0</h3>
+    <!-- Changed to use active_issues parameter -->
+    <h3 id="active-issues">{{ active_issues }}</h3>
     <small id="active-issues-note" class="red">+0 from yesterday</small>
   </div>
   <div class="card">
@@ -86,4 +86,3 @@
   document.addEventListener('DOMContentLoaded', refreshDashboard);
 </script>
 {% endblock %}
-```
