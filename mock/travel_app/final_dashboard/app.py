@@ -2,6 +2,7 @@ import os
 import sys
 from flask import Flask, render_template, redirect, url_for, jsonify, request
 import json
+from datetime import datetime, timedelta
 import time
 import numpy as np
 import pandas as pd
@@ -792,11 +793,13 @@ def process_log_files():
                         response_anomalies = result_df[result_df['predicted_anomaly'] == True]
                         normal = result_df[result_df['predicted_anomaly'] == False]
                         
-                        # Update API-specific statistics
                         api_stats[api_name]["total_logs"] = len(result_df)
                         api_stats[api_name]["original_anomalies"] = original_anomalies_count
                         api_stats[api_name]["response_anomalies"] = len(response_anomalies)
-                        api_stats[api_name]["anomalies"] = len(response_anomalies)  # Make sure 'anomalies' is set correctly
+    
+    # Set active issues to original anomalies count (is_anomalous flag)
+                        api_stats[api_name]["anomalies"] = original_anomalies_count
+                          # Make sure 'anomalies' is set correctly
                         
                         # Calculate API-specific anomaly percentage (based on original anomalies)
                         if len(result_df) > 0:
@@ -865,13 +868,24 @@ class APIForecastingSystem:
         self.time_series['system'] = {'timestamps': [], 'error_rates': []}
         
     def load_recent_logs(self):
-        """Load and process logs from the last time_window_minutes"""
-        now = datetime.datetime.now()
-        if self.time_window_minutes is not None:
-            cutoff_time = now - datetime.timedelta(minutes=self.time_window_minutes)
-        else:
-        # Set cutoff_time to a very old date to include all logs
-            cutoff_time = datetime.datetime(1970, 1, 1)    
+   
+    # Correctly handle datetime depending on your import style
+        try:
+            # If you have: import datetime
+            now = datetime.datetime.now()
+            if self.time_window_minutes is not None:
+                cutoff_time = now - datetime.timedelta(minutes=self.time_window_minutes)
+            else:
+                # Set cutoff_time to a very old date to include all logs
+                cutoff_time = datetime.datetime(1970, 1, 1)
+        except AttributeError:
+            # If you have: from datetime import datetime, timedelta
+            now = datetime.now()
+            if self.time_window_minutes is not None:
+                cutoff_time = now - datetime.timedelta(minutes=self.time_window_minutes)
+            else:
+                # Set cutoff_time to a very old date to include all logs
+                cutoff_time = datetime(1970, 1, 1)
         
         # Reset time series data
         for api in self.api_names + ['system']:
@@ -900,23 +914,48 @@ class APIForecastingSystem:
         
         # Filter to recent logs only
         recent_logs = []
-        for log in all_logs:
-            try:
-                log_time = datetime.datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
-                if log_time >= cutoff_time:
-                    recent_logs.append(log)
-            except (ValueError, TypeError):
-                continue
+        try:
+            for log in all_logs:
+                try:
+                    # Handle the datetime import style correctly
+                    try:
+                        log_time = datetime.datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
+                    except AttributeError:
+                        log_time = datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
+                    
+                    if log_time >= cutoff_time:
+                        recent_logs.append(log)
+                except (ValueError, TypeError):
+                    continue
+        except Exception as e:
+            print(f"Error processing log timestamps: {str(e)}")
+            # Fallback: use all logs if timestamp parsing fails
+            recent_logs = all_logs
         
         if recent_logs:
-            first_log_time = datetime.datetime.fromisoformat(recent_logs[0].get('timestamp', '').replace('Z', '+00:00'))
-            start_time = first_log_time - datetime.timedelta(
-                seconds=first_log_time.timestamp() % self.interval_seconds
-            )
+            try:
+                # Handle the datetime import style correctly
+                try:
+                    first_log_time = datetime.datetime.fromisoformat(recent_logs[0].get('timestamp', '').replace('Z', '+00:00'))
+                    start_time = first_log_time - datetime.timedelta(
+                        seconds=first_log_time.timestamp() % self.interval_seconds
+                    )
+                except AttributeError:
+                    first_log_time = datetime.fromisoformat(recent_logs[0].get('timestamp', '').replace('Z', '+00:00'))
+                    start_time = first_log_time - timedelta(
+                        seconds=first_log_time.timestamp() % self.interval_seconds
+                    )
+            except Exception as e:
+                print(f"Error calculating start time: {str(e)}")
+                start_time = cutoff_time
         else:
-            start_time = cutoff_time        
+            start_time = cutoff_time
+        
         # Process logs in time intervals
-        self._process_logs_by_interval(recent_logs, start_time, now)
+        try:
+            self._process_logs_by_interval(recent_logs, start_time, now)
+        except Exception as e:
+            print(f"Error processing logs by interval: {str(e)}")
         
         return recent_logs
         
@@ -942,9 +981,15 @@ class APIForecastingSystem:
             return []
             
     def _process_logs_by_interval(self, logs, start_time, end_time):
-        """Process logs into time intervals"""
+        
         # Create time buckets
-        interval_delta = datetime.timedelta(seconds=self.interval_seconds)
+        try:
+            # If import is: import datetime
+            interval_delta = datetime.timedelta(seconds=self.interval_seconds)
+        except AttributeError:
+            # If import is: from datetime import datetime, timedelta
+            interval_delta = timedelta(seconds=self.interval_seconds)
+        
         current_time = start_time
         time_buckets = []
         
@@ -960,7 +1005,12 @@ class APIForecastingSystem:
         # Assign logs to buckets
         for log in logs:
             try:
-                log_time = datetime.datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
+                # Handle the datetime import style correctly
+                try:
+                    log_time = datetime.datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
+                except AttributeError:
+                    log_time = datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
+                
                 api_type = log.get('api_type', 'unknown')
                 
                 for bucket in time_buckets:
@@ -969,7 +1019,8 @@ class APIForecastingSystem:
                             bucket['logs'][api_type].append(log)
                         bucket['all_logs'].append(log)
                         break
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, Exception) as e:
+                print(f"Error processing log timestamp: {str(e)}")
                 continue
                 
         # Calculate metrics for each bucket
@@ -1071,7 +1122,47 @@ def dashboard():
                           alerts=combined_stats.get('alerts', []),
                           has_alerts=combined_stats.get('has_alerts', False))
 
+@app.route('/api/error_rates')
+def error_rates():
+    """API endpoint to provide error rate data for charts"""
+    # Create a simplified response with mock data
+    mock_data = {
+        'metadata': {
+            'error_rate_unit': 'percent'
+        },
+        'historical': {
+            'system': generate_mock_data(),
+            'auth': generate_mock_data(),
+            'search': generate_mock_data(),
+            'booking': generate_mock_data(),
+            'payment': generate_mock_data(),
+            'feedback': generate_mock_data()
+        }
+    }
+    
+    return jsonify(mock_data)
 
+def generate_mock_data():
+    """Generate mock time series data for charts"""
+    import random
+    
+    # Create a list of timestamps (last 24 hours in hourly intervals)
+    timestamps = []
+    error_rates = []
+    
+    # Generate 24 hourly timestamps with random error rates
+    for i in range(24):
+        hour = str(i).zfill(2)
+        timestamps.append(f"{hour}:00:00")
+        
+        # Generate a random error rate between 0-30%
+        error_rate = round(random.random() * 30, 2)
+        error_rates.append(error_rate)
+    
+    return {
+        'timestamps': timestamps,
+        'error_rates': error_rates
+    }
 @app.context_processor
 def inject_alerts_count():
     """
@@ -1146,11 +1237,18 @@ def system_api():
 def auth_api():
     # Process log files and get statistics
     combined_stats = process_log_files_with_spikes()
-    # Add active_issues to context
-    active_issues = combined_stats['api_stats']['auth'].get('response_anomalies', 0)
+    stats = combined_stats['api_stats']['auth']
+    
+    # Add debug print
+    print(f"DEBUG - Auth API route - original_anomalies: {stats.get('original_anomalies', 0)}")
+    
+    # Make sure active_issues parameter is explicitly passed
+    active_issues = stats.get('original_anomalies', 0)
+    print(f"DEBUG - Auth API - active_issues to be displayed: {active_issues}")
+    
     return render_template('api_health.html', 
                           api_name="Authentication", 
-                          stats=combined_stats['api_stats']['auth'],
+                          stats=stats,
                           active_issues=active_issues,
                           kibana_dashboard_id="auth-api-dashboard")
 
