@@ -472,8 +472,8 @@ def generate_alerts(spike_data):
         alerts.append(alert)
         
         # If you've implemented email notification:
-        # if severity == "CRITICAL":
-        #     send_alert_email(alert)
+        if severity == "CRITICAL":
+            send_alert_email(alert)
     
     # Sort alerts by severity and time
     severity_order = {"CRITICAL": 0, "MEDIUM": 1}
@@ -616,10 +616,10 @@ def send_alert_email(alert):
     Args:
         alert: Dictionary containing alert information
     """
-    # Email configuration (update these with your actual email settings)
-    sender_email = "rachitprasad2274@gmail.com"
-    receiver_email = "gargi.dandare221@vit.edu"  # Developer's email
-    password = "Creator@2274"  # Consider using environment variables for this
+    # Email configuration
+    sender_email = "rachitprasad2274@gmail.com"  # Update with your actual email
+    receiver_email = "rachitchandawar40@gmail.com"  # Update with recipient email
+    app_password = "mnxp ykbw rujv eeaz"  # Use an app password for Gmail, not your regular password
     
     # Create message
     message = MIMEMultipart()
@@ -627,39 +627,50 @@ def send_alert_email(alert):
     message["From"] = sender_email
     message["To"] = receiver_email
     
-    # Email body
+    # Create detailed email body
     body = f"""
-    CRITICAL ALERT NOTIFICATION
-    
-    API: {alert['api']}
-    Time: {alert['timestamp']}
-    Severity: {alert['severity']}
-    
-    Details: {alert['details']}
-    
-    Response time: {alert['response_time']}ms
-    Normal threshold: {alert['threshold']}ms
-    Times above normal: {alert['times_avg']:.1f}x
-    
-    Please investigate this issue immediately.
+    <html>
+    <body>
+        <h2 style="color: #c00;">CRITICAL ALERT NOTIFICATION</h2>
+        
+        <p><strong>API:</strong> {alert['api']}</p>
+        <p><strong>Time:</strong> {alert['timestamp']}</p>
+        <p><strong>Severity:</strong> {alert['severity']}</p>
+        
+        <p><strong>Details:</strong> {alert['details']}</p>
+        
+        <p><strong>Response time:</strong> {alert['response_time']}ms</p>
+        <p><strong>Normal average:</strong> {alert.get('normal_avg', 0)}ms</p>
+        <p><strong>Times above normal:</strong> {alert.get('times_avg', 0):.1f}x</p>
+        
+        <p style="color: #c00;"><strong>Please investigate this issue immediately.</strong></p>
+    </body>
+    </html>
     """
     
-    # Attach body to email
-    message.attach(MIMEText(body, "plain"))
+    # Attach HTML body to email
+    message.attach(MIMEText(body, "html"))
     
     try:
-        # Create server connection
-        server = smtplib.SMTP('smtp.gmail.com', 587)  # Update with your SMTP server
+        # Create server connection with Gmail
+        server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()  # Secure the connection
-        server.login(sender_email, password)
+        
+        print(f"Attempting to send email alert to {receiver_email}")
+        
+        # Login using app password (not regular password)
+        server.login(sender_email, app_password)
         
         # Send email
         server.sendmail(sender_email, receiver_email, message.as_string())
         server.quit()
-        print(f"Email alert sent to {receiver_email}")
+        print(f"Email alert successfully sent to {receiver_email}")
         return True
     except Exception as e:
-        print(f"Failed to send email: {str(e)}")
+        print(f"Failed to send email alert: {str(e)}")
+        # Print full exception details for debugging
+        import traceback
+        print(traceback.format_exc())
         return False
 def process_log_files_with_spikes():
    
