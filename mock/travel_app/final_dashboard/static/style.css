@@ -51,14 +51,17 @@ body {
   margin-bottom: 30px;
 }
 
+
+/* Update the refresh button with reduced vertical padding */
 .refresh-btn {
   background-color: #0072CE;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 6px 16px; /* Reduced vertical padding (was 8px) */
   border-radius: 6px;
   cursor: pointer;
 }
+
 
 .cards, .statuses {
   display: flex;

@@ -67,7 +67,7 @@
     <small id="active-issues-note" class="red">+{{ alerts|length if alerts else 0 }} from yesterday</small>
   </div>
   <div class="card">
-    <h4>Average Response</h4>
+    <h4>Response Time Anamolies</h4>
     <h3 id="avg-response">{{ stats.normal_avg|round|int if stats.normal_avg else 0 }}ms</h3>
     <small id="avg-response-note" class="green">{{ stats.normal_avg|round|int if stats.normal_avg else 0 }}ms typical</small>
   </div>

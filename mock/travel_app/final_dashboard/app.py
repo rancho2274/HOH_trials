@@ -9,6 +9,9 @@ from datetime import datetime
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 
@@ -175,18 +178,17 @@ class ResponseTimeAnomalyDetector:
         return result_df
     
     def detect_anomalies(self, logs):
-    
+   
         if not logs:
             return pd.DataFrame()
-            
-    # Preprocess logs
+                
+        # Preprocess logs
         features_df = self.preprocess_logs(logs)
         
         if len(features_df) == 0:
             return pd.DataFrame()
         
         # Calculate adaptive thresholds based on the distribution of response times
-        # This helps ensure changes to individual logs are better handled
         times = features_df['time_ms'].values
         
         # Calculate basic statistics
@@ -194,22 +196,32 @@ class ResponseTimeAnomalyDetector:
         mean_time = np.mean(times)
         std_time = np.std(times)
         
-        # Calculate the 95th percentile as a reference for extreme values
-        percentile_95 = np.percentile(times, 95)
+        # Calculate percentiles to better handle skewed distributions
+        percentile_75 = np.percentile(times, 75)
+        percentile_90 = np.percentile(times, 90)
         
-        # Set an adaptive threshold that's more robust to changes
-        adaptive_threshold = max(1000, median_time * 2, mean_time + 2 * std_time)
+        # IMPROVED: Lower the fixed minimum threshold and use more sensitive multipliers
+        # Old version: adaptive_threshold = max(1000, median_time * 2, mean_time + 2 * std_time)
+        adaptive_threshold = max(
+            750,  # Lower fixed minimum threshold from 1000 to 750ms
+            median_time * 1.5,  # Lower multiplier from 2.0 to 1.5
+            mean_time + 1.5 * std_time,  # Lower std multiplier from 2.0 to 1.5
+            percentile_75 * 1.2  # Add percentile-based threshold
+        )
         
         print(f"Anomaly detection statistics:")
         print(f"  Median response time: {median_time:.2f}ms")
         print(f"  Mean response time: {mean_time:.2f}ms")
-        print(f"  95th percentile: {percentile_95:.2f}ms")
-        print(f"  Adaptive threshold: {adaptive_threshold:.2f}ms")
+        print(f"  75th percentile: {percentile_75:.2f}ms")
+        print(f"  90th percentile: {percentile_90:.2f}ms")
+        print(f"  Improved adaptive threshold: {adaptive_threshold:.2f}ms")
         
-        # Train model with custom contamination parameter based on data distribution
-        # Use a lower contamination if the data seems to have few outliers
+        # IMPROVED: More sensitive contamination for better anomaly detection
+        # Calculate how many responses would be flagged with our improved threshold
         estimated_contamination = len(times[times > adaptive_threshold]) / len(times)
-        contamination = min(max(0.01, estimated_contamination), 0.1)  # Keep between 1% and 10%
+        # Set minimum contamination to 0.02 (2%) instead of 0.01 (1%)
+        # This ensures Isolation Forest will be more sensitive
+        contamination = min(max(0.02, estimated_contamination), 0.15)  # Range: 2% to 15%
         
         print(f"  Estimated contamination: {estimated_contamination:.4f}")
         print(f"  Using contamination: {contamination:.4f}")
@@ -226,26 +238,58 @@ class ResponseTimeAnomalyDetector:
         # Make predictions
         result_df = self.predict(features_df)
         
-        # Add an extra pass to properly label manually modified logs
-        # If a log has a time below our adaptive threshold, make sure it's not anomalous
-        result_df.loc[result_df['time_ms'] < adaptive_threshold, 'force_normal'] = True
+        # IMPROVED: More intelligent post-processing for edge cases
+        # Instead of forcing all responses below threshold to be normal,
+        # use a combination of threshold and distance from mean
         
-        # Override predictions for manually modified logs
+        # Create a series indicating if a response time is extreme (>3000ms)
+        extreme_response_times = result_df['time_ms'] >= 3000
+        
+        # Create a series indicating if a response time is high multiple of mean
+        mean_multiple = result_df['time_ms'] / mean_time
+        high_mean_multiple = mean_multiple >= 2.0  # 2x or higher than mean
+        
+        # Only force normal if response time is below half of threshold 
+        # AND not extreme AND not a high multiple of the mean
+        result_df.loc[(result_df['time_ms'] < adaptive_threshold/2) & 
+                    ~extreme_response_times & 
+                    ~high_mean_multiple, 'force_normal'] = True
+        
+        # Force anomaly status for very extreme values, regardless of Isolation Forest
+        result_df.loc[extreme_response_times, 'force_anomaly'] = True
+        
+        # Apply manual corrections
         manual_corrections = result_df['force_normal'] == True
         if manual_corrections.any():
             num_corrections = manual_corrections.sum()
-            print(f"  Applied manual corrections to {num_corrections} logs (likely modified)")
+            print(f"  Applied {num_corrections} manual 'normal' corrections")
             result_df.loc[manual_corrections, 'predicted_anomaly'] = False
-            result_df.loc[manual_corrections, 'anomaly_score'] = 1  # 1 means normal in Isolation Forest
+            result_df.loc[manual_corrections, 'anomaly_score'] = 1  # 1 = normal
+        
+        # Apply forced anomalies (very high response times)
+        forced_anomalies = result_df.get('force_anomaly') == True
+        if forced_anomalies.any():
+            num_forced = forced_anomalies.sum()
+            print(f"  Forced {num_forced} extreme values to be anomalies")
+            result_df.loc[forced_anomalies, 'predicted_anomaly'] = True
+            result_df.loc[forced_anomalies, 'anomaly_score'] = -1  # -1 = anomaly
         
         # Restore the original contamination value
         self.contamination = original_contamination
+        
+        # Add a column indicating how many times higher than mean
+        result_df['times_mean'] = result_df['time_ms'] / mean_time
+        
+        # Count and print how many anomalies were detected
+        anomalies_count = result_df['predicted_anomaly'].sum()
+        normal_count = len(result_df) - anomalies_count
+        print(f"  Detected {anomalies_count} anomalies out of {len(result_df)} logs ({anomalies_count/len(result_df)*100:.2f}%)")
         
         return result_df
 
 def detect_spikes(logs, threshold_multiplier=3.0, min_threshold=1000):
     """
-    Simple function to detect response time spikes in logs
+    Simple function to detect response time spikes in logs compared to average normal time
     
     Args:
         logs: List of log entries
@@ -266,6 +310,9 @@ def detect_spikes(logs, threshold_multiplier=3.0, min_threshold=1000):
         "payment": [],
         "feedback": []
     }
+    
+    # First, calculate average normal response time for each API
+    api_averages = {}
     
     # Process each log
     for log in logs:
@@ -290,8 +337,34 @@ def detect_spikes(logs, threshold_multiplier=3.0, min_threshold=1000):
                 api_response_times[api_type].append({
                     "timestamp": log.get("timestamp"),
                     "response_time": time_ms,
-                    "api": api_type
+                    "api": api_type,
+                    "operation": log.get('operation', {}).get('type') if 'operation' in log else 
+                               log.get('search_service', {}).get('type') if 'search_service' in log else
+                               log.get('payment_service', {}).get('operation') if 'payment_service' in log else
+                               log.get('booking_service', {}).get('operation') if 'booking_service' in log else
+                               log.get('feedback_service', {}).get('operation') if 'feedback_service' in log else
+                               'unknown'
                 })
+    
+    # Calculate average for each API (excluding outliers)
+    for api, data in api_response_times.items():
+        if not data:
+            api_averages[api] = 0
+            continue
+        
+        # Get response times
+        times = [entry["response_time"] for entry in data]
+        
+        # Sort times and exclude top 10% to avoid skewing from existing outliers
+        sorted_times = sorted(times)
+        cutoff = int(len(sorted_times) * 0.9)
+        normal_times = sorted_times[:cutoff] if cutoff > 0 else sorted_times
+        
+        # Calculate average of normal times
+        if normal_times:
+            api_averages[api] = sum(normal_times) / len(normal_times)
+        else:
+            api_averages[api] = 0
     
     # Detect spikes for each API
     all_spikes = []
@@ -302,23 +375,26 @@ def detect_spikes(logs, threshold_multiplier=3.0, min_threshold=1000):
             api_spikes[api] = []
             continue
         
-        # Get response times
-        times = [entry["response_time"] for entry in data]
-        
-        # Calculate average
-        avg_time = sum(times) / len(times)
-        
-        # Set threshold
-        threshold = max(min_threshold, avg_time * threshold_multiplier)
+        # Get the average normal response time for this API
+        avg_normal_time = api_averages[api]
+        if avg_normal_time == 0:
+            # Fall back to calculating simple average if no normal time available
+            times = [entry["response_time"] for entry in data]
+            avg_normal_time = sum(times) / len(times) if times else 0
         
         # Find spikes
         spikes = []
         for entry in data:
-            if entry["response_time"] >= threshold:
+            response_time = entry["response_time"]
+            # Calculate how many times higher than normal
+            times_avg = response_time / avg_normal_time if avg_normal_time > 0 else 0
+            
+            # Consider a spike if response time is significantly higher than average
+            if times_avg >= threshold_multiplier:
                 # Add additional spike info
                 spike = entry.copy()
-                spike["threshold"] = threshold
-                spike["times_avg"] = entry["response_time"] / avg_time
+                spike["normal_avg"] = avg_normal_time
+                spike["times_avg"] = times_avg
                 spikes.append(spike)
         
         # Store spikes for this API
@@ -327,22 +403,32 @@ def detect_spikes(logs, threshold_multiplier=3.0, min_threshold=1000):
     
     return {
         "spikes": all_spikes,
-        "api_spikes": api_spikes
+        "api_spikes": api_spikes,
+        "api_averages": api_averages
     }
 
 def generate_alerts(spike_data):
-   
+    """
+    Generate alerts from spike data with enhanced details
+    comparing to average normal response times
+    
+    Args:
+        spike_data: Dictionary with spike information
+        
+    Returns:
+        List of alert dictionaries
+    """
     alerts = []
     
     # Process all spikes
     for spike in spike_data["spikes"]:
-        # Determine severity based on how many times above threshold
+        # Determine severity based on how many times above normal
         times_avg = spike.get("times_avg", 0)
         
-        if times_avg >= 5.0:
+        
+        if times_avg >= 8.0:
             severity = "CRITICAL"
-        elif times_avg >= 3.0:
-            severity = "HIGH"
+        
         else:
             severity = "MEDIUM"
         
@@ -356,14 +442,12 @@ def generate_alerts(spike_data):
         # Create more descriptive details for each alert
         api_type = spike["api"].upper()
         response_time = spike["response_time"]
-        threshold = spike.get("threshold", 0)
+        normal_avg = spike.get("normal_avg", 0)
         
         if severity == "CRITICAL":
-            details = f"Response time of {response_time:.0f}ms is {times_avg:.1f}x higher than normal ({threshold:.0f}ms). This indicates a severe performance degradation that requires immediate attention."
-        elif severity == "HIGH":
-            details = f"Response time of {response_time:.0f}ms significantly exceeds the normal threshold of {threshold:.0f}ms. Users may be experiencing delays."
+            details = f"Response time of {response_time:.0f}ms is {times_avg:.1f}x higher than the normal average of {normal_avg:.0f}ms. This indicates a severe performance degradation that requires immediate attention."
         else:
-            details = f"Response time of {response_time:.0f}ms is higher than the expected threshold of {threshold:.0f}ms. This may indicate an emerging issue."
+            details = f"Response time of {response_time:.0f}ms is higher than the normal average of {normal_avg:.0f}ms. This may indicate an emerging issue."
         
         # Add operation type if available
         operation = spike.get("operation")
@@ -378,16 +462,20 @@ def generate_alerts(spike_data):
             "details": details,
             "timestamp": formatted_time,
             "response_time": response_time,
-            "threshold": threshold,
+            "normal_avg": normal_avg,
             "times_avg": times_avg,
             "operation": operation
         }
         
         alerts.append(alert)
+        
+        # If you've implemented email notification:
+        # if severity == "CRITICAL":
+        #     send_alert_email(alert)
     
     # Sort alerts by severity and time
-    severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2}
-    alerts.sort(key=lambda x: (severity_order.get(x["severity"], 3), -x["response_time"]))
+    severity_order = {"CRITICAL": 0, "MEDIUM": 1}
+    alerts.sort(key=lambda x: (severity_order.get(x["severity"], 2), -x["response_time"]))
     
     return alerts
 
@@ -519,6 +607,58 @@ def add_response_anomaly_to_logs(input_file, result_df, output_folder, api_name)
     
     return output_file
 
+def send_alert_email(alert):
+    """
+    Send an email notification for critical alerts
+    
+    Args:
+        alert: Dictionary containing alert information
+    """
+    # Email configuration (update these with your actual email settings)
+    sender_email = "rachitprasad2274@gmail.com"
+    receiver_email = "gargi.dandare221@vit.edu"  # Developer's email
+    password = "Creator@2274"  # Consider using environment variables for this
+    
+    # Create message
+    message = MIMEMultipart()
+    message["Subject"] = f"CRITICAL ALERT: {alert['api']} API Response Time Spike"
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    
+    # Email body
+    body = f"""
+    CRITICAL ALERT NOTIFICATION
+    
+    API: {alert['api']}
+    Time: {alert['timestamp']}
+    Severity: {alert['severity']}
+    
+    Details: {alert['details']}
+    
+    Response time: {alert['response_time']}ms
+    Normal threshold: {alert['threshold']}ms
+    Times above normal: {alert['times_avg']:.1f}x
+    
+    Please investigate this issue immediately.
+    """
+    
+    # Attach body to email
+    message.attach(MIMEText(body, "plain"))
+    
+    try:
+        # Create server connection
+        server = smtplib.SMTP('smtp.gmail.com', 587)  # Update with your SMTP server
+        server.starttls()  # Secure the connection
+        server.login(sender_email, password)
+        
+        # Send email
+        server.sendmail(sender_email, receiver_email, message.as_string())
+        server.quit()
+        print(f"Email alert sent to {receiver_email}")
+        return True
+    except Exception as e:
+        print(f"Failed to send email: {str(e)}")
+        return False
 def process_log_files_with_spikes():
     """
     Process all log files, detect anomalies, and identify spikes
@@ -581,13 +721,7 @@ def process_log_files_with_spikes():
     }
 
 def process_log_files():
-    """
-    Process all log files, detect anomalies, and update logs with response_anomaly flags
-    with improved handling of manually modified logs
-    
-    Returns:
-        Dictionary with statistics for each API
-    """
+   
     # Create an instance of the anomaly detector
     detector = ResponseTimeAnomalyDetector()
     
@@ -613,7 +747,8 @@ def process_log_files():
     # Gather overall statistics
     stats = {
         "total_logs": 0,
-        "anomalies": 0,
+        "original_anomalies": 0,  # Count based on is_anomalous flag
+        "response_anomalies": 0,  # Count based on response_anomaly detection
         "anomaly_percent": 0,
         "normal_logs": 0,
         "normal_avg": 0,
@@ -623,167 +758,66 @@ def process_log_files():
     
     # Prepare stats for each API
     api_stats = {
-        "auth": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
-        "search": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
-        "booking": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
-        "payment": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
-        "feedback": {"total_logs": 0, "anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0}
+        "auth": {"total_logs": 0, "original_anomalies": 0, "response_anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
+        "search": {"total_logs": 0, "original_anomalies": 0, "response_anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
+        "booking": {"total_logs": 0, "original_anomalies": 0, "response_anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
+        "payment": {"total_logs": 0, "original_anomalies": 0, "response_anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0},
+        "feedback": {"total_logs": 0, "original_anomalies": 0, "response_anomalies": 0, "anomaly_percent": 0, "normal_avg": 0, "anomalous_avg": 0}
     }
-    
-    # Debug info
-    print("\n==== Starting Log Processing ====")
-    print(f"Looking for logs in: {travel_app_dir}")
-    print(f"Saving processed logs to: {combine_logs_dir}")
-    
-    # Check if there are any existing processed logs in combine_logs directory
-    # We'll check these to detect manual modifications
-    existing_processed_files = {}
-    for api_name in log_files.keys():
-        processed_file = os.path.join(combine_logs_dir, f"{api_name}_interactions_with_anomalies.json")
-        if os.path.exists(processed_file):
-            existing_processed_files[api_name] = processed_file
-    
-    if existing_processed_files:
-        print(f"Found existing processed logs: {list(existing_processed_files.keys())}")
     
     # Process each log file
     for api_name, log_file in log_files.items():
         file_path = os.path.join(travel_app_dir, log_file)
-        print(f"\nChecking for file: {file_path}")
-        
         if os.path.exists(file_path):
-            print(f"  File exists! Processing {api_name} logs...")
             try:
                 # Load logs
                 logs = detector.load_logs(file_path)
-                print(f"  Loaded {len(logs)} log entries for {api_name}")
-                
-                # Check if we have previously processed logs to compare against
-                previous_logs = []
-                if api_name in existing_processed_files:
-                    try:
-                        previous_logs = detector.load_logs(existing_processed_files[api_name])
-                        print(f"  Also loaded {len(previous_logs)} previously processed logs for comparison")
-                    except Exception as e:
-                        print(f"  Error loading previous logs: {str(e)}")
-                
-                # Create lookup for previous anomaly flags
-                previous_anomaly_map = {}
-                if previous_logs:
-                    for prev_log in previous_logs:
-                        if 'timestamp' in prev_log and 'response' in prev_log and 'time_ms' in prev_log['response']:
-                            timestamp = prev_log['timestamp']
-                            previous_anomaly_map[timestamp] = {
-                                'time_ms': prev_log['response']['time_ms'],
-                                'response_anomaly': prev_log.get('response_anomaly', False)
-                            }
-                
-                # Check for manual modifications by comparing current logs with previous processed logs
-                manual_modifications = []
-                for log in logs:
-                    timestamp = log.get('timestamp')
-                    if timestamp in previous_anomaly_map:
-                        prev_data = previous_anomaly_map[timestamp]
-                        current_time = log['response']['time_ms']
-                        
-                        # If response time has changed significantly and anomaly flag was set
-                        if abs(current_time - prev_data['time_ms']) > 0.1 and prev_data['response_anomaly']:
-                            manual_modifications.append({
-                                'timestamp': timestamp,
-                                'previous_time': prev_data['time_ms'],
-                                'current_time': current_time,
-                                'previous_anomaly': prev_data['response_anomaly']
-                            })
-                
-                if manual_modifications:
-                    print(f"  Detected {len(manual_modifications)} manual modifications to response times!")
-                    for mod in manual_modifications[:5]:  # Show max 5 examples
-                        print(f"    {mod['timestamp']}: {mod['previous_time']}ms → {mod['current_time']}ms")
-                    
-                    if len(manual_modifications) > 5:
-                        print(f"    ... and {len(manual_modifications) - 5} more")
                 
                 if logs:
                     # Process logs and get results
                     result_df = detector.detect_anomalies(logs)
                     
+                    # Count original anomalies (based on is_anomalous flag)
+                    original_anomalies_count = 0
+                    for log in logs:
+                        if log.get('is_anomalous', False):
+                            original_anomalies_count += 1
+                    
                     # Update logs with response_anomaly flags and save to combine_logs directory
                     add_response_anomaly_to_logs(file_path, result_df, combine_logs_dir, api_name)
                     
                     if not result_df.empty:
-                        # Count anomalies
-                        anomalies = result_df[result_df['predicted_anomaly'] == True]
+                        # Count response time anomalies
+                        response_anomalies = result_df[result_df['predicted_anomaly'] == True]
                         normal = result_df[result_df['predicted_anomaly'] == False]
-                        
-                        print(f"  {api_name} stats: {len(result_df)} total logs, {len(anomalies)} anomalies")
                         
                         # Update API-specific statistics
                         api_stats[api_name]["total_logs"] = len(result_df)
-                        api_stats[api_name]["anomalies"] = len(anomalies)
+                        api_stats[api_name]["original_anomalies"] = original_anomalies_count
+                        api_stats[api_name]["response_anomalies"] = len(response_anomalies)
                         
-                        # Calculate API-specific anomaly percentage
+                        # Calculate API-specific anomaly percentage (based on original anomalies)
                         if len(result_df) > 0:
-                            api_stats[api_name]["anomaly_percent"] = round(len(anomalies) / len(result_df) * 100, 1)
+                            api_stats[api_name]["anomaly_percent"] = round(original_anomalies_count / len(result_df) * 100, 1)
                         
                         # Calculate API-specific response time averages
                         if len(normal) > 0:
-                            # Simple mean of time_ms column for normal logs
                             api_stats[api_name]["normal_avg"] = round(normal['time_ms'].mean(), 2)
                         
-                        if len(anomalies) > 0:
-                            # Simple mean of time_ms column for anomalous logs
-                            api_stats[api_name]["anomalous_avg"] = round(anomalies['time_ms'].mean(), 2)
+                        if len(response_anomalies) > 0:
+                            api_stats[api_name]["anomalous_avg"] = round(response_anomalies['time_ms'].mean(), 2)
                         
                         # Update overall stats
                         stats["total_logs"] += len(result_df)
-                        stats["anomalies"] += len(anomalies)
+                        stats["original_anomalies"] += original_anomalies_count
+                        stats["response_anomalies"] += len(response_anomalies)
                         stats["normal_logs"] += len(normal)
-                        
-                        # Calculate overall normal and anomalous response time averages
-                        if len(normal) > 0:
-                            normal_sum = normal['time_ms'].sum()
-                            # For the first API being processed
-                            if api_name == "auth" or stats["normal_avg"] == 0:
-                                stats["normal_avg"] = round(normal_sum / len(normal), 2)
-                            else:
-                                # Calculate weighted average for subsequent APIs
-                                previous_total = stats["normal_avg"] * (stats["normal_logs"] - len(normal))
-                                new_avg = (previous_total + normal_sum) / stats["normal_logs"]
-                                stats["normal_avg"] = round(new_avg, 2)
-                        
-                        if len(anomalies) > 0:
-                            anomalies_sum = anomalies['time_ms'].sum()
-                            # For the first API being processed
-                            if api_name == "auth" or stats["anomalous_avg"] == 0:
-                                stats["anomalous_avg"] = round(anomalies_sum / len(anomalies), 2)
-                            else:
-                                # Calculate weighted average for subsequent APIs
-                                previous_total = stats["anomalous_avg"] * (stats["anomalies"] - len(anomalies))
-                                new_avg = (previous_total + anomalies_sum) / stats["anomalies"]
-                                stats["anomalous_avg"] = round(new_avg, 2)
-                    else:
-                        print(f"  No valid data found in {api_name} logs after processing")
-                        
-                else:
-                    print(f"  No logs found in {api_name} file")
             except Exception as e:
-                print(f"  Error processing {file_path}: {str(e)}")
-                import traceback
-                traceback.print_exc()
-        else:
-            print(f"  File not found: {file_path}")
+                print(f"Error processing {file_path}: {str(e)}")
     
-    # Calculate overall anomaly percentage
+    # Calculate overall anomaly percentage (based on original anomalies)
     if stats["total_logs"] > 0:
-        stats["anomaly_percent"] = round(stats["anomalies"] / stats["total_logs"] * 100, 1)
-    
-    # Print overall stats for debugging
-    print("\n==== Overall Statistics ====")
-    print(f"Total logs: {stats['total_logs']}")
-    print(f"Anomalies: {stats['anomalies']} ({stats['anomaly_percent']}%)")
-    print(f"Normal logs: {stats['normal_logs']}")
-    print(f"Normal average response time: {stats['normal_avg']} ms")
-    print(f"Anomalous average response time: {stats['anomalous_avg']} ms")
+        stats["anomaly_percent"] = round(stats["original_anomalies"] / stats["total_logs"] * 100, 1)
     
     return stats, api_stats
 @app.route('/alerts')
@@ -810,11 +844,14 @@ def alerts():
 def dashboard():
     # Process log files and get statistics with spike detection
     combined_stats = process_log_files_with_spikes()
+    overall_stats = combined_stats['overall']
     
     # Pass all required variables to the template
     return render_template('dashboard.html', 
-                          stats=combined_stats['overall'], 
+                          stats=overall_stats, 
                           api_stats=combined_stats['api_stats'],
+                          original_anomaly_count=overall_stats.get('original_anomalies', 0),
+                          response_anomaly_count=overall_stats.get('response_anomalies', 0),
                           spikes=combined_stats.get('spikes', []),
                           api_spikes=combined_stats.get('api_spikes', {}),
                           alerts=combined_stats.get('alerts', []),
