@@ -864,25 +864,20 @@ class APIForecastingSystem:
         # Add system-wide metrics
         self.time_series['system'] = {'timestamps': [], 'error_rates': []}
         
+        # For forecast results
+        self.forecasts = {
+            api: {'future_timestamps': [], 'predicted_error_rates': []}
+            for api in self.api_names + ['system']
+        }
+
     def load_recent_logs(self):
-   
-    # Correctly handle datetime depending on your import style
-        try:
-            # If you have: import datetime
-            now = datetime.datetime.now()
-            if self.time_window_minutes is not None:
-                cutoff_time = now - datetime.timedelta(minutes=self.time_window_minutes)
-            else:
-                # Set cutoff_time to a very old date to include all logs
-                cutoff_time = datetime.datetime(1970, 1, 1)
-        except AttributeError:
-            # If you have: from datetime import datetime, timedelta
-            now = datetime.now()
-            if self.time_window_minutes is not None:
-                cutoff_time = now - datetime.timedelta(minutes=self.time_window_minutes)
-            else:
-                # Set cutoff_time to a very old date to include all logs
-                cutoff_time = datetime(1970, 1, 1)
+        """Load and process logs from the last time_window_minutes"""
+        now = datetime.now()
+        if self.time_window_minutes is not None:
+            cutoff_time = now - timedelta(minutes=self.time_window_minutes)
+        else:
+            # Set cutoff_time to a very old date to include all logs
+            cutoff_time = datetime(1970, 1, 1)    
         
         # Reset time series data
         for api in self.api_names + ['system']:
@@ -911,48 +906,24 @@ class APIForecastingSystem:
         
         # Filter to recent logs only
         recent_logs = []
-        try:
-            for log in all_logs:
-                try:
-                    # Handle the datetime import style correctly
-                    try:
-                        log_time = datetime.datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
-                    except AttributeError:
-                        log_time = datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
-                    
-                    if log_time >= cutoff_time:
-                        recent_logs.append(log)
-                except (ValueError, TypeError):
-                    continue
-        except Exception as e:
-            print(f"Error processing log timestamps: {str(e)}")
-            # Fallback: use all logs if timestamp parsing fails
-            recent_logs = all_logs
+        for log in all_logs:
+            try:
+                log_time = datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
+                if log_time >= cutoff_time:
+                    recent_logs.append(log)
+            except (ValueError, TypeError):
+                continue
         
         if recent_logs:
-            try:
-                # Handle the datetime import style correctly
-                try:
-                    first_log_time = datetime.datetime.fromisoformat(recent_logs[0].get('timestamp', '').replace('Z', '+00:00'))
-                    start_time = first_log_time - datetime.timedelta(
-                        seconds=first_log_time.timestamp() % self.interval_seconds
-                    )
-                except AttributeError:
-                    first_log_time = datetime.fromisoformat(recent_logs[0].get('timestamp', '').replace('Z', '+00:00'))
-                    start_time = first_log_time - timedelta(
-                        seconds=first_log_time.timestamp() % self.interval_seconds
-                    )
-            except Exception as e:
-                print(f"Error calculating start time: {str(e)}")
-                start_time = cutoff_time
+            first_log_time = datetime.fromisoformat(recent_logs[0].get('timestamp', '').replace('Z', '+00:00'))
+            start_time = first_log_time - timedelta(
+                seconds=first_log_time.timestamp() % self.interval_seconds
+            )
         else:
-            start_time = cutoff_time
+            start_time = cutoff_time        
         
         # Process logs in time intervals
-        try:
-            self._process_logs_by_interval(recent_logs, start_time, now)
-        except Exception as e:
-            print(f"Error processing logs by interval: {str(e)}")
+        self._process_logs_by_interval(recent_logs, start_time, now)
         
         return recent_logs
         
@@ -978,15 +949,9 @@ class APIForecastingSystem:
             return []
             
     def _process_logs_by_interval(self, logs, start_time, end_time):
-        
+        """Process logs into time intervals"""
         # Create time buckets
-        try:
-            # If import is: import datetime
-            interval_delta = datetime.timedelta(seconds=self.interval_seconds)
-        except AttributeError:
-            # If import is: from datetime import datetime, timedelta
-            interval_delta = timedelta(seconds=self.interval_seconds)
-        
+        interval_delta = timedelta(seconds=self.interval_seconds)
         current_time = start_time
         time_buckets = []
         
@@ -1002,12 +967,7 @@ class APIForecastingSystem:
         # Assign logs to buckets
         for log in logs:
             try:
-                # Handle the datetime import style correctly
-                try:
-                    log_time = datetime.datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
-                except AttributeError:
-                    log_time = datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
-                
+                log_time = datetime.fromisoformat(log.get('timestamp', '').replace('Z', '+00:00'))
                 api_type = log.get('api_type', 'unknown')
                 
                 for bucket in time_buckets:
@@ -1016,8 +976,7 @@ class APIForecastingSystem:
                             bucket['logs'][api_type].append(log)
                         bucket['all_logs'].append(log)
                         break
-            except (ValueError, TypeError, Exception) as e:
-                print(f"Error processing log timestamp: {str(e)}")
+            except (ValueError, TypeError):
                 continue
                 
         # Calculate metrics for each bucket
@@ -1053,7 +1012,7 @@ class APIForecastingSystem:
             return (
                 # Explicit server error status codes
                 status_code in [500, 502, 503, 504] or 
-                # Client error status codes
+                # Client error status codes that should count as errors
                 (400 <= status_code < 600) or 
                 # Explicit anomaly flag
                 log.get('is_anomalous', False)
@@ -1067,6 +1026,58 @@ class APIForecastingSystem:
         
         # Store the error rate as a percentage
         self.time_series[api_name]['error_rates'].append(error_rate)
+        
+    def generate_forecasts(self, forecast_periods=6):
+        """Generate forecasts based on recent trends"""
+        now = datetime.now()
+        future_timestamps = []
+        
+        # Generate future timestamps
+        for i in range(1, forecast_periods + 1):
+            future_timestamps.append(now + timedelta(seconds=i * self.interval_seconds))
+        
+        # For each API, generate forecasts
+        for api in self.api_names + ['system']:
+            self._forecast_api_metrics(api, future_timestamps, forecast_periods)
+            
+        return self.forecasts
+    
+    def _forecast_api_metrics(self, api_name, future_timestamps, forecast_periods):
+        """Generate forecasts for a specific API"""
+        # Get historical data
+        error_rates = self.time_series[api_name]['error_rates']
+        
+        # Store future timestamps
+        self.forecasts[api_name]['future_timestamps'] = future_timestamps
+        
+        # Error rate forecast - simple linear extrapolation
+        if len(error_rates) > 1:
+            # Get trend from the last few intervals
+            num_points = min(5, len(error_rates))
+            recent_errors = error_rates[-num_points:]
+            
+            if len(set(recent_errors)) > 1:  # Check if we have varying data
+                # Calculate slope of recent trend
+                x = np.arange(num_points)
+                # Fit a line to the recent data
+                slope, intercept = np.polyfit(x, recent_errors, 1)
+                
+                # Predict future values
+                predictions = []
+                for i in range(1, forecast_periods + 1):
+                    predicted_value = slope * (num_points + i - 1) + intercept
+                    # Ensure predictions stay between 0 and 100 percent
+                    predicted_value = max(0, min(100, predicted_value))
+                    predictions.append(predicted_value)
+                
+                self.forecasts[api_name]['predicted_error_rates'] = predictions
+            else:
+                # If all recent values are the same, predict the same value continuing
+                self.forecasts[api_name]['predicted_error_rates'] = [recent_errors[-1]] * forecast_periods
+        else:
+            # Not enough data, use last known value or 0
+            last_error_rate = error_rates[-1] if error_rates else 0
+            self.forecasts[api_name]['predicted_error_rates'] = [last_error_rate] * forecast_periods
     
     def get_visualization_data(self):
         """Prepare data for visualization"""
@@ -1078,6 +1089,12 @@ class APIForecastingSystem:
                 api: {
                     'timestamps': [t.strftime("%H:%M:%S") for t in self.time_series[api]['timestamps']],
                     'error_rates': self.time_series[api]['error_rates']
+                } for api in self.api_names + ['system']
+            },
+            'forecast': {
+                api: {
+                    'timestamps': [t.strftime("%H:%M:%S") for t in self.forecasts[api]['future_timestamps']],
+                    'error_rates': self.forecasts[api]['predicted_error_rates']
                 } for api in self.api_names + ['system']
             }
         }
@@ -1108,7 +1125,7 @@ def dashboard():
     combined_stats = process_log_files_with_spikes()
     overall_stats = combined_stats['overall']
     
-    # Pass all required variables to the template
+    # Pass all required variables to the template including forecast_data
     return render_template('dashboard.html', 
                           stats=overall_stats, 
                           api_stats=combined_stats['api_stats'],
@@ -1117,27 +1134,37 @@ def dashboard():
                           spikes=combined_stats.get('spikes', []),
                           api_spikes=combined_stats.get('api_spikes', {}),
                           alerts=combined_stats.get('alerts', []),
-                          has_alerts=combined_stats.get('has_alerts', False))
+                          has_alerts=combined_stats.get('has_alerts', False),
+                          forecast_data=combined_stats.get('forecast_data', None))
 
 @app.route('/api/error_rates')
 def error_rates():
-    """API endpoint to provide error rate data for charts"""
-    # Create a simplified response with mock data
-    mock_data = {
-        'metadata': {
-            'error_rate_unit': 'percent'
-        },
-        'historical': {
-            'system': generate_mock_data(),
-            'auth': generate_mock_data(),
-            'search': generate_mock_data(),
-            'booking': generate_mock_data(),
-            'payment': generate_mock_data(),
-            'feedback': generate_mock_data()
-        }
-    }
-    
-    return jsonify(mock_data)
+    """API endpoint to provide error rate data for charts using real forecast system"""
+    try:
+        # Get current directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        travel_app_dir = os.path.dirname(current_dir)  # Go up one level to reach travel_app
+        
+        # Initialize forecasting system
+        forecasting_system = APIForecastingSystem(
+            log_directory=travel_app_dir, 
+            time_window_minutes=None,  # Use all available logs
+            interval_seconds=900  # 15-minute intervals
+        )
+        
+        # Load recent logs and generate forecasts
+        forecasting_system.load_recent_logs()
+        forecasting_system.generate_forecasts(forecast_periods=6)
+        
+        # Get visualization data
+        visualization_data = forecasting_system.get_visualization_data()
+        
+        return jsonify(visualization_data)
+    except Exception as e:
+        import traceback
+        print(f"Error generating forecast data: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
 
 def generate_mock_data():
     """Generate mock time series data for charts"""
