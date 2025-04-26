@@ -1136,11 +1136,17 @@ def dashboard():
     combined_stats = process_log_files_with_spikes()
     overall_stats = combined_stats['overall']
     
+    # Correctly calculate total active issues by summing original anomalies from each API
+    total_active_issues = sum(
+        combined_stats['api_stats'].get(api, {}).get('original_anomalies', 0) 
+        for api in ['auth', 'search', 'booking', 'payment', 'feedback']
+    )
+    
     # Pass all required variables to the template including forecast_data
     return render_template('dashboard.html', 
                           stats=overall_stats, 
                           api_stats=combined_stats['api_stats'],
-                          original_anomaly_count=overall_stats.get('original_anomalies', 0),
+                          original_anomaly_count=total_active_issues,  # Use the correctly calculated total
                           response_anomaly_count=overall_stats.get('response_anomalies', 0),
                           spikes=combined_stats.get('spikes', []),
                           api_spikes=combined_stats.get('api_spikes', {}),

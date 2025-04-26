@@ -47,15 +47,67 @@
 </div>
 
 <!-- Kibana Dashboard Section -->
+<!-- Add this to templates/book.html after the response time cards section -->
+
+<!-- Kibana Dashboard Section -->
 <div class="kibana-container">
   <h3 style="margin-top: 30px; margin-bottom: 15px; color: #0072CE;">Live Kibana Dashboard</h3>
   <div class="kibana-frame">
     <div class="kibana-loading">
-      <i class="fas fa-spinner"></i> Loading Kibana Dashboard...
+      <i class="fas fa-spinner fa-spin"></i> Loading Kibana Dashboard...
     </div>
     <iframe src="http://localhost:5601/app/dashboards#/view/booking-api-dashboard" height="600" width="100%" frameborder="0" style="display: none;"></iframe>
   </div>
 </div>
+
+<script>
+  // Handle iframe loading
+  document.addEventListener('DOMContentLoaded', function() {
+    const iframe = document.querySelector('.kibana-frame iframe');
+    const loadingDiv = document.querySelector('.kibana-loading');
+    
+    iframe.onload = function() {
+      // Hide loading indicator and show iframe when loaded
+      loadingDiv.style.display = 'none';
+      iframe.style.display = 'block';
+    };
+  });
+</script>
+
+<style>
+  .kibana-container {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .kibana-frame {
+    position: relative;
+    min-height: 600px;
+  }
+  
+  .kibana-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9fafe;
+    font-size: 16px;
+    color: #0072CE;
+  }
+  
+  .kibana-loading i {
+    margin-right: 10px;
+    font-size: 24px;
+  }
+</style>
 
 <script>
   function refreshDashboard() {

@@ -65,8 +65,8 @@
   </div>
   <div class="card">
     <h4>Active Issues</h4>
-    <h3 id="active-issues">{{ alerts|length if alerts else 0 }}</h3>
-    <small id="active-issues-note" class="red">+{{ alerts|length if alerts else 0 }} from yesterday</small>
+    <h3 id="active-issues">{{ original_anomaly_count }}</h3>
+    <small id="active-issues-note" class="red">+{{ original_anomaly_count }} from yesterday</small>
   </div>
   <div class="card">
     <h4>Response Time Anomalies</h4>
@@ -508,13 +508,15 @@
     startSpikeCheck();
   });
   
-  function startSpikeCheck() {
-    // Check for spikes every 30 seconds
-    alertCheckInterval = setInterval(checkForSpikes, 30000);
-    
-    // Do an initial check
-    checkForSpikes();
-  }
+  function checkForSpikes() {
+    console.log('Original Active Issues:', document.getElementById('active-issues').textContent);
+    fetch('/api/check_spikes')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Spike Check Data:', data);
+        // ... rest of the function remains the same
+      })
+}
   
   function checkForSpikes() {
     fetch('/api/check_spikes')
@@ -536,8 +538,11 @@
           // Update alerts list
           updateAlertsList(data.alerts);
           
-          // Update dashboard stats
-          document.getElementById('active-issues').textContent = data.alerts.length;
+          // MODIFIED: Keep original active issues count
+          const originalActiveIssues = parseInt(document.getElementById('active-issues').textContent);
+          
+          // Update dashboard stats, preserving original active issues count
+          document.getElementById('active-issues').textContent = originalActiveIssues;
           document.getElementById('active-issues-note').textContent = `+${data.alerts.length} from yesterday`;
           document.getElementById('system-health').textContent = `${(100 - data.alerts.length * 10)}%`;
           document.getElementById('system-health-note').textContent = `-${data.alerts.length * 10}% this hour`;
