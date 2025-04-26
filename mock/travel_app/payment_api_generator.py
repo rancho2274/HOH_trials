@@ -296,7 +296,7 @@ def generate_payment_log_entry(timestamp=None, operation=None,
         operation = random.choice(PAYMENT_OPERATIONS)
     
     # Environment and region
-    environment = random.choice(PAYMENT_ENVIRONMENTS)
+    environment = "AZURE"
     region = random.choice(PAYMENT_REGIONS)
     server = random.choice(PAYMENT_SERVERS)
     instance_id = f"{server}-{region}-{random.randint(1, 5)}"

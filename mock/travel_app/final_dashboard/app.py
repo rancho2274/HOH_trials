@@ -472,8 +472,8 @@ def generate_alerts(spike_data):
         alerts.append(alert)
         
         # If you've implemented email notification:
-        if severity == "CRITICAL":
-            send_alert_email(alert)
+        # if severity == "CRITICAL":
+        #     send_alert_email(alert)
     
     # Sort alerts by severity and time
     severity_order = {"CRITICAL": 0, "MEDIUM": 1}

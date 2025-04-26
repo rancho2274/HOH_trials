@@ -370,7 +370,7 @@ def generate_booking_log_entry(timestamp=None, operation=None,
         operation = random.choice(BOOKING_OPERATIONS)
     
     # Environment and region
-    environment = random.choice(BOOKING_ENVIRONMENTS)
+    environment = "AWS"
     region = random.choice(BOOKING_REGIONS)
     server = random.choice(BOOKING_SERVERS)
     instance_id = f"{server}-{region}-{random.randint(1, 5)}"

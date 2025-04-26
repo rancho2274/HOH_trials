@@ -263,7 +263,7 @@ def generate_search_log_entry(timestamp=None, search_type=None,
         search_type = random.choice(SEARCH_TYPES)
     
     # Environment and region
-    environment = random.choice(SEARCH_ENVIRONMENTS)
+    environment = "AZURE"
     region = random.choice(SEARCH_REGIONS)
     server = random.choice(SEARCH_SERVERS)
     instance_id = f"{server}-{region}-{random.randint(1, 5)}"

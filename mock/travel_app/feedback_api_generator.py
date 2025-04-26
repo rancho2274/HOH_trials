@@ -263,7 +263,7 @@ def generate_feedback_log_entry(timestamp=None, operation=None,
         operation = random.choice(FEEDBACK_OPERATIONS)
     
     # Environment and region
-    environment = random.choice(FEEDBACK_ENVIRONMENTS)
+    environment = "AWS"
     region = random.choice(FEEDBACK_REGIONS)
     server = random.choice(FEEDBACK_SERVERS)
     instance_id = f"{server}-{region}-{random.randint(1, 5)}"

@@ -450,7 +450,7 @@ def generate_auth_log_entry(timestamp=None, operation=None, auth_type=None,
         operation = random.choices(operations, weights=weights)[0]
     
     # Environment and region
-    environment = random.choice(AUTH_ENVIRONMENTS)
+    environment = "AWS"
     region = random.choice(AUTH_REGIONS)
     server = random.choice(AUTH_SERVERS)
     instance_id = f"{server}-{region}-{random.randint(1, 5)}"
