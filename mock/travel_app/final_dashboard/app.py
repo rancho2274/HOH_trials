@@ -476,7 +476,7 @@ def generate_alerts(spike_data):
         #     send_alert_email(alert)
     
     # Sort alerts by severity and time
-    severity_order = {"CRITICAL": 0, "MEDIUM": 1}
+    severity_order = {"CRITICAL": 0, "HIGH": 1,"MEDIUM": 2}
     alerts.sort(key=lambda x: (severity_order.get(x["severity"], 2), -x["response_time"]))
     
     return alerts
@@ -1300,6 +1300,35 @@ def response_times():
     except Exception as e:
         import traceback
         print(f"Error generating response time data: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/error_rates')
+def get_error_rates():
+    """API endpoint to provide error rate data for charts using real forecast system"""
+    try:
+        # Get current directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        travel_app_dir = os.path.dirname(current_dir)  # Go up one level to reach travel_app
+        
+        # Initialize forecasting system
+        forecasting_system = APIForecastingSystem(
+            log_directory=travel_app_dir, 
+            time_window_minutes=None,  # Use all available logs
+            interval_seconds=900  # 15-minute intervals
+        )
+        
+        # Load recent logs and generate forecasts
+        forecasting_system.load_recent_logs()
+        forecasting_system.generate_forecasts(forecast_periods=6)
+        
+        # Get visualization data
+        visualization_data = forecasting_system.get_visualization_data()
+        
+        return jsonify(visualization_data)
+    except Exception as e:
+        import traceback
+        print(f"Error generating forecast data: {str(e)}")
         print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 @app.route('/api/error_rates')

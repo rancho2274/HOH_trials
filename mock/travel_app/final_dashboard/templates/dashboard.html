@@ -7,8 +7,9 @@
   </button>
 </div>
 
-<!-- Response Time Spike Alerts Section - MODIFIED FOR COMPACTNESS -->
-<div id="alerts-container" class="{% if has_alerts %}active{% endif %}" style="margin-bottom: 20px;">
+<!-- Response Time Spike Alerts Section -->
+{% if alerts %}
+<div id="alerts-container" class="active" style="margin-bottom: 20px;">
   <div class="alerts-wrapper">
     <div class="alerts-header">
       <h3><i class="fas fa-exclamation-triangle"></i> Response Time Spike Alerts</h3>
@@ -16,46 +17,39 @@
     </div>
     <div class="alerts-content">
       <div id="alerts-list">
-        {% if alerts %}
-          {% for alert in alerts[:5] %}
-            <div class="alert-item alert-{{ alert.severity|lower }}">
-              <div class="alert-icon">
-                {% if alert.severity == 'CRITICAL' %}
-                  <i class="fas fa-exclamation-circle"></i>
-                {% elif alert.severity == 'HIGH' %}
-                  <i class="fas fa-exclamation-triangle"></i>
-                {% else %}
-                  <i class="fas fa-info-circle"></i>
-                {% endif %}
-              </div>
-              <div class="alert-content">
-                <div class="alert-title">{{ alert.message }}</div>
-                <div class="alert-meta">
-                  <span><i class="fas fa-clock"></i> {{ alert.timestamp }}</span>
-                  <span><i class="fas fa-server"></i> {{ alert.api }}</span>
-                </div>
+        {% for alert in alerts[:3] %}
+          <div class="alert-item alert-{{ alert.severity|lower }}">
+            <div class="alert-icon">
+              {% if alert.severity == 'CRITICAL' %}
+                <i class="fas fa-exclamation-circle"></i>
+              {% elif alert.severity == 'HIGH' %}
+                <i class="fas fa-exclamation-triangle"></i>
+              {% else %}
+                <i class="fas fa-info-circle"></i>
+              {% endif %}
+            </div>
+            <div class="alert-content">
+              <div class="alert-title">{{ alert.message }}</div>
+              <div class="alert-meta">
+                <span><i class="fas fa-clock"></i> {{ alert.timestamp }}</span>
+                <span><i class="fas fa-server"></i> {{ alert.api }}</span>
               </div>
             </div>
-          {% endfor %}
-          
-          {% if alerts|length > 5 %}
-            <div class="alert-more">
-              <button id="show-all-alerts" class="show-more-btn" onclick="location.href='{{ url_for('alerts') }}'">
-                Show {{ alerts|length - 5 }} more alerts...
-              </button>
-            </div>
-          {% endif %}
-        {% else %}
-          <div class="alert-empty">
-            No alerts at this time
+          </div>
+        {% endfor %}
+        
+        {% if alerts|length > 3 %}
+          <div class="alert-more">
+            <button id="show-all-alerts" class="show-more-btn" onclick="location.href='{{ url_for('alerts') }}'">
+              Show {{ alerts|length - 3 }} more alerts...
+            </button>
           </div>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
-
-<!-- Only including the cards section that needs to be modified -->
+{% endif %}
 
 <div class="cards">
   <div class="card">
@@ -65,12 +59,11 @@
   </div>
   <div class="card">
     <h4>Active Issues</h4>
-    <h3 id="active-issues">{{ original_anomaly_count }}</h3>
-    <small id="active-issues-note" class="red">+{{ original_anomaly_count }} from yesterday</small>
+    <h3 id="active-issues">{{ alerts|length if alerts else 0 }}</h3>
+    <small id="active-issues-note" class="red">+{{ alerts|length if alerts else 0 }} from yesterday</small>
   </div>
   <div class="card">
     <h4>Response Time Anomalies</h4>
-    <!-- Changed to show the count of response anomalies instead of average time -->
     <h3 id="avg-response">{{ response_anomaly_count }}</h3>
     <small id="avg-response-note" class="{% if response_anomaly_count > 0 %}red{% else %}green{% endif %}">
       {{ '+' + response_anomaly_count|string if response_anomaly_count > 0 else 'No' }} response anomalies
@@ -97,7 +90,27 @@
     <div class="chart-legend" style="margin-top: 15px; display: flex; justify-content: center; gap: 20px;">
       <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
         <div style="width: 15px; height: 3px; background-color: #0072CE;"></div>
-        <span>Historical Data</span>
+        <span>Auth API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
+        <div style="width: 15px; height: 3px; background-color: #28a745;"></div>
+        <span>Search API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
+        <div style="width: 15px; height: 3px; background-color: #17a2b8;"></div>
+        <span>Booking API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
+        <div style="width: 15px; height: 3px; background-color: #6610f2;"></div>
+        <span>Payment API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
+        <div style="width: 15px; height: 3px; background-color: #fd7e14;"></div>
+        <span>Feedback API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
+        <div style="width: 15px; height: 3px; background-color: #dc3545;"></div>
+        <span>System</span>
       </div>
       <div class="legend-item" style="display: flex; align-items: center; gap: 5px;">
         <div style="width: 15px; height: 3px; background-color: #ED8936; border-top: 1px dashed #ED8936;"></div>
@@ -157,13 +170,14 @@
     const ctx = document.getElementById('forecastChart').getContext('2d');
     
     // Prepare combined dataset from all APIs
-    const apis = ['auth', 'search', 'booking', 'payment', 'feedback'];
+    const apis = ['auth', 'search', 'booking', 'payment', 'feedback', 'system'];
     const colors = {
-      'auth': '#0072CE',     // Blue
-      'search': '#28a745',   // Green
-      'booking': '#17a2b8',  // Teal
-      'payment': '#6610f2',  // Purple
-      'feedback': '#fd7e14'  // Orange
+        'auth': '#0072CE',     // Blue
+        'search': '#28a745',   // Green
+        'booking': '#17a2b8',  // Teal
+        'payment': '#6610f2',  // Purple
+        'feedback': '#fd7e14', // Orange
+        'system': '#dc3545'    // Red - for system error rate
     };
     
     const datasets = [];
@@ -171,146 +185,148 @@
     
     // Add datasets for each API
     apis.forEach(api => {
-      const apiData = data.historical[api];
-      const forecastData = data.forecast ? data.forecast[api] : null;
-      
-      if (apiData && apiData.timestamps && apiData.timestamps.length > 0) {
-        // Historical dataset
-        datasets.push({
-          label: `${api.charAt(0).toUpperCase() + api.slice(1)} API`,
-          data: apiData.error_rates,
-          borderColor: colors[api],
-          backgroundColor: hexToRgba(colors[api], 0.1),
-          borderWidth: 2,
-          fill: false,
-          tension: 0.2
-        });
+        const apiData = data.historical[api];
+        const forecastData = data.forecast ? data.forecast[api] : null;
         
-        // Forecast dataset (if available)
-        if (forecastData && forecastData.timestamps && forecastData.timestamps.length > 0) {
-          // Create array of nulls for historical data points
-          const forecastValues = Array(apiData.timestamps.length).fill(null);
-          
-          // Add the last historical point to connect the lines
-          if (apiData.error_rates.length > 0) {
-            forecastValues[apiData.error_rates.length - 1] = 
-              apiData.error_rates[apiData.error_rates.length - 1];
-          }
-          
-          // Add the forecast points
-          forecastData.error_rates.forEach(rate => {
-            forecastValues.push(rate);
-          });
-          
-          forecastDatasets.push({
-            label: `${api.charAt(0).toUpperCase() + api.slice(1)} Forecast`,
-            data: forecastValues,
-            borderColor: colors[api],
-            backgroundColor: hexToRgba(colors[api], 0.05),
-            borderWidth: 2,
-            borderDash: [5, 5],
-            fill: false,
-            tension: 0.2,
-            hidden: true // Hide forecast lines by default
-          });
+        if (apiData && apiData.timestamps && apiData.timestamps.length > 0) {
+            // Historical dataset
+            datasets.push({
+                label: `${api.charAt(0).toUpperCase() + api.slice(1)} API`,
+                data: apiData.error_rates,
+                borderColor: colors[api],
+                backgroundColor: hexToRgba(colors[api], 0.1),
+                borderWidth: 2,
+                fill: false,
+                tension: 0.2
+            });
+            
+            // Forecast dataset (if available)
+            if (forecastData && forecastData.timestamps && forecastData.timestamps.length > 0) {
+                // Create array of nulls for historical data points
+                const forecastValues = Array(apiData.timestamps.length).fill(null);
+                
+                // Add the last historical point to connect the lines
+                if (apiData.error_rates.length > 0) {
+                    forecastValues[apiData.error_rates.length - 1] = 
+                        apiData.error_rates[apiData.error_rates.length - 1];
+                }
+                
+                // Add the forecast points
+                forecastData.error_rates.forEach(rate => {
+                    forecastValues.push(rate);
+                });
+                
+                forecastDatasets.push({
+                    label: `${api.charAt(0).toUpperCase() + api.slice(1)} Forecast`,
+                    data: forecastValues,
+                    borderColor: colors[api],
+                    backgroundColor: hexToRgba(colors[api], 0.05),
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.2,
+                    hidden: true // Hide forecast lines by default
+                });
+            }
         }
-      }
     });
     
     // Find all unique timestamps from all APIs
     let allTimestamps = [];
     apis.forEach(api => {
-      const apiData = data.historical[api];
-      const forecastData = data.forecast ? data.forecast[api] : null;
-      
-      if (apiData && apiData.timestamps) {
-        apiData.timestamps.forEach(timestamp => {
-          if (!allTimestamps.includes(timestamp)) {
-            allTimestamps.push(timestamp);
-          }
-        });
-      }
-      
-      if (forecastData && forecastData.timestamps) {
-        forecastData.timestamps.forEach(timestamp => {
-          if (!allTimestamps.includes(timestamp)) {
-            allTimestamps.push(timestamp);
-          }
-        });
-      }
+        const apiData = data.historical[api];
+        const forecastData = data.forecast ? data.forecast[api] : null;
+        
+        if (apiData && apiData.timestamps) {
+            apiData.timestamps.forEach(timestamp => {
+                if (!allTimestamps.includes(timestamp)) {
+                    allTimestamps.push(timestamp);
+                }
+            });
+        }
+        
+        if (forecastData && forecastData.timestamps) {
+            forecastData.timestamps.forEach(timestamp => {
+                if (!allTimestamps.includes(timestamp)) {
+                    allTimestamps.push(timestamp);
+                }
+            });
+        }
     });
     
     // Sort timestamps chronologically
     allTimestamps.sort();
     
     // Create the chart with all datasets
-    forecastChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: allTimestamps,
-        datasets: [...datasets, ...forecastDatasets]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Error Rate (%)'
-            },
-            max: 100
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Time'
-            }
-          }
+    const forecastChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: allTimestamps,
+            datasets: [...datasets, ...forecastDatasets]
         },
-        plugins: {
-          legend: {
-            position: 'top',
-            onClick: function(e, legendItem, legend) {
-              const index = legendItem.datasetIndex;
-              const ci = legend.chart;
-              
-              // Toggle the clicked dataset
-              ci.data.datasets[index].hidden = !ci.data.datasets[index].hidden;
-              
-              // If historical dataset is clicked, toggle its corresponding forecast
-              if (index < datasets.length) {
-                const forecastIndex = datasets.length + index;
-                if (forecastIndex < ci.data.datasets.length) {
-                  // Make forecast visibility match historical
-                  ci.data.datasets[forecastIndex].hidden = ci.data.datasets[index].hidden;
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Error Rate (%)'
+                    },
+                    max: 100
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    }
                 }
-              }
-              
-              ci.update();
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    onClick: function(e, legendItem, legend) {
+                        const index = legendItem.datasetIndex;
+                        const ci = legend.chart;
+                        
+                        // Toggle the clicked dataset
+                        ci.data.datasets[index].hidden = !ci.data.datasets[index].hidden;
+                        
+                        // If historical dataset is clicked, toggle its corresponding forecast
+                        if (index < datasets.length) {
+                            const forecastIndex = datasets.length + index;
+                            if (forecastIndex < ci.data.datasets.length) {
+                                // Make forecast visibility match historical
+                                ci.data.datasets[forecastIndex].hidden = ci.data.datasets[index].hidden;
+                            }
+                        }
+                        
+                        ci.update();
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y?.toFixed(2) || 'N/A'}%`;
+                        }
+                    }
+                }
             }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return `${context.dataset.label}: ${context.parsed.y?.toFixed(2) || 'N/A'}%`;
-              }
-            }
-          }
         }
-      }
     });
-  }
-  
-  // Helper function to convert hex color to rgba
-  function hexToRgba(hex, alpha) {
+    
+    return forecastChart;
+}
+
+// Helper function to convert hex color to rgba
+function hexToRgba(hex, alpha) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
     
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  }
+}
 </script>
 
 <style>
