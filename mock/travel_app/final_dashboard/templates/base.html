@@ -25,6 +25,9 @@
     </div>
     <a class="nav-link" href="#"><i class="fas fa-bullseye"></i> Root Prediction</a>
     <a class="nav-link" href="#"><i class="fas fa-exclamation-circle"></i> Root Cause</a>
+    <a class="nav-link {% if request.path == url_for('forecast') %}active{% endif %}" href="{{ url_for('forecast') }}">
+      <i class="fas fa-chart-line"></i> Forecasting
+    </a>
     <a class="nav-link {% if request.path == url_for('alerts') %}active{% endif %}" href="{{ url_for('alerts') }}">
       <i class="fas fa-bell"></i> Alerts
       {% if alerts_count and alerts_count > 0 %}

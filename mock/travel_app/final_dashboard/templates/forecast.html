@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h2>Response Time Forecasting</h2>
+  <button class="refresh-btn" onclick="refreshForecast()">
+    <i class="fas fa-sync-alt"></i> Refresh
+  </button>
+</div>
+
+<!-- Response Time Forecasting Section -->
+<div class="forecast-container" style="margin-top: 30px;">
+  <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 style="margin: 0; color: #00395D; font-size: 20px;">API Response Times</h2>
+    <div class="time-selector" style="display: flex; gap: 10px;">
+      <button onclick="updateChartTimeframe('24h')" class="time-btn active" style="padding: 5px 10px; border: 1px solid #0072CE; background: white; border-radius: 4px; cursor: pointer;">24h</button>
+      <button onclick="updateChartTimeframe('7d')" class="time-btn" style="padding: 5px 10px; border: 1px solid #0072CE; background: white; border-radius: 4px; cursor: pointer;">7d</button>
+    </div>
+  </div>
+  
+  <!-- Debug Info - will be hidden in production -->
+  <div id="debug-info" style="margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6; display: none;">
+    <h4 style="margin-top: 0;">Debug Information</h4>
+    <div id="debug-content"></div>
+  </div>
+  
+  <div class="chart-container" style="background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+    <div class="chart-area" style="height: 400px; position: relative;">
+      <canvas id="responseTimeChart"></canvas>
+      <div id="loading-indicator" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center;">
+        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #0072CE; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite;"></div>
+        <div style="margin-top: 10px;">Loading data...</div>
+      </div>
+      <div id="no-data-message" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; display: none;">
+        <i class="fas fa-exclamation-circle" style="font-size: 40px; color: #6c757d;"></i>
+        <p>No data available to display</p>
+      </div>
+    </div>
+    
+    <div class="chart-legend" style="margin-top: 15px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px; margin: 5px;">
+        <div style="width: 12px; height: 12px; background-color: #0072CE; border-radius: 50%;"></div>
+        <span>Auth API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px; margin: 5px;">
+        <div style="width: 12px; height: 12px; background-color: #28a745; border-radius: 50%;"></div>
+        <span>Search API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px; margin: 5px;">
+        <div style="width: 12px; height: 12px; background-color: #17a2b8; border-radius: 50%;"></div>
+        <span>Booking API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px; margin: 5px;">
+        <div style="width: 12px; height: 12px; background-color: #6610f2; border-radius: 50%;"></div>
+        <span>Payment API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px; margin: 5px;">
+        <div style="width: 12px; height: 12px; background-color: #fd7e14; border-radius: 50%;"></div>
+        <span>Feedback API</span>
+      </div>
+      <div class="legend-item" style="display: flex; align-items: center; gap: 5px; margin: 5px;">
+        <div style="width: 20px; height: 2px; background-color: #dc3545;"></div>
+        <span>Forecast</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Statistics Section -->
+<div class="stats-summary" style="margin-top: 30px; background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+  <h3 style="margin-top: 0; color: #00395D;">Response Time Summary</h3>
+  <div id="stats-content">
+    <p>Loading statistics...</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+<script>
+  // Initialize variables
+  let responseTimeChart = null;
+  let chartData = null;
+  let currentTimeframe = '24h';
+  
+  // Define colors for each API
+  const apiColors = {
+    'auth': '#0072CE',     // Blue
+    'search': '#28a745',   // Green
+    'booking': '#17a2b8',  // Teal
+    'payment': '#6610f2',  // Purple
+    'feedback': '#fd7e14'  // Orange
+  };
+  
+  // Helper function to add debug messages
+  function addDebugMessage(message) {
+    const debugContent = document.getElementById('debug-content');
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    debugContent.appendChild(messageElement);
+    
+    // Show debug panel
+    document.getElementById('debug-info').style.display = 'block';
+  }
+  
+  // When the document is loaded, fetch and display data
+  document.addEventListener('DOMContentLoaded', function() {
+    // Show loading indicator
+    document.getElementById('loading-indicator').style.display = 'flex';
+    
+    // Fetch response time data
+    fetchData();
+    
+    // Set up time period buttons
+    document.querySelectorAll('.time-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  });
+  
+  // Fetch data from the API
+  function fetchData() {
+    // Show loading indicator
+    document.getElementById('loading-indicator').style.display = 'flex';
+    document.getElementById('no-data-message').style.display = 'none';
+    
+    fetch('/api/response_times')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Store the data
+        chartData = data;
+        
+        // Log data for debugging
+        console.log('Response data:', data);
+        addDebugMessage(`Received data with ${Object.keys(data.historical).length} APIs`);
+        
+        // Hide loading indicator
+        document.getElementById('loading-indicator').style.display = 'none';
+        
+        // Check if we have data to display
+        const hasData = Object.values(data.historical).some(api => 
+          api.timestamps && api.timestamps.length > 0);
+          
+        if (hasData) {
+          // Initialize the chart with the data
+          initializeChart(data);
+          // Update statistics
+          updateStatistics(data);
+        } else {
+          // Show no data message
+          document.getElementById('no-data-message').style.display = 'block';
+          addDebugMessage('No data available to display');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        addDebugMessage(`Error: ${error.message}`);
+        
+        // Hide loading indicator and show error message
+        document.getElementById('loading-indicator').style.display = 'none';
+        document.getElementById('no-data-message').style.display = 'block';
+        document.getElementById('no-data-message').innerHTML = `
+          <i class="fas fa-exclamation-circle" style="font-size: 40px; color: #dc3545;"></i>
+          <p>Error loading data: ${error.message}</p>
+        `;
+      });
+  }
+  
+  // Initialize the chart
+  function initializeChart(data) {
+    // Get the canvas element
+    const canvas = document.getElementById('responseTimeChart');
+    const ctx = canvas.getContext('2d');
+    
+    // Destroy previous chart if it exists
+    if (responseTimeChart) {
+      responseTimeChart.destroy();
+    }
+    
+    // Prepare datasets
+    const datasets = [];
+    
+    // Process each API's data
+    for (const apiName in data.historical) {
+      const apiData = data.historical[apiName];
+      
+      // Skip if no data
+      if (!apiData.timestamps || apiData.timestamps.length === 0) {
+        continue;
+      }
+      
+      addDebugMessage(`Processing ${apiName} API with ${apiData.timestamps.length} data points`);
+      
+      // Create the dataset for this API
+      datasets.push({
+        label: `${apiName.charAt(0).toUpperCase() + apiName.slice(1)} API`,
+        data: apiData.response_times.map((value, index) => ({
+          x: index,  // Use index as x-value for simplicity
+          y: value
+        })),
+        backgroundColor: apiColors[apiName] || '#000000',
+        borderColor: apiColors[apiName] || '#000000',
+        fill: false,
+        tension: 0.1,
+        pointRadius: 3,
+        pointHoverRadius: 5
+      });
+      
+      // Add forecast if available
+      if (data.forecast[apiName] && 
+          data.forecast[apiName].response_times && 
+          data.forecast[apiName].response_times.length > 0) {
+        
+        const historicalLength = apiData.response_times.length;
+        const forecastData = data.forecast[apiName].response_times;
+        
+        // Create a combined dataset with historical and forecast
+        const combinedData = [];
+        
+        // Add the last point from historical data as connection point
+        if (historicalLength > 0) {
+          combinedData.push({
+            x: historicalLength - 1,
+            y: apiData.response_times[historicalLength - 1]
+          });
+        }
+        
+        // Add forecast points
+        forecastData.forEach((value, index) => {
+          combinedData.push({
+            x: historicalLength + index,
+            y: value
+          });
+        });
+        
+        // Add forecast dataset
+        datasets.push({
+          label: `${apiName.charAt(0).toUpperCase() + apiName.slice(1)} API Forecast`,
+          data: combinedData,
+          borderColor: apiColors[apiName] || '#000000',
+          borderDash: [5, 5],
+          backgroundColor: 'transparent',
+          fill: false,
+          tension: 0.1,
+          pointRadius: 0
+        });
+      }
+    }
+    
+    // Create the chart
+    responseTimeChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            type: 'linear',
+            position: 'bottom',
+            title: {
+              display: true,
+              text: 'Log Index'
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Response Time (ms)'
+            },
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.1)'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false  // We're using our custom legend
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              title: function(tooltipItems) {
+                return `Log #${tooltipItems[0].parsed.x}`;
+              },
+              label: function(context) {
+                const label = context.dataset.label || '';
+                const value = context.parsed.y || 0;
+                return `${label}: ${value.toFixed(2)} ms`;
+              }
+            }
+          }
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        }
+      }
+    });
+    
+    addDebugMessage('Chart initialized successfully');
+  }
+  
+  // Update timeframe and refresh data
+  function updateChartTimeframe(timeframe) {
+    currentTimeframe = timeframe;
+    addDebugMessage(`Timeframe changed to ${timeframe}`);
+    
+    // In a real application, you would pass the timeframe to the API
+    // For now, we'll just refresh with the same data
+    fetchData();
+  }
+  
+  // Refresh the forecast data
+  function refreshForecast() {
+    addDebugMessage('Manual refresh triggered');
+    fetchData();
+  }
+  
+  // Update statistics section
+  function updateStatistics(data) {
+    const statsContent = document.getElementById('stats-content');
+    let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">';
+    
+    // Process each API
+    for (const apiName in data.historical) {
+      const apiData = data.historical[apiName];
+      
+      // Skip if no data
+      if (!apiData.timestamps || apiData.timestamps.length === 0) {
+        continue;
+      }
+      
+      // Calculate basic statistics
+      const responseTimes = apiData.response_times;
+      const count = responseTimes.length;
+      const min = Math.min(...responseTimes);
+      const max = Math.max(...responseTimes);
+      const avg = responseTimes.reduce((a, b) => a + b, 0) / count;
+      
+      // Format the API name
+      const formattedName = apiName.charAt(0).toUpperCase() + apiName.slice(1);
+      
+      // Add to the HTML
+      html += `
+        <div style="padding: 15px; border-radius: 8px; background-color: #f8f9fa; border-left: 4px solid ${apiColors[apiName] || '#000000'};">
+          <h4 style="margin-top: 0; color: ${apiColors[apiName] || '#000000'};">${formattedName} API</h4>
+          <ul style="list-style-type: none; padding-left: 0; margin-bottom: 0;">
+            <li><strong>Logs:</strong> ${count}</li>
+            <li><strong>Min:</strong> ${min.toFixed(2)} ms</li>
+            <li><strong>Max:</strong> ${max.toFixed(2)} ms</li>
+            <li><strong>Avg:</strong> ${avg.toFixed(2)} ms</li>
+          </ul>
+        </div>
+      `;
+    }
+    
+    html += '</div>';
+    statsContent.innerHTML = html;
+  }
+</script>
+
+<style>
+  .time-btn.active {
+    background-color: #0072CE !important;
+    color: white;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+{% endblock %}

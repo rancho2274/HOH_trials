@@ -1147,7 +1147,155 @@ def dashboard():
                           alerts=combined_stats.get('alerts', []),
                           has_alerts=combined_stats.get('has_alerts', False),
                           forecast_data=combined_stats.get('forecast_data', None))
+# Add this route to your app.py file
+@app.route('/forecast')
+def forecast():
+    """
+    Display the forecasting page with response time trends and predictions
+    """
+    # Process log files and get statistics with spike detection
+    combined_stats = process_log_files_with_spikes()
+    
+    # Pass all required variables to the template
+    return render_template('forecast.html', 
+                          stats=combined_stats['overall'], 
+                          api_stats=combined_stats['api_stats'],
+                          alerts=combined_stats.get('alerts', []),
+                          has_alerts=combined_stats.get('has_alerts', False))
 
+@app.route('/api/response_times')
+def response_times():
+    """API endpoint to provide individual log response time data for charts"""
+    try:
+        # Get current directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        travel_app_dir = os.path.dirname(current_dir)  # Go up one level to reach travel_app
+        
+        # Initialize the response data structure
+        api_response_data = {
+            'metadata': {
+                'response_time_unit': 'milliseconds'
+            },
+            'historical': {},
+            'forecast': {}
+        }
+        
+        # Define the API names to process
+        api_names = ["auth", "search", "booking", "payment", "feedback"]
+        
+        # Process each API's logs
+        for api_name in api_names:
+            # Determine the file path
+            file_path = os.path.join(travel_app_dir, f"{api_name}_interactions.json")
+            if not os.path.exists(file_path):
+                # Create empty data for this API to avoid errors
+                api_response_data['historical'][api_name] = {
+                    'timestamps': [],
+                    'response_times': []
+                }
+                continue
+            
+            # Load the logs
+            try:
+                with open(file_path, 'r') as f:
+                    content = f.read().strip()
+                    if content.startswith('[') and content.endswith(']'):
+                        logs = json.loads(content)
+                    else:
+                        # Handle newline-delimited JSON
+                        logs = []
+                        for line in content.split('\n\n'):
+                            if line.strip():
+                                try:
+                                    logs.append(json.loads(line.strip()))
+                                except json.JSONDecodeError:
+                                    pass
+                
+                # Extract individual log response times
+                timestamps = []
+                response_times = []
+                
+                for log in logs:
+                    try:
+                        # Only include logs with valid response times
+                        if 'response' in log and 'time_ms' in log['response']:
+                            # Format timestamp for display (we don't need full datetime objects)
+                            timestamp = log.get('timestamp', '')
+                            if timestamp:
+                                # Simple formatting to avoid parsing errors
+                                timestamps.append(timestamp)
+                                response_times.append(log['response']['time_ms'])
+                    except Exception as e:
+                        print(f"Error processing log: {str(e)}")
+                        continue
+                
+                # Add to historical data
+                api_response_data['historical'][api_name] = {
+                    'timestamps': timestamps,
+                    'response_times': response_times
+                }
+                
+                # Print debug information
+                print(f"Processed {len(response_times)} logs for {api_name} API")
+                
+                # Only generate forecast if we have enough data points
+                if len(response_times) >= 3:
+                    # Simple linear extrapolation for forecast
+                    try:
+                        # Use the last few points for trend prediction
+                        forecast_points = min(10, len(response_times))
+                        x = list(range(forecast_points))
+                        y = response_times[-forecast_points:]
+                        
+                        # Simple linear regression
+                        n = len(x)
+                        sum_x = sum(x)
+                        sum_y = sum(y)
+                        sum_x_squared = sum(i*i for i in x)
+                        sum_xy = sum(x[i]*y[i] for i in range(n))
+                        
+                        # Calculate slope and intercept
+                        slope = (n * sum_xy - sum_x * sum_y) / (n * sum_x_squared - sum_x * sum_x)
+                        intercept = (sum_y - slope * sum_x) / n
+                        
+                        # Generate future points
+                        future_points = 5
+                        future_timestamps = []
+                        future_response_times = []
+                        
+                        # Simple extrapolation for timestamps
+                        if timestamps:
+                            last_timestamp = timestamps[-1]
+                            # Add some future timestamp format (doesn't need to be precise)
+                            for i in range(1, future_points + 1):
+                                future_timestamps.append(f"Forecast {i}")
+                                # Predict future response time
+                                future_value = intercept + slope * (forecast_points + i - 1)
+                                # Ensure no negative values
+                                future_value = max(0, future_value)
+                                future_response_times.append(future_value)
+                        
+                        # Add to forecast data
+                        api_response_data['forecast'][api_name] = {
+                            'timestamps': future_timestamps,
+                            'response_times': future_response_times
+                        }
+                    except Exception as e:
+                        print(f"Error generating forecast for {api_name}: {str(e)}")
+            except Exception as e:
+                print(f"Error processing file {file_path}: {str(e)}")
+                # Create empty data for this API to avoid errors
+                api_response_data['historical'][api_name] = {
+                    'timestamps': [],
+                    'response_times': []
+                }
+        
+        return jsonify(api_response_data)
+    except Exception as e:
+        import traceback
+        print(f"Error generating response time data: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
 @app.route('/api/error_rates')
 def error_rates():
     """API endpoint to provide error rate data for charts using real forecast system"""
