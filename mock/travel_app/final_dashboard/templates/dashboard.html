@@ -59,8 +59,8 @@
   </div>
   <div class="card">
     <h4>Active Issues</h4>
-    <h3 id="active-issues">{{ alerts|length if alerts else 0 }}</h3>
-    <small id="active-issues-note" class="red">+{{ alerts|length if alerts else 0 }} from yesterday</small>
+    <h3 id="active-issues">{{ original_anomaly_count }}</h3>
+    <small id="active-issues-note" class="red">+{{ original_anomaly_count }} from yesterday</small>
   </div>
   <div class="card">
     <h4>Response Time Anomalies</h4>
@@ -71,7 +71,7 @@
   </div>
   <div class="card">
     <h4>System Health</h4>
-    <h3 id="system-health">{{ (100 - alerts|length * 10)|round|int if alerts else 100 }}%</h3>
+    <h3 id="system-health">{{ (100 - stats.anomaly_percent|default(0))|round }}%</h3>
     <small id="system-health-note" class="{% if alerts %}red{% else %}green{% endif %}">{% if alerts %}-{{ alerts|length * 10 }}% this hour{% else %}No issues{% endif %}</small>
   </div>
 </div>
