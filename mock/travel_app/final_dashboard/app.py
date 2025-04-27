@@ -609,69 +609,69 @@ def add_response_anomaly_to_logs(input_file, result_df, output_folder, api_name)
     
     return output_file
 
-def send_alert_email(alert):
-    """
-    Send an email notification for critical alerts
+# def send_alert_email(alert):
+#     """
+#     Send an email notification for critical alerts
     
-    Args:
-        alert: Dictionary containing alert information
-    """
-    # Email configuration
-    sender_email = "rachitprasad2274@gmail.com"  # Update with your actual email
-    receiver_email = "rachitchandawar40@gmail.com"  # Update with recipient email
-    app_password = "mnxp ykbw rujv eeaz"  # Use an app password for Gmail, not your regular password
+#     Args:
+#         alert: Dictionary containing alert information
+#     """
+#     # Email configuration
+#     sender_email = "rachitprasad2274@gmail.com"  # Update with your actual email
+#     receiver_email = "rachitchandawar40@gmail.com"  # Update with recipient email
+#     app_password = "mnxp ykbw rujv eeaz"  # Use an app password for Gmail, not your regular password
     
-    # Create message
-    message = MIMEMultipart()
-    message["Subject"] = f"CRITICAL ALERT: {alert['api']} API Response Time Spike"
-    message["From"] = sender_email
-    message["To"] = receiver_email
+#     # Create message
+#     message = MIMEMultipart()
+#     message["Subject"] = f"CRITICAL ALERT: {alert['api']} API Response Time Spike"
+#     message["From"] = sender_email
+#     message["To"] = receiver_email
     
-    # Create detailed email body
-    body = f"""
-    <html>
-    <body>
-        <h2 style="color: #c00;">CRITICAL ALERT NOTIFICATION</h2>
+#     # Create detailed email body
+#     body = f"""
+#     <html>
+#     <body>
+#         <h2 style="color: #c00;">CRITICAL ALERT NOTIFICATION</h2>
         
-        <p><strong>API:</strong> {alert['api']}</p>
-        <p><strong>Time:</strong> {alert['timestamp']}</p>
-        <p><strong>Severity:</strong> {alert['severity']}</p>
+#         <p><strong>API:</strong> {alert['api']}</p>
+#         <p><strong>Time:</strong> {alert['timestamp']}</p>
+#         <p><strong>Severity:</strong> {alert['severity']}</p>
         
-        <p><strong>Details:</strong> {alert['details']}</p>
+#         <p><strong>Details:</strong> {alert['details']}</p>
         
-        <p><strong>Response time:</strong> {alert['response_time']}ms</p>
-        <p><strong>Normal average:</strong> {alert.get('normal_avg', 0)}ms</p>
-        <p><strong>Times above normal:</strong> {alert.get('times_avg', 0):.1f}x</p>
+#         <p><strong>Response time:</strong> {alert['response_time']}ms</p>
+#         <p><strong>Normal average:</strong> {alert.get('normal_avg', 0)}ms</p>
+#         <p><strong>Times above normal:</strong> {alert.get('times_avg', 0):.1f}x</p>
         
-        <p style="color: #c00;"><strong>Please investigate this issue immediately.</strong></p>
-    </body>
-    </html>
-    """
+#         <p style="color: #c00;"><strong>Please investigate this issue immediately.</strong></p>
+#     </body>
+#     </html>
+#     """
     
-    # Attach HTML body to email
-    message.attach(MIMEText(body, "html"))
+#     # Attach HTML body to email
+#     message.attach(MIMEText(body, "html"))
     
-    try:
-        # Create server connection with Gmail
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()  # Secure the connection
+#     try:
+#         # Create server connection with Gmail
+#         server = smtplib.SMTP('smtp.gmail.com', 587)
+#         server.starttls()  # Secure the connection
         
-        print(f"Attempting to send email alert to {receiver_email}")
+#         print(f"Attempting to send email alert to {receiver_email}")
         
-        # Login using app password (not regular password)
-        server.login(sender_email, app_password)
+#         # Login using app password (not regular password)
+#         server.login(sender_email, app_password)
         
-        # Send email
-        server.sendmail(sender_email, receiver_email, message.as_string())
-        server.quit()
-        print(f"Email alert successfully sent to {receiver_email}")
-        return True
-    except Exception as e:
-        print(f"Failed to send email alert: {str(e)}")
-        # Print full exception details for debugging
-        import traceback
-        print(traceback.format_exc())
-        return False
+#         # Send email
+#         server.sendmail(sender_email, receiver_email, message.as_string())
+#         server.quit()
+#         print(f"Email alert successfully sent to {receiver_email}")
+#         return True
+#     except Exception as e:
+#         print(f"Failed to send email alert: {str(e)}")
+#         # Print full exception details for debugging
+#         import traceback
+#         print(traceback.format_exc())
+#         return False
 def process_log_files_with_spikes():
    
     # Get regular statistics
